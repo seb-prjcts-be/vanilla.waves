@@ -114,7 +114,8 @@ lezen en de A-tabellen bijwerken.
 
 - **2026-06-29** — baseline vastgelegd op v3.4.0 / `6ce959e` / 34 waves. Geen drift. Verwijderd sinds vorige major: `createGrid`. Toegevoegd: `closing`-group, `period`/`targetPeriod`.
 - **2026-06-29** — `waves-core.js` toegevoegd = canonieke math byte-getrouw (p5-hook eruit, eigen global). Bit-identiek geverifieerd: 1009/1009 parity-checks tegen p5.waves v3.4.0. A1–A4 ✅.
-- **2026-06-29** — `engine.js` ✅ (DOM-loop 30fps + IO-pauze + register/init/destroy + helpers, uit wel.js; pipeline geverifieerd) en `vanilla.waves.js` bundel gegenereerd. **Bib functioneel klaar.** Next: `vanilla.waves_elements` (loader-element eerst). TODO core: `.min.js`-release-artefact.
+- **2026-06-29** — `engine.js` ✅ (DOM-loop 30fps + IO-pauze + register/init/destroy + helpers, uit wel.js; pipeline geverifieerd) en `vanilla.waves.js` bundel gegenereerd. **Bib functioneel klaar.**
+- **2026-06-29** — `.min.js` (terser, 1009/1009 parity) + README + LICENSE + demo `index.html`. **GEPUBLICEERD v0.1.0**: jsDelivr live, GitHub Pages aan (`seb-prjcts-be.github.io/vanilla.waves/`). Next: `vanilla.waves_elements` (loader-element eerst).
 
 ---
 

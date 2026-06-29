@@ -35,4 +35,6 @@ Dit is de **bib/motor** — concrete componenten leven in `vanilla.waves_element
 - 2026-06-29: ✅ `waves-core.js` KLAAR. Vondst: canonieke p5.waves-math is al puur vanilla → port = canonieke kern byte-getrouw, enkel de 8 p5-prototype-regels weg, eigen global (VanillaWaves/vWaves/Waves-drop-in). Bit-identiek geverifieerd (1009/1009 parity-checks tegen v3.4.0).
 - 2026-06-29: ✅ `engine.js` KLAAR (gedeelde rAF-loop 30fps + IO-pauze + register/init/destroy + helpers, uit `wel.js`). Pipeline deterministisch geverifieerd (register→init→create→update→destroy). Augmenteert de VanillaWaves-global; marker = `data-wv`, klasse `wv--ready`.
 - 2026-06-29: ✅ `vanilla.waves.js` gegenereerd (bundel core+engine, niet met de hand bewerken). TODO: `.min.js` als release-artefact.
-- VOLGENDE STAP: **de bib is functioneel klaar** → `vanilla.waves_elements` (eerste element: `loader`, uit `waves-loader.js`). Eventueel eerst git-init + jsDelivr-tag van `vanilla.waves`.
+- 2026-06-29: ✅ `.min.js` gegenereerd (terser, bit-identiek geverifieerd 1009/1009). README + LICENSE (MIT) + live demo `index.html` toegevoegd.
+- 2026-06-29: ✅ GEPUBLICEERD — repo `github.com/seb-prjcts-be/vanilla.waves`, tag **v0.1.0**. jsDelivr live (HTTP 200): `cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js`. GitHub Pages aan: `seb-prjcts-be.github.io/vanilla.waves/`. Dialect-baseline p5.waves v3.4.0.
+- VOLGENDE STAP: `vanilla.waves_elements` (eerste element: `loader`, uit `waves-loader.js`), gebouwd op de gepubliceerde engine.
