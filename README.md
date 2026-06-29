@@ -108,7 +108,8 @@ The shared loop calls your `update` every frame; offscreen elements pause.
       });
     }
   });
-  // auto-inits on DOMContentLoaded; call VanillaWaves.init() again after adding nodes
+  // auto-inits on DOMContentLoaded. Register types BEFORE that, or call
+  // VanillaWaves.init() again after registering types / adding nodes.
 </script>
 ```
 
@@ -117,6 +118,12 @@ When the work is done (e.g. content finished loading), stop and clean up:
 ```js
 VanillaWaves.destroy(myElement);   // or a selector, NodeList, or nothing for all
 ```
+
+`destroy` removes **only the nodes your `create` added** (pre-existing author
+content is left intact), runs your optional `destroy(state, node)` disposer if
+you defined one, restores `aria-hidden`, and stops the shared loop once the last
+element is gone — so `destroy()` followed by `init()` re-renders cleanly instead
+of duplicating children.
 
 ---
 
@@ -153,19 +160,26 @@ VanillaWaves.destroy(myElement);   // or a selector, NodeList, or nothing for al
 
 | Call | Does |
 |---|---|
-| `VanillaWaves.register(name, { create, update? })` | define an element type |
+| `VanillaWaves.register(name, { create, update?, destroy? })` | define an element type |
 | `VanillaWaves.init(target?)` | wire up `[data-wv]` (or a selector / element / NodeList) |
 | `VanillaWaves.destroy(target?)` | stop and clean up |
 
 `create(node, opts, helpers)` returns your state object; `update(state, t)`
-mutates the DOM each frame. **Helpers:** `makeSampler(extra?)` (a sampler with
-element-friendly defaults), `norm(v)` (maps about [-1,1] to [0,1]),
-`num(v, default)`, `el(tag, class?)`.
+mutates the DOM each frame; optional `destroy(state, node)` releases any
+resources you allocated (timers, listeners). **Helpers:** `makeSampler(extra?)`
+(a sampler with element-friendly defaults), `norm(v)` (maps about [-1,1] to
+[0,1]), `num(v, default)`, `el(tag, class?)`.
 
 **Conventions:** marker attribute `data-wv`, ready class `wv--ready`, shared loop
 at 30 fps, `data-*` attributes become `opts`, `data-speed` scales time. CSS
 class and element names use a `wv-` prefix, never dots (`p5.waves.loader` is not
 a valid selector).
+
+**Accessibility & seeds.** Decorative elements get `aria-hidden="true"`
+automatically. If a `data-wv` element carries meaning, opt out with
+`data-decorative="false"` (or set your own `aria-hidden`) and the engine leaves
+it alone. `data-seed` may be any string — non-numeric seeds are hashed to a
+stable start offset, so they animate just like numeric ones.
 
 ---
 
@@ -185,11 +199,18 @@ Dialect baseline: **p5.waves v3.4.0** (commit `6ce959e`, 34 waves).
 ```
 waves-core.js        the math (zero-dep port of p5.waves)
 engine.js            the DOM engine (shared loop, register/init/destroy)
+build.mjs            regenerates the two bundles from the sources
 vanilla.waves.js     generated bundle (core + engine, readable)
 vanilla.waves.min.js generated bundle, minified, the CDN artifact
 docs/waves.feature.md port-coverage + drift-watch changedoc
 index.html           live demos
 ```
+
+**Build.** The two `vanilla.waves(.min).js` files are generated — never edit them
+by hand. Change `waves-core.js` or `engine.js`, then run `node build.mjs` (uses
+`terser` via `npx`; no runtime dependencies). The build only concatenates +
+minifies; it never alters the math, so parity with the canonical p5.waves core
+is preserved by construction.
 
 The element library (loaders, controls, draggables) lives in a separate
 package, **vanilla.waves_elements**, built on this engine.
