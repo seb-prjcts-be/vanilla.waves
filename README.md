@@ -1,24 +1,24 @@
 # vanilla.waves
 
 **The wave dialect, without p5 and without a canvas.** A zero-dependency,
-vanilla-JS port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) — the
+vanilla-JS port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves): the
 same `wave()` / `createSampler()` math, plus a tiny DOM engine that drives plain
 HTML elements instead of a `<canvas>`.
 
 ```
-p5.waves        → the dialect for p5.js / canvas
-processing.waves → the dialect for Processing / Java
-vanilla.waves   → the dialect for plain DOM/CSS, zero dependencies   ← you are here
+p5.waves         the dialect for p5.js / canvas
+processing.waves the dialect for Processing / Java
+vanilla.waves    the dialect for plain DOM/CSS, zero dependencies   (you are here)
 ```
 
-- 🪶 **Zero dependencies.** No p5, no canvas, no build step. One `<script>`.
-- 🎯 **Bit-identical math.** The sampler returns the *exact same numbers* as
-  p5.waves v3.4.0 — verified across 1009 parity checks (all 34 waves, morph,
+- **Zero dependencies.** No p5, no canvas, no build step. One `<script>`.
+- **Bit-identical math.** The sampler returns the exact same numbers as
+  p5.waves v3.4.0, verified across 1009 parity checks (all 34 waves, morph,
   range, wild, sampler).
-- 🧩 **DOM engine included.** Register an element type, mark it with
-  `data-wv`, and one shared 30 fps loop animates it — offscreen elements pause
+- **DOM engine included.** Register an element type, mark it with `data-wv`,
+  and one shared 30 fps loop animates it; offscreen elements pause
   automatically.
-- ♿ **Respects `prefers-reduced-motion`** — renders one static frame instead of
+- **Respects `prefers-reduced-motion`:** renders one static frame instead of
   animating.
 
 ---
@@ -26,27 +26,27 @@ vanilla.waves   → the dialect for plain DOM/CSS, zero dependencies   ← you a
 ## Why this exists
 
 The p5.waves *math* never actually needed p5. Look at the source: `wave()`,
-`createSampler()`, the 34 wave formulas, the seeded shift/morph engine — all of
+`createSampler()`, the 34 wave formulas, the seeded shift/morph engine, all of
 it is pure `Math.*`. The only p5 touchpoint is an 8-line prototype hook at the
 bottom of the file.
 
 `vanilla.waves` is that canonical core, byte-for-byte, with the p5 hook removed
-and a DOM engine bolted on. So you get the full wave dialect — the same
-breathing, shifting, morphing motion — to drive **loaders, backgrounds, text
+and a DOM engine bolted on. So you get the full wave dialect, the same
+breathing, shifting, morphing motion, to drive **loaders, backgrounds, text
 fields, meters, any DOM element**, with nothing else loaded.
 
 ---
 
 ## Install
 
-### CDN (jsDelivr) — one tag, everything
+### CDN (jsDelivr): one tag, everything
 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"></script>
 ```
 
-That bundle is `waves-core.js` (the math) + `engine.js` (the DOM loop). Want just
-the math? Load `waves-core.js` on its own.
+That bundle is `waves-core.js` (the math) plus `engine.js` (the DOM loop). Want
+just the math? Load `waves-core.js` on its own.
 
 ### Local
 
@@ -63,7 +63,7 @@ to your HTML and point a `<script>` at it. No npm, no bundler.
 present) exposes the dialect:
 
 ```js
-// one value in, one value out — always a number
+// one value in, one value out: always a number
 VanillaWaves.wave(x, { wave: 'mountain peaks', t: performance.now() / 1000, amplitude: 80 });
 
 // a reusable sampler (cheaper for many calls per frame)
@@ -72,7 +72,7 @@ s.sample(x, t);          // position + time
 s.waveName;              // "mountain peaks"  (live getter)
 ```
 
-Drive any DOM property with it — a bar height, a hue, a transform:
+Drive any DOM property with it: a bar height, a hue, a transform:
 
 ```js
 const s = VanillaWaves.createSampler({ seed: 13, range: [0, 100] });
@@ -102,7 +102,7 @@ The shared loop calls your `update` every frame; offscreen elements pause.
     },
     update(state, t) {                              // every frame
       state.bars.forEach((b, i) => {
-        // sampler → [0,1] via the norm() helper, mapped to a scaleY
+        // sampler value mapped to a scaleY
         const v = 0.1 + state.sampler.sample(i * 0.5, t) * 0.9;
         b.style.transform = 'scaleY(' + v.toFixed(3) + ')';
       });
@@ -129,24 +129,25 @@ VanillaWaves.destroy(myElement);   // or a selector, NodeList, or nothing for al
 | `VanillaWaves.wave(y)` | default wave, frozen |
 | `VanillaWaves.wave(y, 3)` | **seed** 3 (hashed to a wave) |
 | `VanillaWaves.wave(y, 'triangle')` | wave by name |
-| `VanillaWaves.wave(y, { … })` | full options (below) |
-| `VanillaWaves.createSampler({ … })` | a sampler object |
+| `VanillaWaves.wave(y, { ... })` | full options (below) |
+| `VanillaWaves.createSampler({ ... })` | a sampler object |
 | `VanillaWaves.list()` / `.count` / `.data` | discover the 34 waves at runtime |
 
 **Options** (all optional): `wave` (name / index / `[a,b]` to morph), `t`,
 `amplitude` (default 100), `range` `[min,max]` (overrides amplitude),
 `frequency` (1), `phase` (0), `seed` (0), `mode` `'stable'`/`'wild'`,
-`unpredictability` (0–1, wild only), `mix` (0–1, for morph), `shift` (bool),
+`unpredictability` (0..1, wild only), `mix` (0..1, for morph), `shift` (bool),
 `group` `'gentle'`/`'harsh'`/`'closing'`/`'all'`/array, `shiftInterval` (3),
 `shiftDuration` (1).
 
-**Sampler:** `sample(y)` · `sample(y, t)` · `sample(y, t, mix)`. Live getters:
+**Sampler:** `sample(y)`, `sample(y, t)`, `sample(y, t, mix)`. Live getters:
 `waveName`, `targetName`, `shifting`, `mix`, `period`, `targetPeriod`.
 
-> ⚠️ `shift` is **not** deterministic across page loads — a per-session random
-> offset is mixed in, so the same `seed` yields a different wave *sequence* on
-> every reload (identical within one session). This is faithful to p5.waves and
-> intentional: the per-load variation is richer than a fixed sequence.
+> **Note:** `shift` is **not** deterministic across page loads. A per-session
+> random offset is mixed in, so the same `seed` yields a different wave
+> *sequence* on every reload (identical within one session). This is faithful to
+> p5.waves and intentional: the per-load variation is richer than a fixed
+> sequence.
 
 ### Engine (vanilla.waves only)
 
@@ -154,21 +155,21 @@ VanillaWaves.destroy(myElement);   // or a selector, NodeList, or nothing for al
 |---|---|
 | `VanillaWaves.register(name, { create, update? })` | define an element type |
 | `VanillaWaves.init(target?)` | wire up `[data-wv]` (or a selector / element / NodeList) |
-| `VanillaWaves.destroy(target?)` | stop & clean up |
+| `VanillaWaves.destroy(target?)` | stop and clean up |
 
 `create(node, opts, helpers)` returns your state object; `update(state, t)`
 mutates the DOM each frame. **Helpers:** `makeSampler(extra?)` (a sampler with
-element-friendly defaults), `norm(v)` (~[-1,1] → [0,1]), `num(v, default)`,
-`el(tag, class?)`.
+element-friendly defaults), `norm(v)` (maps about [-1,1] to [0,1]),
+`num(v, default)`, `el(tag, class?)`.
 
 **Conventions:** marker attribute `data-wv`, ready class `wv--ready`, shared loop
-at 30 fps, `data-*` attributes become `opts`, `data-speed` scales time.
-CSS class/element names use a `wv-` prefix — never dots (`p5.waves.loader` is not
+at 30 fps, `data-*` attributes become `opts`, `data-speed` scales time. CSS
+class and element names use a `wv-` prefix, never dots (`p5.waves.loader` is not
 a valid selector).
 
 ---
 
-## Parity & drift
+## Parity and drift
 
 `waves-core.js` is the canonical `p5.waves.js` math with only the p5 prototype
 hook removed. It tracks p5.waves as the source of truth; a weekly drift-watch
@@ -185,7 +186,7 @@ Dialect baseline: **p5.waves v3.4.0** (commit `6ce959e`, 34 waves).
 waves-core.js        the math (zero-dep port of p5.waves)
 engine.js            the DOM engine (shared loop, register/init/destroy)
 vanilla.waves.js     generated bundle (core + engine, readable)
-vanilla.waves.min.js generated bundle, minified — the CDN artifact
+vanilla.waves.min.js generated bundle, minified, the CDN artifact
 docs/waves.feature.md port-coverage + drift-watch changedoc
 index.html           live demos
 ```
@@ -197,4 +198,4 @@ package, **vanilla.waves_elements**, built on this engine.
 
 ## License
 
-MIT © Sebastien Vanblaere ([seb@prjcts](https://github.com/seb-prjcts-be))
+MIT, Sebastien Vanblaere ([seb@prjcts](https://github.com/seb-prjcts-be))
