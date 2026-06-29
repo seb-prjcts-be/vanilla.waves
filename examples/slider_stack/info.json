@@ -1,0 +1,8 @@
+{
+  "name": "Slider Stack",
+  "slug": "slider_stack",
+  "type": "sliders",
+  "description": "Native input type=range controls whose value is the wave.",
+  "library": "vanilla.waves",
+  "version": "0.1.0"
+}

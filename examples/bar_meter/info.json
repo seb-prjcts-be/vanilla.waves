@@ -1,0 +1,8 @@
+{
+  "name": "Bar Meter",
+  "slug": "bar_meter",
+  "type": "eq",
+  "description": "A real equalizer: each span bar is one sample of a shifting wave.",
+  "library": "vanilla.waves",
+  "version": "0.1.0"
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bar Meter — vanilla.waves</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../docs/style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo">vanilla.<span>waves</span></div>
+    <ul class="nav-links">
+      <li><a href="../../index.html">Showcase</a></li>
+      <li><a href="../../docs/examples.html" class="active">Examples</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <div class="ex-page-header">
+    <div class="section-tag" style="margin-bottom:0.6rem">shift: true</div>
+    <h1>Bar Meter</h1>
+    <p>A real equalizer: each &lt;span&gt; bar is one sample of a shifting wave.</p>
+  </div>
+
+  <section class="section" style="padding-top:0;">
+    <div class="ex-preview" style="max-width:760px;">
+      <div class="ex-canvas" style="min-height:360px;">
+        <div class="wv-stage">
+          <div class="wv-label"><span>data-wv="eq"</span><b data-wv-name>&mdash;</b></div>
+          <div class="wv-eq" data-wv="eq" data-count="40" data-seed="13"></div>
+        </div>
+      </div>
+      <div class="ex-links">
+        <a class="ex-full-link" href="../../docs/examples.html">&lt;- all examples</a>
+        <a class="ex-full-link" href="../../docs/examples.js" target="_blank">renderer source -&gt;</a>
+      </div>
+      <p class="section-desc" style="font-size:0.82rem;">
+        This page loads <code>vanilla.waves.min.js</code> + <code>docs/examples.js</code> and drops a single
+        <code>&lt;div data-wv="eq"&gt;</code>. The shared engine auto-wires it &mdash; no per-page script.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Built with <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank">vanilla.waves</a> — plain DOM, zero dependencies.</p>
+    <p class="footer-sub">MIT License &middot; v0.1.0</p>
+  </footer>
+
+  <script src="../../vanilla.waves.min.js"></script>
+  <script src="../../docs/examples.js"></script>
+</body>
+</html>

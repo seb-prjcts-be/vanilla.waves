@@ -1,0 +1,385 @@
+/* ============================================================
+   vanilla.waves Showcase — Sober B&W, Oswald titles.
+   Canon-identical chrome to p5.waves / processing.waves
+   (same dialect, different runtime). The ONLY colour lives
+   inside the DOM elements themselves — never in the chrome.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+
+:root {
+  --bg:          #f5f5f5;
+  --bg2:         #eeeeee;
+  --bg3:         #e4e4e4;
+  --surface:     #ffffff;
+  --border:      rgba(0, 0, 0, 0.1);
+  --border-mid:  rgba(0, 0, 0, 0.2);
+  --border-hard: rgba(0, 0, 0, 0.7);
+  --text:        #111111;
+  --text-muted:  #666666;
+  --text-faint:  #999999;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── TYPOGRAPHY ── */
+h1, h2, h3, .nav-logo, .stat-num, .cta-btn, .hero-badge {
+  font-family: 'Oswald', sans-serif;
+}
+
+/* ── NAV ── */
+#navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 2.5rem;
+  background: rgba(245, 245, 245, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-mid);
+}
+
+.nav-logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.nav-logo span { color: #000; border-bottom: 2px solid #000; }
+
+.nav-links { display: flex; list-style: none; gap: 2rem; }
+
+.nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 400;
+  transition: color 0.15s;
+}
+
+.nav-links a:hover { color: #000; }
+.nav-links a.active {
+  color: #000;
+  border-bottom: 2px solid #000;
+  padding-bottom: 2px;
+}
+
+#hero, .section, footer { position: relative; z-index: 1; }
+
+/* ── HERO ── */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 6rem 2rem 4rem;
+}
+
+.hero-text { text-align: center; max-width: 720px; }
+
+.hero-badge {
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border: 1px solid var(--border-hard);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.hero-text h1 {
+  font-size: clamp(3.5rem, 11vw, 8rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: #000;
+  margin-bottom: 1.2rem;
+}
+
+.hero-sub {
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+  font-weight: 400;
+}
+
+/* Hero stage: a live wall of wave-driven DOM, not a canvas */
+.hero-stage {
+  width: 100%;
+  margin: 0 auto 2.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  height: 120px;
+}
+
+.cta-btn {
+  display: inline-block;
+  padding: 0.8rem 2.5rem;
+  background: #000;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.cta-btn:hover { background: #333; }
+.cta-btn.ghost { background: #fff; color: #000; border: 1px solid var(--border-hard); }
+.cta-btn.ghost:hover { background: #000; color: #fff; }
+
+/* ── SECTIONS ── */
+.section { padding: 6rem 2rem; }
+
+.section-dark {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.section-header { text-align: center; max-width: 680px; margin: 0 auto 3rem; }
+
+.section-tag {
+  display: inline-block;
+  padding: 0.2rem 0.8rem;
+  border: 1px solid var(--border-mid);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-family: 'Consolas', monospace;
+  margin-bottom: 1rem;
+}
+
+.section-header h2 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #000;
+  margin-bottom: 1rem;
+}
+
+.section-header p { color: var(--text-muted); line-height: 1.7; font-size: 0.97rem; }
+.section-header p code,
+.ex-page-header p code { font-family: 'Courier New', monospace; background: #e9e9e9; padding: 0.1em 0.35em; font-size: 0.9em; }
+
+.accent { color: #000; }
+
+/* ── CODE PREVIEW (Prism Atom One Light) ── */
+.code-preview, .ex-code-block {
+  background: #faf8f3;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+}
+.code-preview code, .ex-code-block code {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: #111;
+  background: transparent;
+  white-space: pre-wrap;
+  line-height: 1.65;
+}
+.ex-code-block { white-space: pre; overflow-x: auto; }
+
+.token.comment    { color: #A0A1A7; font-style: italic; }
+.token.keyword    { color: #A626A4; }
+.token.string     { color: #50A14F; }
+.token.number,
+.token.boolean    { color: #986801; }
+.token.function   { color: #4078F2; }
+.token.class-name { color: #C18401; }
+.token.property   { color: #E45649; }
+.token.operator,
+.token.punctuation { color: #383A42; }
+
+/* ── EXAMPLES PAGE ── */
+.ex-page-header { max-width: 1100px; margin: 0 auto; padding: 7rem 2rem 3rem; text-align: center; }
+.ex-page-header h1 { font-family: 'Oswald', sans-serif; font-size: 2.8rem; margin-bottom: 0.6rem; }
+.ex-page-header > p { max-width: 640px; margin: 0 auto 2rem; line-height: 1.7; color: var(--text-muted); }
+
+.ex-lab-card {
+  display: inline-block;
+  text-align: left;
+  text-decoration: none;
+  border: 1px solid var(--border-hard);
+  background: #000;
+  color: #fff;
+  padding: 1.2rem 1.6rem;
+  max-width: 420px;
+  transition: background 0.15s;
+}
+.ex-lab-card:hover { background: #1a1a1a; }
+.ex-lab-card .section-tag { color: #777; border-color: #444; margin-bottom: 0.4rem; }
+.ex-lab-card strong { display: block; font-family: 'Oswald', sans-serif; font-size: 1.15rem; letter-spacing: .04em; margin-bottom: 0.35rem; color: #fff; }
+.ex-lab-card p { font-size: 0.84rem; color: #999; margin: 0; line-height: 1.5; }
+
+.ex-preview { display: flex; flex-direction: column; align-items: stretch; gap: 12px; max-width: 560px; margin: 0 auto; }
+.ex-links { display: flex; gap: 1.5rem; }
+.ex-full-link {
+  display: inline-block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-mid);
+  transition: color 0.15s, border-color 0.15s;
+}
+.ex-full-link:hover { color: #000; border-color: #000; }
+
+/* The DOM stage that replaces p5's canvas */
+.ex-canvas {
+  background: var(--bg);
+  border: 1px solid var(--border-mid);
+  width: 100%;
+  min-height: 220px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.section-dark .ex-canvas { background: var(--bg2); }
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 3rem 2rem;
+  border-top: 1px solid var(--border-mid);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.9;
+}
+footer a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+footer a:hover { color: #000; }
+.footer-sub { font-size: 0.75rem; color: var(--text-faint); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #aaa; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
+
+section[id] { scroll-margin-top: 62px; }
+
+/* ── HAMBURGER ── */
+.nav-hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; z-index: 101; }
+.nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: transform 0.2s, opacity 0.2s; }
+#navbar.nav-open .nav-hamburger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+#navbar.nav-open .nav-hamburger span:nth-child(2) { opacity: 0; }
+#navbar.nav-open .nav-hamburger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ════════════════════════════════════════════════════════════
+   ELEMENT LAYER — the recognizable DOM elements, wave-driven.
+   Prefix wv-. Colour is allowed HERE (inside the elements),
+   never in the page chrome. Seed for vanilla.waves_elements.
+   ════════════════════════════════════════════════════════════ */
+
+/* live-label strip shown above many demos */
+.wv-stage { width: 100%; display: flex; flex-direction: column; gap: 0.9rem; align-items: stretch; }
+.wv-label {
+  font-family: 'Consolas', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  display: flex; justify-content: space-between; gap: 1rem;
+}
+.wv-label b { color: #000; font-weight: 500; }
+
+/* bar meter (equalizer of real divs) */
+.wv-eq { display: flex; align-items: flex-end; gap: 4px; height: 140px; width: 100%; }
+.wv-eq span { flex: 1; height: 100%; background: #000; transform-origin: bottom; transform: scaleY(0.1); display: block; }
+
+/* checkbox field — a grid of native checkboxes thresholded by two samplers */
+.wv-checks { display: grid; gap: 4px; width: 100%; }
+.wv-checks input[type="checkbox"] { width: 100%; height: 18px; accent-color: #000; margin: 0; cursor: default; }
+
+/* slider stack — native range inputs whose value is wave-driven */
+.wv-sliders { display: flex; flex-direction: column; gap: 0.55rem; width: 100%; }
+.wv-sliders .row { display: grid; grid-template-columns: 2.2rem 1fr 2.6rem; align-items: center; gap: 0.6rem; }
+.wv-sliders label { font-family: 'Consolas', monospace; font-size: 0.7rem; color: var(--text-muted); }
+.wv-sliders input[type="range"] { width: 100%; accent-color: #000; cursor: default; }
+.wv-sliders output { font-family: 'Consolas', monospace; font-size: 0.7rem; color: #000; text-align: right; }
+
+/* progress morph — rows of native <progress> bars */
+.wv-progress { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
+.wv-progress .row { display: grid; grid-template-columns: 5.5rem 1fr; align-items: center; gap: 0.7rem; }
+.wv-progress label { font-family: 'Consolas', monospace; font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wv-progress progress { width: 100%; height: 12px; accent-color: #000; }
+.wv-progress progress { -webkit-appearance: none; appearance: none; }
+.wv-progress progress::-webkit-progress-bar { background: #e0e0e0; }
+.wv-progress progress::-webkit-progress-value { background: #000; }
+.wv-progress progress::-moz-progress-bar { background: #000; }
+
+/* glyph field — a monospace flow field of ASCII directions */
+.wv-glyphs {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 16px; line-height: 1.05; letter-spacing: 0.18em;
+  white-space: pre; color: #000; user-select: none;
+}
+
+/* radial loader — dots placed around a ring via transform */
+.wv-ring { position: relative; width: 180px; height: 180px; }
+.wv-ring span { position: absolute; top: 50%; left: 50%; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: #000; display: block; }
+
+/* text loader — 4x4 character grid from wave density */
+.wv-load { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); width: 120px; height: 120px; }
+.wv-load span { display: flex; align-items: center; justify-content: center; font-family: 'Consolas', monospace; font-size: 30px; line-height: 1; }
+
+/* chip walkers — small badges that move by wave velocity */
+.wv-walk { position: relative; width: 100%; height: 200px; overflow: hidden; }
+.wv-walk .chip {
+  position: absolute; top: 0; left: 0;
+  font-family: 'Consolas', monospace; font-size: 0.7rem;
+  padding: 0.15rem 0.5rem; border: 1px solid #000; background: #fff; color: #000;
+  white-space: nowrap; will-change: transform;
+}
+
+/* one-number row — same wave drives size, position, colour of real buttons */
+.wv-trio { display: flex; flex-direction: column; gap: 1.1rem; width: 100%; }
+.wv-trio .lane { display: flex; align-items: center; justify-content: space-between; gap: 6px; height: 40px; }
+.wv-trio .lane .cap { font-family: 'Consolas', monospace; font-size: 0.65rem; color: var(--text-faint); width: 4rem; flex-shrink: 0; }
+.wv-trio button { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.08em; border: 1px solid #000; background: #000; color: #fff; padding: 0.3rem 0.6rem; font-size: 0.7rem; cursor: default; }
+.wv-trio .dot { width: 14px; height: 14px; border-radius: 50%; background: #000; flex-shrink: 0; }
+
+.wv--ready { opacity: 1; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .nav-hamburger { display: flex; }
+  .nav-links {
+    display: none;
+    position: fixed; top: 52px; left: 0; right: 0;
+    flex-direction: column; gap: 0;
+    background: rgba(245, 245, 245, 0.97);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-mid);
+    padding: 0.5rem 0 1rem;
+  }
+  #navbar.nav-open .nav-links { display: flex; }
+  .nav-links a { display: block; padding: 0.75rem 2rem; font-size: 0.9rem; }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Glyph Field",
+  "slug": "glyph_field",
+  "type": "glyphs",
+  "description": "A flow field of / - | \ characters in a single text node, picked per cell by one sampler.",
+  "library": "vanilla.waves",
+  "version": "0.1.0"
+}
