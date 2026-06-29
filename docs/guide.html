@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide — vanilla.waves</title>
+  <meta name="description" content="vanilla.waves guide — the wave dialect for plain DOM. One number out, point it at any element. Declarative data-wv or imperative createSampler.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo">vanilla.<span>waves</span></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Showcase</a></li>
+      <li><a href="../index.html#elements">Elements</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="guide.html" class="active">Guide</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <div class="guide-wrap">
+
+    <div class="section-tag" style="margin-bottom:0.6rem">DOM port of p5.waves · v0.1.0</div>
+    <h1>vanilla.<span class="accent">waves</span> Guide</h1>
+    <p class="guide-intro">
+      You give it a number. It gives you a number back.<br>
+      Same idea as p5.waves — only here you point that number at an element, not a pixel. No p5, no canvas.
+    </p>
+
+    <!-- INSTALL -->
+    <h2>Install</h2>
+    <p>One script tag. No npm, no build step, zero dependencies.</p>
+    <pre class="code-block"><code>&lt;script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"&gt;&lt;/script&gt;</code></pre>
+    <p>That one file is the whole library: the wave <strong>math</strong> (a byte-identical port of p5.waves — 1009/1009 parity checks against v3.4.0) plus a tiny DOM <strong>engine</strong> (one shared 30&nbsp;fps loop, offscreen pause, reduced-motion support). It exposes a global <code>VanillaWaves</code> (alias <code>vWaves</code>, and <code>Waves</code> if nothing else claimed it).</p>
+
+    <!-- FIRST ELEMENT -->
+    <h2>Your First Element</h2>
+    <p>The declarative path: drop an element with a <code>data-wv</code> type. The engine scans the page on load and wires it up — no code of your own.</p>
+    <pre class="code-block"><code>&lt;div class="wv-eq" data-wv="eq" data-count="24"&gt;&lt;/div&gt;</code></pre>
+    <p>You'll see a row of bars whose heights ride a wave that morphs every few seconds. <code>data-wv</code> names the element type; any other <code>data-*</code> attribute is passed to that type as an option.</p>
+    <div class="callout"><p>The built-in demo types (<code>eq</code>, <code>sliders</code>, <code>progress</code>, <code>checks</code>, <code>glyphs</code>, <code>ring</code>, <code>load</code>, <code>walk</code>, <code>trio</code>) live in <code>docs/examples.js</code> — the prototype catalog for the upcoming <code>vanilla.waves_elements</code> CDN. The core library ships the math + engine; you register the element types (or load that catalog).</p></div>
+
+    <!-- TWO WAYS -->
+    <h2>Two Ways to Use It</h2>
+    <p>Declarative for decoration, imperative for control. Both call the exact same math.</p>
+
+    <h3>1 — Imperative: drive any property yourself</h3>
+    <p>Make a sampler once, then read a number out of it inside your own loop. This is the heart of the library — the rest is sugar.</p>
+    <pre class="code-block"><code>const s = VanillaWaves.createSampler({ shift: true, range: [-50, 50] });
+
+function frame(t) {
+  // t is whatever number you pass — seconds, scroll, anything
+  box.style.transform = 'translateY(' + s.sample(0, t) + 'px)';
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);</code></pre>
+
+    <h3>2 — Declarative: register a type, let the engine drive it</h3>
+    <p>Tell the engine how to build and update an element type; it handles the loop, the timing, the offscreen pause.</p>
+    <pre class="code-block"><code>VanillaWaves.register('nudge', {
+  create(node, opts, h) {
+    return { sampler: h.makeSampler({ range: [-50, 50] }) };
+  },
+  update(state, t) {
+    node.style.transform = 'translateY(' + state.sampler.sample(0, t) + 'px)';
+  }
+});
+// then: &lt;div data-wv="nudge"&gt;&lt;/div&gt;  — auto-wired on load</code></pre>
+
+    <!-- WHAT CAN A NUMBER DRIVE -->
+    <h2>What Can a Number Drive?</h2>
+    <p>Anything in the DOM that takes a number. A few ideas:</p>
+    <pre class="code-block"><code>// position
+el.style.transform = 'translateX(' + s.sample(0, t) + 'px)';
+
+// opacity
+el.style.opacity = VanillaWaves.wave(i, { wave: 'pulse', range: [0.2, 1] });
+
+// a real form control's value
+range.value = VanillaWaves.wave(i, { wave: 'sine', range: [0, 100] });
+
+// colour channel
+const g = VanillaWaves.wave(x, { wave: 'meta sine', range: [0, 255] });
+swatch.style.background = `rgb(${g},${g},${g})`;
+
+// text content
+cell.textContent = ramp[Math.floor(VanillaWaves.wave(i, { range: [0, ramp.length - 1] }))];</code></pre>
+    <p>If a property accepts a number, a wave can drive it.</p>
+
+    <!-- OPTIONS -->
+    <h2>The Options</h2>
+    <p>Both <code>VanillaWaves.wave(y, opts)</code> and <code>createSampler(opts)</code> take these. Start with the top three.</p>
+
+    <h3>Start here</h3>
+    <table class="opts-table">
+      <tr><th>Option</th><th>What it does</th><th>Default</th></tr>
+      <tr><td><code>wave</code></td><td>Which shape. A name like <code>'sine'</code>, an index like <code>9</code>, or a blend: <code>['sine', 'triangle']</code>.</td><td>random</td></tr>
+      <tr><td><code>t</code></td><td>Time. Makes it move. Any number — seconds, scroll offset, whatever. No <code>t</code> = frozen.</td><td><code>0</code></td></tr>
+      <tr><td><code>amplitude</code></td><td>How big. Output swings from <code>-amplitude</code> to <code>+amplitude</code>.</td><td><code>1</code></td></tr>
+    </table>
+
+    <h3>Level up</h3>
+    <table class="opts-table">
+      <tr><th>Option</th><th>What it does</th><th>Default</th></tr>
+      <tr><td><code>range</code></td><td>Map output to any range. <code>[0, 100]</code> for a slider, <code>[0, 255]</code> for a colour channel. Replaces amplitude.</td><td><code>null</code></td></tr>
+      <tr><td><code>frequency</code></td><td>Squeeze the wave tighter (high) or stretch it out (low).</td><td><code>1</code></td></tr>
+      <tr><td><code>seed</code></td><td>Give each element its own wave. Same seed always picks the same wave.</td><td><code>0</code></td></tr>
+      <tr><td><code>shift</code></td><td><code>true</code> = auto-switch to a new random wave every few seconds, with a smooth morph. Different every page load.</td><td><code>false</code></td></tr>
+      <tr><td><code>group</code></td><td>Which pool <code>shift</code>/<code>seed</code> draws from. <code>'gentle'</code> = sines &amp; curves. <code>'harsh'</code> = tan/noise/random. <code>'closing'</code> = waves that all close on one sweep. <code>'all'</code> or your own list.</td><td><code>'all'</code></td></tr>
+    </table>
+
+    <h3>Go deeper</h3>
+    <table class="opts-table">
+      <tr><th>Option</th><th>What it does</th><th>Default</th></tr>
+      <tr><td><code>phase</code></td><td>Nudge the wave sideways.</td><td><code>0</code></td></tr>
+      <tr><td><code>mode</code></td><td><code>'stable'</code> = clean. <code>'wild'</code> = wobbly and unpredictable.</td><td><code>'stable'</code></td></tr>
+      <tr><td><code>unpredictability</code></td><td>Chaos dial for wild mode. 0 = calm, 1 = full chaos.</td><td><code>0</code></td></tr>
+      <tr><td><code>mix</code></td><td>When blending two waves: 0 = all first, 1 = all second.</td><td><code>0.5</code></td></tr>
+      <tr><td><code>shiftInterval</code></td><td>How long to hold each wave before switching (in units of <code>t</code>).</td><td><code>3</code></td></tr>
+      <tr><td><code>shiftDuration</code></td><td>How long the smooth transition takes (in units of <code>t</code>).</td><td><code>1</code></td></tr>
+    </table>
+
+    <!-- WAVE LIST -->
+    <h2>All 34 Waves</h2>
+    <p>Use the name or the index. Yes, there's one called <strong>batman</strong>. Same 34 formulas as p5.waves, byte for byte.</p>
+    <div class="wave-grid">
+      <div class="wave-item"><span class="wi">0</span> classic sine</div>
+      <div class="wave-item"><span class="wi">1</span> sine</div>
+      <div class="wave-item"><span class="wi">2</span> sharp peaks</div>
+      <div class="wave-item"><span class="wi">3</span> square</div>
+      <div class="wave-item"><span class="wi">4</span> pulse</div>
+      <div class="wave-item"><span class="wi">5</span> stepped sine</div>
+      <div class="wave-item"><span class="wi">6</span> mountain peaks</div>
+      <div class="wave-item"><span class="wi">7</span> valleys</div>
+      <div class="wave-item"><span class="wi">8</span> zig-zag sine</div>
+      <div class="wave-item"><span class="wi">9</span> batman</div>
+      <div class="wave-item"><span class="wi">10</span> offset sine</div>
+      <div class="wave-item"><span class="wi">11</span> steps down</div>
+      <div class="wave-item"><span class="wi">12</span> steps</div>
+      <div class="wave-item"><span class="wi">13</span> squared sine</div>
+      <div class="wave-item"><span class="wi">14</span> bumpy sine</div>
+      <div class="wave-item"><span class="wi">15</span> wobble sine</div>
+      <div class="wave-item"><span class="wi">16</span> up down noise</div>
+      <div class="wave-item"><span class="wi">17</span> meta sine</div>
+      <div class="wave-item"><span class="wi">18</span> triangle</div>
+      <div class="wave-item"><span class="wi">19</span> ramp</div>
+      <div class="wave-item"><span class="wi">20</span> saw down</div>
+      <div class="wave-item"><span class="wi">21</span> saw up</div>
+      <div class="wave-item"><span class="wi">22</span> fade out</div>
+      <div class="wave-item"><span class="wi">23</span> grow random</div>
+      <div class="wave-item"><span class="wi">24</span> noise</div>
+      <div class="wave-item"><span class="wi">25</span> fuzzy pulse</div>
+      <div class="wave-item"><span class="wi">26</span> up down pulse</div>
+      <div class="wave-item"><span class="wi">27</span> bald patch</div>
+      <div class="wave-item"><span class="wi">28</span> fuzzy peak sine</div>
+      <div class="wave-item"><span class="wi">29</span> ramp up sine</div>
+      <div class="wave-item"><span class="wi">30</span> triangle sine</div>
+      <div class="wave-item"><span class="wi">31</span> round linked sine</div>
+      <div class="wave-item"><span class="wi">32</span> half sine</div>
+      <div class="wave-item"><span class="wi">33</span> smooth solid sine</div>
+    </div>
+
+    <!-- SHIFT -->
+    <h2>Wave Shift — The Fun Part</h2>
+    <p>One flag, and your wave starts switching to random formulas on its own. Smooth morphs. Different sequence every reload.</p>
+    <pre class="code-block"><code>const s = VanillaWaves.createSampler({
+  shift:         true,     // that's the flag
+  range:         [0, 100],
+  shiftInterval: 4,        // hold each wave 4 units of t
+  shiftDuration: 1.5       // morph over 1.5 units of t
+});
+
+// inside your loop — read the live state for free:
+s.sample(0, t);   // the number
+s.waveName;       // "mountain peaks"
+s.shifting;       // true while morphing
+s.targetName;     // "batman" — what's coming next
+s.mix;            // 0 -> 1 during a morph</code></pre>
+    <p>Shift has no internal clock — it reads the <code>t</code> you pass. Tie <code>t</code> to <code>performance.now()/1000</code> for real seconds, or to scroll position, and shift follows that instead.</p>
+
+    <h3>Closing rings <em>while</em> shifting — <code>group: 'closing'</code></h3>
+    <p>Lay dots around a ring with <code>transform: rotate() translateY()</code> and a shifting wave normally tears its seam open the moment it lands on a new formula — every wave has its own period. The <code>'closing'</code> pool fixes that: all its waves share one base period (<code>6.2832</code>), so a sweep of <code>sampler.period × lobes</code> closes seamlessly through every morph.</p>
+    <pre class="code-block"><code>const ring = VanillaWaves.createSampler({ shift: true, group: 'closing', amplitude: 1 });
+const LOBES = 6, N = 56;
+
+function frame(t) {
+  const sweep = ring.period * LOBES;   // read straight off the sampler
+  for (let i = 0; i &lt; N; i++) {
+    const frac = i / N;
+    const r = 62 + ring.sample(frac * sweep, t) * 26;
+    dots[i].style.transform = `rotate(${frac * 360}deg) translateY(-${r}px)`;
+  }
+  requestAnimationFrame(frame);
+}</code></pre>
+    <div class="callout"><p><span class="note">Experimental</span> Period values may drift by ~0.001 in minor versions. Perfect for visuals; not for plotters or anything that minds sub-unit drift.</p></div>
+
+    <!-- ENGINE -->
+    <h2>The Engine</h2>
+    <p>The declarative layer. It runs <strong>one</strong> shared <code>requestAnimationFrame</code> loop for every <code>data-wv</code> element on the page, capped at 30&nbsp;fps (a DOM node doesn't need 60). It pauses elements that scroll offscreen (IntersectionObserver) and renders a single static frame when the user prefers reduced motion.</p>
+
+    <h3>API</h3>
+    <table class="opts-table">
+      <tr><th>Call</th><th>What it does</th></tr>
+      <tr><td><code>register(name, def)</code></td><td>Define an element type. <code>def = { create(node, opts, h), update(state, t) }</code>.</td></tr>
+      <tr><td><code>init(target?)</code></td><td>Scan and wire elements. No arg = all <code>[data-wv]</code>. Also accepts an element, a selector, or a NodeList.</td></tr>
+      <tr><td><code>destroy(target)</code></td><td>Stop and clean up. The shared loop stops itself when the last element is gone.</td></tr>
+    </table>
+    <p>Types must be registered <em>before</em> the engine auto-inits on <code>DOMContentLoaded</code>. Register later or add elements dynamically? Just call <code>VanillaWaves.init()</code> again — already-wired elements are skipped.</p>
+
+    <h3>Helpers passed to <code>create(node, opts, h)</code></h3>
+    <table class="opts-table">
+      <tr><th>Helper</th><th>What it does</th></tr>
+      <tr><td><code>h.makeSampler(extra)</code></td><td>A sampler with element-friendly defaults (shift on, gentle, low frequency), merged with the element's <code>data-*</code> options and your <code>extra</code>.</td></tr>
+      <tr><td><code>h.num(v, d)</code></td><td>Parse a <code>data-*</code> string to a number, with a default.</td></tr>
+      <tr><td><code>h.norm(v)</code></td><td>Clamp a <code>~[-1,1]</code> value to <code>[0,1]</code>.</td></tr>
+      <tr><td><code>h.el(tag, cls)</code></td><td>Create an element with an optional class.</td></tr>
+    </table>
+    <div class="callout"><p>Every element gets <code>aria-hidden="true"</code> (it's decorative) and a <code>wv--ready</code> class once wired. Each picks its own start time from its seed, so a wall of identical elements doesn't move in lockstep.</p></div>
+
+    <!-- BUILD YOUR OWN -->
+    <h2>Build Your Own Element Type</h2>
+    <p>This is the whole point — and the seed for <code>vanilla.waves_elements</code>. A type is two functions: <code>create</code> builds the DOM and returns state; <code>update</code> writes wave values into it each frame.</p>
+    <pre class="code-block"><code>VanillaWaves.register('dots', {
+  create(node, opts, h) {
+    const n = h.num(opts.count, 20), dots = [];
+    for (let i = 0; i &lt; n; i++) dots.push(node.appendChild(h.el('span')));
+    return { dots, n, sampler: h.makeSampler({ range: [0, 1] }) };
+  },
+  update(state, t) {
+    for (let i = 0; i &lt; state.n; i++) {
+      state.dots[i].style.opacity = state.sampler.sample(i * 0.4, t);
+    }
+  }
+});</code></pre>
+    <p>Now <code>&lt;div data-wv="dots" data-count="40"&gt;&lt;/div&gt;</code> works anywhere on the page. That's a publishable element.</p>
+
+    <!-- STARTERS -->
+    <h2>Copy-Paste Starters</h2>
+
+    <h3>Just a number</h3>
+    <pre class="code-block"><code>const y = VanillaWaves.wave(x, 'mountain peaks');</code></pre>
+
+    <h3>A moving element</h3>
+    <pre class="code-block"><code>const s = VanillaWaves.createSampler({ shift: true, range: [-40, 40] });
+function frame(t) { el.style.transform = 'translateY(' + s.sample(0, t) + 'px)'; requestAnimationFrame(frame); }
+requestAnimationFrame(frame);</code></pre>
+
+    <h3>A wave-driven slider</h3>
+    <pre class="code-block"><code>const s = VanillaWaves.createSampler({ shift: true, range: [0, 100] });
+range.value = s.sample(0, t);   // a real &lt;input type="range"&gt;</code></pre>
+
+    <h3>Binary field on two samplers</h3>
+    <pre class="code-block"><code>const rowS = VanillaWaves.createSampler({ shift: true, range: [-1, 1], seed: 1 });
+const colS = VanillaWaves.createSampler({ shift: true, range: [-1, 1], seed: 2 });
+box.checked = (rowS.sample(row * 5 + t, t) + colS.sample(col * 2.5 - t, t)) &gt; 0;</code></pre>
+
+  </div>
+
+  <footer>
+    <p>Built with <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank">vanilla.waves</a> — plain DOM, zero dependencies.</p>
+    <p class="footer-sub">Same dialect as <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank">p5.waves</a> &middot; <a href="https://seb-prjcts-be.github.io/processing.waves/" target="_blank">processing.waves</a> &middot; MIT License &middot; v0.1.0</p>
+  </footer>
+
+</body>
+</html>

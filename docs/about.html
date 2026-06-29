@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — vanilla.waves</title>
+  <meta name="description" content="About vanilla.waves — the wave dialect as a zero-dependency DOM port of p5.waves. Same math, different runtime: plain elements instead of a canvas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo">vanilla.<span>waves</span></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Showcase</a></li>
+      <li><a href="../index.html#elements">Elements</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="guide.html">Guide</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <div class="guide-wrap">
+
+    <div class="section-tag" style="margin-bottom:0.6rem">DOM port of p5.waves · v0.1.0</div>
+    <h1>About vanilla.<span class="accent">waves</span></h1>
+    <p class="guide-intro">
+      One wave dialect, three runtimes. This is the one that needs nothing —
+      no p5, no canvas, no Java, no build step. Just the math and the DOM.
+    </p>
+
+    <!-- live origin: the binary field that started the dialect, as checkboxes -->
+    <div class="ex-canvas" style="margin:1rem 0 0.4rem;">
+      <div class="wv-stage">
+        <div class="wv-label"><span>the binary field — now in checkboxes</span><b data-wv-name>&mdash;</b></div>
+        <div class="wv-checks" data-wv="checks" data-cols="20" data-rows="9" data-seed="5"></div>
+      </div>
+    </div>
+    <p style="font-size:0.8rem;"><em>The two-sampler binary field is where the dialect began. p5.waves draws it in pixels; here it toggles a grid of real checkboxes.</em></p>
+
+    <!-- THE DIALECT -->
+    <h2>One Dialect, Many Runtimes</h2>
+    <p>The "wave dialect" is a small, opinionated idea: <strong>34 curated wave formulas</strong>, each reachable by one function call that takes a number and returns a number. Pass position in, get a value out — for size, motion, colour, density, anything. Add <code>shift</code> and it morphs between formulas on its own; add <code>group: 'closing'</code> and it does so without ever tearing a seam.</p>
+    <p>That dialect now lives in three places, each a faithful port of the same math, maintained separately:</p>
+    <table class="opts-table">
+      <tr><th>Library</th><th>Runtime</th><th>Draws on</th></tr>
+      <tr><td><a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank">p5.waves</a></td><td>p5.js / JavaScript</td><td>a canvas</td></tr>
+      <tr><td><a href="https://seb-prjcts-be.github.io/processing.waves/" target="_blank">processing.waves</a></td><td>Processing / Java</td><td>a PGraphics sketch</td></tr>
+      <tr><td>vanilla.waves</td><td>plain JavaScript</td><td><strong>the DOM itself</strong></td></tr>
+    </table>
+    <p>Same hero line across all three: <em>34 wave shapes, one function call, pass a number in, get a number back.</em> What changes is only the runtime vocabulary — p5.waves loads two script tags, processing.waves drops a jar in your sketchbook, vanilla.waves needs a single tag and an element.</p>
+
+    <!-- WHY DOM -->
+    <h2>Why a DOM Port?</h2>
+    <p>A canvas is one opaque rectangle. Sometimes you want the wave to live in things you already have: a real <code>&lt;input&gt;</code>, a <code>&lt;progress&gt;</code> bar, a grid of checkboxes, a line of text — accessible, inspectable, stylable with CSS, and cheap enough to run dozens of instances on one page without spinning up a renderer. That's the niche vanilla.waves fills: <strong>wave-driven interface</strong>, not wave-drawn imagery.</p>
+
+    <!-- ARCHITECTURE -->
+    <h2>What's Inside</h2>
+    <p>One file, two parts, zero dependencies.</p>
+    <table class="opts-table">
+      <tr><th>Part</th><th>Role</th></tr>
+      <tr><td><strong>the math</strong></td><td>The sampler, the 34 wave formulas, the <code>gentle</code>/<code>harsh</code>/<code>closing</code> groups, shift/mix/seed. A byte-identical port of the canonical p5.waves core — verified 1009/1009 against v3.4.0.</td></tr>
+      <tr><td><strong>the engine</strong></td><td>One shared 30&nbsp;fps <code>requestAnimationFrame</code> loop, IntersectionObserver pause for offscreen elements, reduced-motion support, and a <code>register / init / destroy</code> plugin API.</td></tr>
+    </table>
+    <p>The math owns the numbers — it does <em>not</em> reach for a p5.waves script at runtime. That's the line between a real library and a plugin: this is the library, and it carries its own math.</p>
+
+    <div class="callout"><p><strong>The engine knows no components.</strong> Concrete element types — loaders, meters, fields — are not baked into the core. They live in the demo catalog (<code>docs/examples.js</code>) and, soon, in a separate <code>vanilla.waves_elements</code> CDN built on top of this engine. The core stays pure; elements import it, never the other way round.</p></div>
+
+    <!-- DRIFT -->
+    <h2>Staying in Sync</h2>
+    <p>Because it's a port, the one rule is: <strong>don't drift</strong>. The canonical baseline is p5.waves v3.4.0 (34 waves), pinned in <code>docs/waves.feature.md</code>, and a weekly drift-watch compares the language ports against the canon. A divergence in the numbers is a bug, not a feature — <code>processing.waves</code> set that precedent and vanilla.waves follows it.</p>
+
+    <!-- CREDITS -->
+    <h2>Credits</h2>
+    <p>vanilla.waves is by <a href="https://github.com/seb-prjcts-be" target="_blank">Sebastien Vanblaere</a>, part of the same family as p5.waves and processing.waves. MIT licensed — use it, fork it, build elements on it.</p>
+    <p>Start at the <a href="../index.html">showcase</a>, browse the <a href="examples.html">examples</a>, or read the <a href="guide.html">guide</a>.</p>
+
+  </div>
+
+  <footer>
+    <p>Built with <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank">vanilla.waves</a> — plain DOM, zero dependencies.</p>
+    <p class="footer-sub">Same dialect as <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank">p5.waves</a> &middot; <a href="https://seb-prjcts-be.github.io/processing.waves/" target="_blank">processing.waves</a> &middot; MIT License &middot; v0.1.0</p>
+  </footer>
+
+  <script src="../vanilla.waves.min.js"></script>
+  <script src="examples.js"></script>
+</body>
+</html>

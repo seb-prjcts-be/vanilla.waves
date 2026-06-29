@@ -1,0 +1,8 @@
+{
+  "name": "Checkbox Field",
+  "slug": "checkbox_field",
+  "type": "checks",
+  "description": "The binary field on a grid of real checkboxes  one sampler per axis, summed and thresholded.",
+  "library": "vanilla.waves",
+  "version": "0.1.0"
+}

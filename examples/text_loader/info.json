@@ -1,0 +1,8 @@
+{
+  "name": "Text Loader",
+  "slug": "text_loader",
+  "type": "load",
+  "description": "A 44 grid where each cell picks a character from a wave value. Cheap enough to run dozens.",
+  "library": "vanilla.waves",
+  "version": "0.1.0"
+}

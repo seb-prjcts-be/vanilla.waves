@@ -1,0 +1,8 @@
+{
+  "name": "One Number",
+  "slug": "one_number",
+  "type": "trio",
+  "description": "One sampler value drives the size, position and colour of three real elements at once.",
+  "library": "vanilla.waves",
+  "version": "0.1.0"
+}

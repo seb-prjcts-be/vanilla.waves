@@ -1,0 +1,8 @@
+{
+  "name": "Progress Morph",
+  "slug": "progress_morph",
+  "type": "progress",
+  "description": "Rows of native progress, each on its own shift-sampler. The label shows the live wave name.",
+  "library": "vanilla.waves",
+  "version": "0.1.0"
+}

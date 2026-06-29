@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examples — vanilla.waves</title>
+  <meta name="description" content="vanilla.waves examples — the wave dialect wired to recognizable DOM elements. Sliders, checkboxes, progress bars, text fields, all driven by one wave call.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo">vanilla.<span>waves</span></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Showcase</a></li>
+      <li><a href="../index.html#elements">Elements</a></li>
+      <li><a href="examples.html" class="active">Examples</a></li>
+      <li><a href="guide.html">Guide</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <!-- HEADER -->
+  <div class="ex-page-header">
+    <div class="section-tag" style="margin-bottom:0.6rem">DOM port of p5.waves · v0.1.0</div>
+    <h1>vanilla.<span class="accent">waves</span> Examples</h1>
+    <p>Every preview is a live element — not a canvas. The same wave call that p5.waves points at a pixel,
+      vanilla.waves points at an <code>&lt;input&gt;</code>, a <code>&lt;progress&gt;</code>, a checkbox, a character.
+      Click <strong>-&gt; full example</strong> for the standalone page.</p>
+    <a class="ex-lab-card" href="../index.html#elements">
+      <div class="section-tag">The element catalog</div>
+      <strong>Elements -&gt;</strong>
+      <p>Every demo here is a registered <code style="color:#bbb">data-wv</code> type — the seed for the vanilla.waves_elements CDN.</p>
+    </a>
+  </div>
+
+  <!-- ONE NUMBER -->
+  <section id="onenumber" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">VanillaWaves.wave(y)</div>
+      <h2>One <span class="accent">Number</span></h2>
+      <p class="section-desc">One call returns one number. Use it for size, position, colour — anything. Here it drives three real elements at once.</p>
+    </div>
+    <div class="ex-preview">
+      <div class="ex-canvas">
+        <div class="wv-stage">
+          <div class="wv-label"><span>one sampler, three properties</span><b data-wv-name>&mdash;</b></div>
+          <div class="wv-trio" data-wv="trio" data-seed="2"></div>
+        </div>
+      </div>
+      <pre class="ex-code-block"><code>// one number, used three ways
+const s = VanillaWaves.createSampler({ shift: true, range: [0, 1] });
+
+button.style.minWidth = (3 + s.sample(0, t) * 7) + 'rem';   // size
+mover.style.transform = 'translateX(' + (s.sample(2, t)-.5)*180 + 'px)'; // position
+const g = 20 + s.sample(4, t) * 200;
+dot.style.background = `rgb(${g},${g},${g})`;                // colour</code></pre>
+      <div class="ex-links"><a class="ex-full-link" href="../examples/one_number/">-&gt; full example</a></div>
+    </div>
+  </section>
+
+  <!-- BAR METER -->
+  <section id="barmeter" class="section">
+    <div class="section-header">
+      <div class="section-tag">shift: true</div>
+      <h2>Bar <span class="accent">Meter</span></h2>
+      <p class="section-desc">p5.waves' shifting ribbons, as a real equalizer. Each <code>&lt;span&gt;</code> bar is one sample; the formula morphs every few seconds.</p>
+    </div>
+    <div class="ex-preview">
+      <div class="ex-canvas">
+        <div class="wv-stage">
+          <div class="wv-label"><span>24 bars · one sampler</span><b data-wv-name>&mdash;</b></div>
+          <div class="wv-eq" data-wv="eq" data-count="24" data-seed="13"></div>
+        </div>
+      </div>
+      <pre class="ex-code-block"><code>const s = VanillaWaves.createSampler({ shift: true, range: [0, 1] });
+
+// each bar samples the same wave at its own x
+for (let i = 0; i &lt; bars.length; i++) {
+  const v = 0.06 + s.sample(i * 0.5, t) * 0.94;
+  bars[i].style.transform = `scaleY(${v})`;
+}</code></pre>
+      <div class="ex-links"><a class="ex-full-link" href="../examples/bar_meter/">-&gt; full example</a></div>
+    </div>
+  </section>
+
+  <!-- SLIDER STACK -->
+  <section id="sliders" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">range: [0, 100]</div>
+      <h2>Slider <span class="accent">Stack</span></h2>
+      <p class="section-desc">Native <code>&lt;input type="range"&gt;</code> elements whose <strong>value</strong> is the wave. The thumbs glide, the readouts tick — no custom widget, just real form controls.</p>
+    </div>
+    <div class="ex-preview">
+      <div class="ex-canvas">
+        <div class="wv-stage">
+          <div class="wv-label"><span>6 native sliders</span><b data-wv-name>&mdash;</b></div>
+          <div class="wv-sliders" data-wv="sliders" data-count="6" data-seed="3"></div>
+        </div>
+      </div>
+      <pre class="ex-code-block"><code>const s = VanillaWaves.createSampler({
+  shift: true, range: [0, 100], frequency: 0.35
+});
+
+for (let i = 0; i &lt; rows.length; i++) {
+  const v = Math.round(s.sample(i * 0.9, t + i * 0.15));
+  rows[i].range.value = v;        // a real form control
+  rows[i].output.textContent = v;
+}</code></pre>
+      <div class="ex-links"><a class="ex-full-link" href="../examples/slider_stack/">-&gt; full example</a></div>
+    </div>
+  </section>
+
+  <!-- CHECKBOX FIELD -->
+  <section id="checks" class="section">
+    <div class="section-header">
+      <div class="section-tag">two samplers · sum · threshold</div>
+      <h2>Checkbox <span class="accent">Field</span></h2>
+      <p class="section-desc">The binary field, on a grid of real checkboxes. One sampler per axis; sum them per cell; threshold the result. The whole 2D pattern toggles itself.</p>
+    </div>
+    <div class="ex-preview">
+      <div class="ex-canvas">
+        <div class="wv-stage">
+          <div class="wv-label"><span>14 &times; 7 checkboxes</span><b data-wv-name>&mdash;</b></div>
+          <div class="wv-checks" data-wv="checks" data-cols="14" data-rows="7" data-seed="5"></div>
+        </div>
+      </div>
+      <pre class="ex-code-block"><code>const rowS = VanillaWaves.createSampler({ shift: true, range: [-1, 1], seed: 1 });
+const colS = VanillaWaves.createSampler({ shift: true, range: [-1, 1], seed: 2 });
+
+for (let r = 0; r &lt; rows; r++) {
+  const rv = rowS.sample(r * 5 + t * 0.4, t);
+  for (let c = 0; c &lt; cols; c++) {
+    box[r][c].checked = (rv + colS.sample(c * 2.5 - t * 0.4, t)) &gt; 0;
+  }
+}</code></pre>
+      <div class="ex-links"><a class="ex-full-link" href="../examples/checkbox_field/">-&gt; full example</a></div>
+    </div>
+  </section>
+
+  <!-- PROGRESS MORPH -->
+  <section id="progress" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">one shift sampler per row</div>
+      <h2>Progress <span class="accent">Morph</span></h2>
+      <p class="section-desc">Rows of native <code>&lt;progress&gt;</code>, each on its own shift-sampler and frequency. They fill, drain and re-fill as their formulas change — the label shows the live wave name.</p>
+    </div>
+    <div class="ex-preview">
+      <div class="ex-canvas">
+        <div class="wv-stage">
+          <div class="wv-label"><span>5 native progress bars</span><b>independent shift</b></div>
+          <div class="wv-progress" data-wv="progress" data-count="5" data-seed="11"></div>
+        </div>
+      </div>
+      <pre class="ex-code-block"><code>// one sampler per bar, each its own seed + frequency
+rows.forEach((r, i) =&gt; {
+  r.sampler = VanillaWaves.createSampler({
+    shift: true, range: [0, 100], seed: i * 31 + 5, frequency: 0.3 + i * 0.05
+  });
+});
+
+rows.forEach((r, i) =&gt; {
+  r.progress.value = r.sampler.sample(i * 1.3, t);
+  r.label.textContent = r.sampler.waveName;   // live formula name
+});</code></pre>
+      <div class="ex-links"><a class="ex-full-link" href="../examples/progress_morph/">-&gt; full example</a></div>
+    </div>
+  </section>
+
+  <!-- GLYPH FIELD -->
+  <section id="glyphs" class="section">
+    <div class="section-header">
+      <div class="section-tag">shift + sampler</div>
+      <h2>Glyph <span class="accent">Field</span></h2>
+      <p class="section-desc">A grid of <code>/ - | \</code> characters in a single text node. One sampler picks the direction per cell — like <code>noise()</code>, but with unexpected wave shifts every few seconds.</p>
+    </div>
+    <div class="ex-preview">
+      <div class="ex-canvas">
+        <div class="wv-stage" style="align-items:center;">
+          <div class="wv-label" style="width:100%"><span>30 &times; 12 glyphs</span><b data-wv-name>&mdash;</b></div>
+          <div class="wv-glyphs" data-wv="glyphs" data-cols="30" data-rows="12" data-seed="7"></div>
+        </div>
+      </div>
+      <pre class="ex-code-block"><code>const DIRS = ['-', '/', '|', '\\'];
+const s = VanillaWaves.createSampler({ shift: true, frequency: 2 });
+
+let out = '';
+for (let r = 0; r &lt; ROWS; r++) {
+  for (let c = 0; c &lt; COLS; c++) {
+    const v = s.sample(c * 0.5, t + r * 0.4);       // ~[-1, 1]
+    const i = Math.floor((v + 1) / 2.002 * DIRS.length);
+    out += DIRS[i];
+  }
+  out += '\n';
+}
+field.textContent = out;     // one text node, no canvas</code></pre>
+      <div class="ex-links"><a class="ex-full-link" href="../examples/glyph_field/">-&gt; full example</a></div>
+    </div>
+  </section>
+
+  <!-- RADIAL LOADER -->
+  <section id="ring" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">group: 'closing' · seamless</div>
+      <h2>Radial <span class="accent">Loader</span></h2>
+      <p class="section-desc">Dots placed around a ring with <code>transform: rotate() translateY()</code>. The <strong>closing</strong> pool shares one base period, so a sweep of <code>period × lobes</code> closes through every morph — the loop never shows a seam.</p>
+    </div>
+    <div class="ex-preview">
+      <div class="ex-canvas">
+        <div class="wv-stage" style="align-items:center;">
+          <div class="wv-label" style="width:100%"><span>56 dots · closing pool</span><b data-wv-name>&mdash;</b></div>
+          <div class="wv-ring" data-wv="ring" data-count="56" data-seed="8"></div>
+        </div>
+      </div>
+      <pre class="ex-code-block"><code>const s = VanillaWaves.createSampler({ shift: true, group: 'closing', amplitude: 1 });
+const LOBES = 6;
+
+// s.period comes from the library — 6.2832 for the closing pool
+const sweep = s.period * LOBES;
+for (let i = 0; i &lt; N; i++) {
+  const frac = i / N;
+  const r = 62 + s.sample(frac * sweep, t) * 26;
+  dots[i].style.transform = `rotate(${frac*360}deg) translateY(-${r}px)`;
+}</code></pre>
+      <div class="ex-links"><a class="ex-full-link" href="../examples/radial_loader/">-&gt; full example</a></div>
+    </div>
+  </section>
+
+  <!-- CHIP WALKERS -->
+  <section id="walk" class="section">
+    <div class="section-header">
+      <div class="section-tag">no random() · wave = velocity</div>
+      <h2>Chip <span class="accent">Walkers</span></h2>
+      <p class="section-desc">No angles, no steps — wave output <em>is</em> the velocity. Small badges drift across the field, each with its own pair of samplers, wrapping at the edges.</p>
+    </div>
+    <div class="ex-preview">
+      <div class="ex-canvas">
+        <div class="wv-stage" style="align-items:stretch;">
+          <div class="wv-label"><span>9 walking chips</span><b>velocity = wave</b></div>
+          <div class="wv-walk" data-wv="walk" data-count="9" data-seed="4" data-text="wv,.waves,dom,shift,sample,seed,gentle,closing,plain"></div>
+        </div>
+      </div>
+      <pre class="ex-code-block"><code>const xs = VanillaWaves.createSampler({ shift: true, range: [-1.4, 1.4], seed: 3 });
+const ys = VanillaWaves.createSampler({ shift: true, range: [-1.4, 1.4], seed: 9 });
+
+// wave output IS the velocity — accumulate, then wrap
+chip.x += xs.sample(t * 1.8, t);
+chip.y += ys.sample(t * 2.1, t);
+chip.el.style.transform = `translate(${chip.x}px, ${chip.y}px)`;</code></pre>
+      <div class="ex-links"><a class="ex-full-link" href="../examples/chip_walkers/">-&gt; full example</a></div>
+    </div>
+  </section>
+
+  <!-- TEXT LOADER -->
+  <section id="loader" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">density -&gt; character</div>
+      <h2>Text <span class="accent">Loader</span></h2>
+      <p class="section-desc">The canvasless loader: a 4&times;4 grid where each cell picks a character from a wave value. Cheap enough to run dozens at once — swap the ramp to change the texture.</p>
+    </div>
+    <div class="ex-preview">
+      <div class="ex-canvas">
+        <div class="wv-stage" style="align-items:center;">
+          <div class="wv-label" style="width:100%"><span>three ramps, three seeds</span><b>4&times;4</b></div>
+          <div style="display:flex;gap:22px;flex-wrap:wrap;justify-content:center;">
+            <div class="wv-load" data-wv="load" data-seed="13"></div>
+            <div class="wv-load" data-wv="load" data-seed="7" data-text="WAVES&#183;&#183;&#183;"></div>
+            <div class="wv-load" data-wv="load" data-seed="21" data-text="&#183;:&#9617;&#9618;&#9619;&#9608;"></div>
+          </div>
+        </div>
+      </div>
+      <pre class="ex-code-block"><code>const s = VanillaWaves.createSampler({ shift: true });
+const ramp = '·:░▒▓█';
+
+for (let r = 0; r &lt; 4; r++)
+  for (let c = 0; c &lt; 4; c++) {
+    const v = s.sample(c * 0.5 + t, t + r * 0.9);     // ~[-1, 1]
+    const i = Math.floor((v + 1) / 2 * ramp.length);
+    cell[r][c].textContent = ramp[i];
+  }</code></pre>
+      <div class="ex-links"><a class="ex-full-link" href="../examples/text_loader/">-&gt; full example</a></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Built with <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank">vanilla.waves</a> — plain DOM, zero dependencies.</p>
+    <p class="footer-sub">Same dialect as <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank">p5.waves</a> &middot; MIT License &middot; v0.1.0</p>
+  </footer>
+
+  <script src="../vanilla.waves.min.js"></script>
+  <script src="examples.js"></script>
+</body>
+</html>

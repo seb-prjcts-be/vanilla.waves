@@ -1,0 +1,8 @@
+{
+  "name": "Chip Walkers",
+  "slug": "chip_walkers",
+  "type": "walk",
+  "description": "No random(): wave output is the velocity. Badges drift and wrap at the edges.",
+  "library": "vanilla.waves",
+  "version": "0.1.0"
+}

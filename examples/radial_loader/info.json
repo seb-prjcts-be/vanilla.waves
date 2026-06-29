@@ -1,0 +1,8 @@
+{
+  "name": "Radial Loader",
+  "slug": "radial_loader",
+  "type": "ring",
+  "description": "Dots around a ring. The closing pool shares one base period, so the loop never shows a seam.",
+  "library": "vanilla.waves",
+  "version": "0.1.0"
+}
