@@ -18,11 +18,11 @@
   var NS = 'http://www.w3.org/2000/svg';
   function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
-  // coffeehouse vanilla tones: espresso · mocha · caramel · latte · cinnamon
-  var COFFEE = ['#33261b', '#6f4e37', '#a9763f', '#c8a878', '#8a5a3c'];
+  // coffeehouse vanilla tones: espresso · taupe · teal · sand · brown
+  var COFFEE = ['#453020', '#b39c7d', '#72bab8', '#dbcdad', '#8a6f4a'];
 
-  // a continuous coffee spectrum (dark espresso → light latte) for gradient bands
-  var SPECTRUM = ['#241811', '#3a2a1e', '#5a3f2b', '#7a5334', '#a9763f', '#c08a4a', '#cbab7f'];
+  // a continuous spectrum through the palette (espresso → teal → sand → cream)
+  var SPECTRUM = ['#453020', '#6a5138', '#b39c7d', '#72bab8', '#a9cfc8', '#dbcdad', '#fff5cf'];
   function hx(h) { h = h.replace('#', ''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
   function mix(a, b, t) { var A = hx(a), B = hx(b); return 'rgb(' + Math.round(A[0] + (B[0] - A[0]) * t) + ',' + Math.round(A[1] + (B[1] - A[1]) * t) + ',' + Math.round(A[2] + (B[2] - A[2]) * t) + ')'; }
   function spectrum(t) {

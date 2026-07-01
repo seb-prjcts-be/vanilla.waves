@@ -1,11 +1,11 @@
 /* ============================================================
    vanilla.waves — docs skin
    A p5.waves family member: same typography + layout system
-   (Oswald titles, Inter body, the sibling component set), but
-   with vanilla.waves' own accent — a warm "coffeehouse vanilla"
-   palette used across the site and in the canvasless animations.
-   Its sibling accent is the family's differentiator, the way
-   p5.waves leans on lime. No red anywhere.
+   (Oswald titles, Inter body, the sibling component set), with
+   vanilla.waves' own accent — a coffeehouse-vanilla palette
+   (cream · sand · taupe · espresso + a teal pop) used across the
+   site and in the canvasless animations. The way p5.waves leans
+   on lime, vanilla leans on teal-on-cream. No red anywhere.
    License: MIT · seb@prjcts
    ============================================================ */
 
@@ -13,31 +13,31 @@
 
 :root {
   /* coffeehouse vanilla palette */
-  --bg:          #f3ecdf;   /* vanilla cream           */
-  --bg2:         #ece1d0;   /* raised panel            */
-  --bg3:         #e4d7c2;   /* recessed strip          */
-  --surface:     #fbf6ec;   /* foam — cards, stages    */
-  --ink:         #33261b;   /* espresso — text + lines */
-  --text:        #33261b;
-  --text-muted:  #7c6a56;   /* latte                   */
-  --text-faint:  #a8967f;   /* weak coffee             */
-  --accent:      #a9763f;   /* caramel — the accent    */
-  --accent-deep: #855627;   /* roasted caramel (hover) */
+  --bg:          #fff5cf;   /* pale vanilla cream      */
+  --bg2:         #f0e6c2;   /* raised panel            */
+  --bg3:         #dbcdad;   /* sand — recessed strip   */
+  --surface:     #fffbea;   /* foam — cards, stages    */
+  --ink:         #453020;   /* espresso — text + lines */
+  --text:        #453020;
+  --text-muted:  #6f5c3d;   /* dark taupe              */
+  --text-faint:  #b39c7d;   /* taupe                   */
+  --accent:      #72bab8;   /* teal — the pop          */
+  --accent-deep: #3f8f8c;   /* deep teal (text/hover)  */
 
-  --border:      rgba(51, 38, 27, 0.13);
-  --border-mid:  rgba(51, 38, 27, 0.24);
-  --border-hard: rgba(51, 38, 27, 0.55);
+  --border:      rgba(69, 48, 32, 0.14);
+  --border-mid:  rgba(69, 48, 32, 0.26);
+  --border-hard: rgba(69, 48, 32, 0.50);
 
-  --code-bg:     #f6eddd;
-  --code-inl:    #ece0cd;
+  --code-bg:     #fbf2ce;
+  --code-inl:    #efe3bd;
   --mono:        'Consolas', 'Courier New', monospace;
 
-  /* animation tones: espresso · mocha · caramel · latte · cinnamon */
-  --c1: #33261b;
-  --c2: #6f4e37;
-  --c3: #a9763f;
-  --c4: #c8a878;
-  --c5: #8a5a3c;
+  /* animation tones: espresso · taupe · teal · sand · brown */
+  --c1: #453020;
+  --c2: #b39c7d;
+  --c3: #72bab8;
+  --c4: #dbcdad;
+  --c5: #8a6f4a;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,10 +54,10 @@ body {
 
 h1, h2, h3, .nav-logo, .stat-num, .cta-btn, .hero-badge, .section-tag { font-family: 'Oswald', sans-serif; }
 
-a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
-a:hover { color: var(--accent-deep); }
+a { color: var(--accent-deep); text-decoration: underline; text-underline-offset: 3px; }
+a:hover { color: var(--ink); }
 
-.accent, h1 b, h2 b, h3 b { color: var(--accent); font-weight: inherit; }
+.accent, h1 b, h2 b, h3 b { color: var(--accent-deep); font-weight: inherit; }
 
 /* ── NAV ─────────────────────────────────────────────────── */
 #navbar {
@@ -68,7 +68,7 @@ a:hover { color: var(--accent-deep); }
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 2.5rem;
-  background: rgba(243, 236, 223, 0.92);
+  background: rgba(255, 245, 207, 0.92);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-mid);
 }
@@ -113,8 +113,8 @@ a:hover { color: var(--accent-deep); }
   background: linear-gradient(to bottom,
     var(--bg) 0%,
     var(--bg) 34%,
-    rgba(243, 236, 223, 0.55) 48%,
-    rgba(243, 236, 223, 0) 74%);
+    rgba(255, 245, 207, 0.55) 48%,
+    rgba(255, 245, 207, 0) 74%);
 }
 
 .hero-text { position: relative; z-index: 1; text-align: center; max-width: 780px; }
@@ -136,7 +136,7 @@ a:hover { color: var(--accent-deep); }
   color: var(--ink);
   margin-bottom: 1.2rem;
 }
-.hero-text h1 b { border: none; font-weight: 400; color: var(--accent); }
+.hero-text h1 b { border: none; font-weight: 400; color: var(--accent-deep); }
 .hero-sub {
   font-size: clamp(0.95rem, 2vw, 1.15rem);
   color: var(--text-muted);
@@ -164,9 +164,9 @@ a:hover { color: var(--accent-deep); }
   font-weight: 600;
   transition: background 0.15s, color 0.15s;
 }
-.cta-btn:hover { background: var(--accent); color: var(--surface); }
+.cta-btn:hover { background: var(--accent); color: var(--ink); }
 .cta-btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--border-hard); }
-.cta-btn.ghost:hover { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+.cta-btn.ghost:hover { background: var(--accent); color: var(--ink); border-color: var(--accent); }
 
 /* ── SECTIONS ────────────────────────────────────────────── */
 .section { padding: 6rem 2rem; }
@@ -237,7 +237,7 @@ a:hover { color: var(--accent-deep); }
 .ex-stage { border: 1px solid var(--border-mid); background: var(--surface); min-height: 200px; display: flex; align-items: center; justify-content: center; padding: 20px; overflow: hidden; }
 .ex-links { margin-top: 1rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
 .ex-links a { font-family: 'Oswald', sans-serif; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
-.ex-links a:hover { color: var(--accent); border-color: var(--accent); }
+.ex-links a:hover { color: var(--accent-deep); border-color: var(--accent-deep); }
 
 /* ── CODE (light, on cream) ──────────────────────────────── */
 pre.code, .code-block {
@@ -254,7 +254,7 @@ pre.code, .code-block {
 }
 .ex-grid .code-block { margin: 0; }
 pre .c, .code-block .c { color: var(--text-faint); font-style: italic; }   /* comment */
-pre .k, .code-block .k { color: var(--accent); }                           /* keyword */
+pre .k, .code-block .k { color: var(--accent-deep); }                      /* keyword */
 pre .s, .code-block .s { color: #5f7a48; }                                 /* string  */
 code.inl { font-family: var(--mono); font-size: 0.88em; background: var(--code-inl); padding: 0.1em 0.35em; }
 
@@ -266,8 +266,8 @@ code.inl { font-family: var(--mono); font-size: 0.88em; background: var(--code-i
 .wrap h3 { font-family: 'Oswald', sans-serif; font-size: 1.1rem; margin: 1.8rem 0 0.4rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink); }
 .wrap p { line-height: 1.7; margin-bottom: 0.8rem; color: var(--text-muted); }
 .wrap p strong, .wrap li strong { color: var(--ink); }
-.wrap a { color: var(--accent); text-decoration: underline; }
-.wrap a:hover { color: var(--accent-deep); }
+.wrap a { color: var(--accent-deep); text-decoration: underline; }
+.wrap a:hover { color: var(--ink); }
 .wrap ul, .wrap ol { color: var(--text-muted); line-height: 1.7; margin: 0 0 1rem 1.2rem; }
 .wrap li { margin-bottom: 0.4rem; }
 
@@ -285,7 +285,7 @@ code.inl { font-family: var(--mono); font-size: 0.88em; background: var(--code-i
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.chip:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+.chip:hover { border-color: var(--accent); color: var(--accent-deep); text-decoration: none; }
 
 .callout { border-left: 3px solid var(--accent); background: var(--surface); padding: 0.9rem 1.2rem; margin: 1.2rem 0; }
 .callout p { margin: 0; color: var(--ink); }
@@ -296,7 +296,7 @@ code.inl { font-family: var(--mono); font-size: 0.88em; background: var(--code-i
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: var(--accent); color: var(--surface);
+  background: var(--accent); color: var(--ink);
   padding: 0.15em 0.5em;
   margin-right: 0.4rem;
   vertical-align: middle;
@@ -349,7 +349,7 @@ code.inl { font-family: var(--mono); font-size: 0.88em; background: var(--code-i
 .wave-meta .formula { font-family: var(--mono); font-size: 0.78rem; background: var(--code-inl); padding: 0.25em 0.5em; color: var(--ink); display: inline-block; margin-bottom: 0.55rem; }
 .wave-meta .tags { display: flex; gap: 0.35rem; flex-wrap: wrap; font-family: var(--mono); font-size: 0.68rem; color: var(--text-muted); }
 .wave-meta .tag { padding: 0.1rem 0.45rem; border: 1px solid var(--border-mid); }
-.wave-meta .tag.harsh { border-color: var(--accent); color: var(--accent); }
+.wave-meta .tag.harsh { border-color: var(--accent-deep); color: var(--accent-deep); }
 .wave-meta .tag.closing { background: var(--ink); color: var(--surface); border-color: var(--ink); }
 .wave-meta .tag.period { border-style: dashed; color: var(--text-muted); }
 
@@ -367,7 +367,7 @@ code.inl { font-family: var(--mono); font-size: 0.88em; background: var(--code-i
 /* ── FOOTER ──────────────────────────────────────────────── */
 footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border-mid); color: var(--text-muted); font-size: 0.85rem; line-height: 1.9; }
 footer a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-footer a:hover { color: var(--accent); }
+footer a:hover { color: var(--accent-deep); }
 .footer-sub { font-size: 0.75rem; color: var(--text-faint); }
 
 /* ── SCROLLBAR ───────────────────────────────────────────── */
@@ -396,7 +396,7 @@ section[id], h2[id] { scroll-margin-top: 62px; }
     top: 52px; left: 0; right: 0;
     flex-direction: column;
     gap: 0;
-    background: rgba(243, 236, 223, 0.97);
+    background: rgba(255, 245, 207, 0.97);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-mid);
     padding: 0.5rem 0 1rem;
