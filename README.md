@@ -187,22 +187,24 @@ waves-core.js        the math (zero-dep port of p5.waves)
 engine.js            the DOM engine (shared loop, register/init/destroy)
 vanilla.waves.js     generated bundle (core + engine, readable)
 vanilla.waves.min.js generated bundle, minified, the CDN artifact
-docs/                the GitHub Pages site (canvasless, DOM/SVG demos)
-  index.html         showcase
+index.html           the Showcase (Pages landing, repo root)
+docs/                the rest of the GitHub Pages site
+  examples.html      the canvasless demo vocabulary, with source
+  engine.html        the DOM engine, deep-dive
   waves.html         all 34 waves + periodicity
   guide.html         install, math, engine API, starters
-  examples.html      the canvasless demo vocabulary, with source
   about.html         why it exists, parity, credits
-  style.css          shared skin        waves-demos.js  demo renderers
+  style.css          shared skin
+  waves-demos.js     demo renderers (eq/line/load/wave/ribbons/ascii/field)
   waves.feature.md   port-coverage + drift-watch changedoc
-index.html           live demos (repo root)
 ```
 
-The `docs/` site follows the same page structure as `p5.waves` and
-`processing.waves`, in vanilla.waves' own monospace identity, with every demo
-driven canvaslessly by the engine (no p5, no `<canvas>`). To publish it, point
-GitHub Pages at the **`/docs`** folder; the root `index.html` stays the
-standalone demo.
+The Pages site follows the same structure as `p5.waves` (Showcase at the repo
+root, the rest under `docs/`) and the same nav — Showcase · Examples · Engine ·
+Waves · Guide · About — in vanilla.waves' own monospace identity, with every
+demo driven canvaslessly by the engine (no p5, no `<canvas>`). `p5.waves` calls
+its signature page *Curation Engine*; vanilla's is **Engine**, the DOM loop that
+makes the port more than maths. Publish by serving Pages from the repo root.
 
 The element library (loaders, controls, draggables) lives in a separate
 package, **vanilla.waves_elements**, built on this engine.

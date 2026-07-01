@@ -1,154 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>vanilla.waves — the wave dialect, without p5 or canvas</title>
-<style>
-  :root { --bg:#d9d8d2; --ink:#14140f; --soft:#6b6b63; --line:#14140f; --accent:#ff2e2e; }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--ink);
-         font-family:"Courier New", ui-monospace, monospace; line-height:1.5; }
-  .wrap { max-width:860px; margin:0 auto; padding:40px 24px 80px; }
-  header { border-bottom:2px solid var(--line); padding-bottom:14px; margin-bottom:8px; }
-  h1 { font-size:34px; letter-spacing:.02em; margin:0; text-transform:lowercase; }
-  h1 b { background:var(--ink); color:var(--bg); padding:0 6px; }
-  .tag { font-size:12px; color:var(--soft); text-transform:uppercase; letter-spacing:.12em; margin-top:6px; }
-  .lineage { font-size:11px; color:var(--soft); margin:14px 0 0; }
-  .lineage code { background:rgba(0,0,0,.06); padding:1px 4px; }
-  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.14em; margin:40px 0 4px;
-       border-bottom:1px solid var(--line); padding-bottom:5px; }
-  .note { font-size:12px; color:var(--soft); margin:0 0 16px; }
-  pre { background:var(--ink); color:var(--bg); padding:14px 16px; overflow:auto;
-        font-size:12px; line-height:1.5; }
-  pre .c { color:#9a9a8f; }
-  a { color:var(--accent); }
-  .demo { border:1px solid var(--line); padding:20px; margin:0 0 8px; background:#e7e6e0;
-          display:flex; align-items:center; justify-content:center; min-height:120px; gap:18px; flex-wrap:wrap; }
-
-  /* equalizer */
-  .wv-eq { display:flex; align-items:flex-end; gap:3px; height:90px; }
-  .wv-eq span { width:8px; height:100%; background:var(--ink); transform-origin:bottom; display:block; }
-
-  /* wave line */
-  .wv-line { display:flex; align-items:center; gap:2px; height:90px; }
-  .wv-line span { width:5px; height:5px; border-radius:50%; background:var(--ink); display:block; }
-
-  /* text loader */
-  .wv-load { display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(4,1fr);
-             width:96px; height:96px; }
-  .wv-load span { display:flex; align-items:center; justify-content:center; font-size:24px; line-height:1; }
-
-  footer { margin-top:56px; padding-top:14px; border-top:1px solid var(--line);
-           font-size:11px; color:var(--soft); }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vanilla.waves — the wave dialect, without p5 or canvas</title>
+  <meta name="description" content="vanilla.waves — a zero-dependency vanilla-JS port of p5.waves. The same 34 wave formulas, plus a tiny DOM engine that drives plain HTML instead of a canvas.">
+  <meta property="og:title" content="vanilla.waves — the wave dialect, without p5 or canvas">
+  <meta property="og:description" content="Bit-identical math to p5.waves v3.4.0, zero dependencies, one shared 30fps DOM loop. No p5, no canvas.">
+  <meta property="og:url" content="https://seb-prjcts-be.github.io/vanilla.waves/">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="docs/style.css">
+  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"></script>
+  <script src="docs/waves-demos.js"></script>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <h1>vanilla<b>.waves</b></h1>
-    <div class="tag">the wave dialect — without p5, without a canvas</div>
-  </header>
-  <p class="lineage">
-    <code>p5.waves</code> → canvas &nbsp;·&nbsp; <code>processing.waves</code> → java
-    &nbsp;·&nbsp; <code>vanilla.waves</code> → plain DOM, zero dependencies.
-    Bit-identical math to p5.waves v3.4.0.
-    <a href="https://github.com/seb-prjcts-be/vanilla.waves">GitHub →</a>
-  </p>
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-logo"><a href="index.html">vanilla<b>.waves</b></a></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="#hero" class="active">Showcase</a></li>
+      <li><a href="docs/examples.html">Examples</a></li>
+      <li><a href="docs/engine.html">Engine</a></li>
+      <li><a href="docs/waves.html">Waves</a></li>
+      <li><a href="docs/guide.html">Guide</a></li>
+      <li><a href="docs/about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
 
-  <h2>Drop it in</h2>
-  <pre><span class="c">&lt;!-- one tag: math + DOM engine, no build step --&gt;</span>
-&lt;script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"&gt;&lt;/script&gt;
-&lt;div data-wv="eq" data-seed="13"&gt;&lt;/div&gt;</pre>
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-wave" data-wv="ribbons" data-seed="13" data-rows="8"></div>
+    <div class="hero-text">
+      <div class="hero-badge">zero-dependency library</div>
+      <h1>vanilla<b>.waves</b></h1>
+      <p class="hero-sub">34 wave shapes. One function call. No p5, no <code class="inl">&lt;canvas&gt;</code> — the dialect ported to plain DOM. Bit-identical math to <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank" rel="noopener">p5.waves</a>.</p>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">34</span><span class="stat-label">waves</span></div>
+        <div class="stat"><span class="stat-num">0</span><span class="stat-label">dependencies</span></div>
+        <div class="stat"><span class="stat-num">1</span><span class="stat-label">shared loop</span></div>
+      </div>
+      <div class="cta-row">
+        <a href="docs/waves.html" class="cta-btn">See all 34 waves &#8595;</a>
+        <a href="docs/guide.html" class="cta-btn ghost">Read the guide</a>
+      </div>
+    </div>
+  </section>
 
-  <h2>Equalizer — the DOM engine</h2>
-  <p class="note">A registered <code>eq</code> type. Each bar's height is a sampler value; one shared 30 fps loop drives them all.</p>
-  <div class="demo">
-    <div class="wv-eq" data-wv="eq" data-seed="13" data-count="24"></div>
-  </div>
+  <!-- LINEAGE -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-tag">one dialect, three runtimes</div>
+      <h2>same numbers, <b>no canvas</b></h2>
+      <p>The p5.waves <em>math</em> never actually needed p5 — <code class="inl">wave()</code>, the 34 formulas, the seeded shift engine, all of it is pure <code class="inl">Math.*</code>. vanilla.waves is that canonical core, byte-for-byte, with the p5 hook removed and a tiny DOM engine bolted on.</p>
+    </div>
+    <div style="max-width:720px;margin:0 auto;">
+      <table class="opts-table">
+        <thead><tr><th>Port</th><th>Runtime</th><th class="desc">Draws with</th></tr></thead>
+        <tbody>
+          <tr><td>p5.waves</td><td>p5.js</td><td class="desc">a &lt;canvas&gt;</td></tr>
+          <tr><td>processing.waves</td><td>Java / Processing 4</td><td class="desc">the Processing surface</td></tr>
+          <tr><td>vanilla.waves</td><td>plain DOM, zero deps</td><td class="desc">any HTML element — bars, dots, text, opacity</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-  <h2>Wave line — a sampler traced in dots</h2>
-  <p class="note">One sampler, sampled across position; the row of dots traces the live waveform as it shifts and morphs.</p>
-  <div class="demo">
-    <div class="wv-line" data-wv="line" data-seed="4" data-count="90" data-group="closing"></div>
-  </div>
+  <!-- DROP IT IN -->
+  <section class="section section-alt">
+    <div class="section-header">
+      <div class="section-tag">&lt;script&gt; · no build step</div>
+      <h2>drop it in</h2>
+      <p>One tag pulls the math plus the DOM engine. Mark an element with <code class="inl">data-wv</code>; one shared 30&nbsp;fps loop animates every marked element and pauses the ones offscreen.</p>
+    </div>
+    <div style="max-width:760px;margin:0 auto 1.6rem;">
+      <pre class="code"><span class="c">&lt;!-- one tag: math + DOM engine --&gt;</span>
+&lt;<span class="k">script</span> src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"&gt;&lt;/<span class="k">script</span>&gt;
+&lt;<span class="k">div</span> data-wv="eq" data-seed="13"&gt;&lt;/<span class="k">div</span>&gt;</pre>
+    </div>
+    <div class="demo" style="max-width:760px;margin:0 auto;">
+      <div class="wv-eq" data-wv="eq" data-seed="13" data-count="28"></div>
+    </div>
+  </section>
 
-  <h2>Text loader — characters from wave density</h2>
-  <p class="note">The canvasless loader technique: a 4×4 grid where each cell picks a character from a wave value. Cheap enough to run dozens at once.</p>
-  <div class="demo">
-    <div class="wv-load" data-wv="load" data-seed="13"></div>
-    <div class="wv-load" data-wv="load" data-seed="7" data-text="WAVES···"></div>
-    <div class="wv-load" data-wv="load" data-seed="21" data-text="·:░▒▓█"></div>
-  </div>
+  <!-- WHAT ONE LOOP DRIVES -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-tag">canvasless demos</div>
+      <h2>what one loop <b>drives</b></h2>
+      <p>The sampler returns a number; you map it to any DOM property. Height, position, a character, an opacity — all from the same breathing, shifting, morphing motion.</p>
+    </div>
 
-  <h2>Just the math</h2>
-  <pre><span class="c">// same numbers as p5.waves — drive any DOM property</span>
-const s = VanillaWaves.createSampler({ shift: true, range: [-50, 50] });
-el.style.transform = 'translateY(' + s.sample(0, t) + 'px)';</pre>
+    <div class="ex-list">
 
+      <div class="ex-block">
+        <div class="ex-head"><h3>equalizer</h3><span class="ex-tag">sampler → scaleY</span></div>
+        <p class="lead">Each bar's height is one sampler value read at a different position. The wave shifts through formulas on its own, so the meter never repeats.</p>
+        <div class="ex-grid">
+          <div class="ex-stage"><div class="wv-eq" data-wv="eq" data-seed="4" data-count="22"></div></div>
+          <pre class="code-block"><span class="c">// each bar: a sampler value → scaleY</span>
+v = 0.08 + s.sample(i * 0.55, t) * 0.92;
+bar.style.transform = <span class="s">'scaleY('</span> + v + <span class="s">')'</span>;</pre>
+        </div>
+      </div>
+
+      <div class="ex-block">
+        <div class="ex-head"><h3>wave line</h3><span class="ex-tag">sampler → translateY</span></div>
+        <p class="lead">One sampler traced across position, drawn as a row of dots. The row <em>is</em> the live waveform, complete with shift and morph.</p>
+        <div class="ex-grid">
+          <div class="ex-stage"><div class="wv-line" data-wv="line" data-seed="7" data-count="70" data-group="closing"></div></div>
+          <pre class="code-block"><span class="c">// dots trace the waveform</span>
+v = s.sample(i * 0.18, t);
+dot.style.transform = <span class="s">'translateY('</span> + v*38 + <span class="s">'px)'</span>;</pre>
+        </div>
+      </div>
+
+      <div class="ex-block">
+        <div class="ex-head"><h3>text loader</h3><span class="ex-tag">wave → character</span></div>
+        <p class="lead">A 4×4 grid where each cell picks a glyph from a wave value. Cheap enough to run dozens at once — the canvasless loader technique.</p>
+        <div class="ex-grid">
+          <div class="ex-stage" style="gap:22px;">
+            <div class="wv-load" data-wv="load" data-seed="13"></div>
+            <div class="wv-load" data-wv="load" data-seed="21" data-text="·:░▒▓█"></div>
+          </div>
+          <pre class="code-block"><span class="c">// value → index into a character ramp</span>
+idx = floor((v + 1) / 2 * text.length);
+cell.textContent = text[idx];</pre>
+        </div>
+      </div>
+
+      <div class="ex-block">
+        <div class="ex-head"><h3>tone field</h3><span class="ex-tag">wave → opacity</span></div>
+        <p class="lead">A grid of ink cells whose opacity is a sampler value. Structured like noise, but it breathes and re-forms as the wave shifts.</p>
+        <div class="ex-grid">
+          <div class="ex-stage"><div class="wv-field" data-wv="field" data-seed="9" data-cols="22" data-rows="9"></div></div>
+          <pre class="code-block"><span class="c">// each cell: value → opacity</span>
+v = (s.sample(c*0.4, t + r*0.5) + 1) / 2;
+cell.style.opacity = 0.06 + v * 0.94;</pre>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cta-row" style="margin-top:2.4rem;">
+      <a href="docs/examples.html" class="cta-btn">All examples &rarr;</a>
+      <a href="docs/engine.html" class="cta-btn ghost">How the engine works &rarr;</a>
+    </div>
+  </section>
+
+  <!-- WAVES TEASER -->
+  <section class="section section-alt">
+    <div class="section-header">
+      <div class="section-tag">Waves.wave(x, "name")</div>
+      <h2>34 shapes, three <b>temperaments</b></h2>
+      <p>Smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos — each a tiny formula tuned to drive motion. Here traced live, canvasless, in SVG.</p>
+    </div>
+    <div class="wave-cards" style="max-width:1000px;margin:0 auto;">
+      <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="classic sine"></div><div class="wave-meta"><div class="idx">00</div><div class="name">classic sine</div></div></article>
+      <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="mountain peaks"></div><div class="wave-meta"><div class="idx">06</div><div class="name">mountain peaks</div></div></article>
+      <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="batman"></div><div class="wave-meta"><div class="idx">09</div><div class="name">batman</div></div></article>
+      <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="triangle"></div><div class="wave-meta"><div class="idx">18</div><div class="name">triangle</div></div></article>
+      <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="wobble sine"></div><div class="wave-meta"><div class="idx">15</div><div class="name">wobble sine</div></div></article>
+      <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="noise"></div><div class="wave-meta"><div class="idx">24</div><div class="name">noise</div></div></article>
+    </div>
+    <div style="text-align:center;margin-top:2rem;">
+      <a href="docs/waves.html" class="cta-btn">See all 34 waves &rarr;</a>
+    </div>
+  </section>
+
+  <!-- GET STARTED -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-tag">just the math</div>
+      <h2>drive any <b>property</b></h2>
+      <p>Skip the engine entirely if you want. A sampler is one value in, one number out — point it at any DOM property in your own loop.</p>
+    </div>
+    <div style="max-width:640px;margin:0 auto;">
+      <pre class="code"><span class="c">// same numbers as p5.waves — drive anything</span>
+<span class="k">const</span> s = VanillaWaves.createSampler({ shift: <span class="k">true</span>, range: [-50, 50] });
+
+<span class="k">function</span> tick(now) {
+  el.style.transform = <span class="s">'translateY('</span> + s.sample(0, now/1000) + <span class="s">'px)'</span>;
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);</pre>
+    </div>
+    <div class="cta-row" style="margin-top:2rem;">
+      <a href="docs/guide.html" class="cta-btn">Full guide &rarr;</a>
+      <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener" class="cta-btn ghost">GitHub &rarr;</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
   <footer>
-    vanilla.waves · zero-dependency vanilla-JS port of the p5.waves dialect ·
-    MIT © <a href="https://github.com/seb-prjcts-be">Sebastien Vanblaere</a>
+    <p>Zero-dependency vanilla-JS port of the <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> dialect · baseline v3.4.0</p>
+    <p class="footer-sub">MIT License · v0.1.0 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a> · <a href="https://github.com/seb-prjcts-be">Sebastien Vanblaere</a></p>
   </footer>
 
-</div>
-
-<!-- the library itself -->
-<script src="vanilla.waves.min.js"></script>
-<script>
-  // Demo element types, registered on the engine.
-  const W = window.VanillaWaves;
-
-  W.register('eq', {
-    create(node, o, h) {
-      const n = h.num(o.count, 16), bars = [];
-      for (let i = 0; i < n; i++) bars.push(node.appendChild(h.el('span')));
-      return { bars, n, sampler: h.makeSampler() };
-    },
-    update(s, t) {
-      for (let i = 0; i < s.n; i++) {
-        const v = 0.08 + s.sampler.sample(i * 0.55, t) * 0.92;   // sampler→height
-        s.bars[i].style.transform = 'scaleY(' + v.toFixed(3) + ')';
-      }
-    }
-  });
-
-  W.register('line', {
-    create(node, o, h) {
-      const n = h.num(o.count, 80), dots = [];
-      for (let i = 0; i < n; i++) dots.push(node.appendChild(h.el('span')));
-      return { dots, n, sampler: h.makeSampler({ amplitude: 1 }) };
-    },
-    update(s, t) {
-      for (let i = 0; i < s.n; i++) {
-        const v = s.sampler.sample(i * 0.18, t);        // ~[-1,1]
-        s.dots[i].style.transform = 'translateY(' + (v * 38).toFixed(1) + 'px)';
-      }
-    }
-  });
-
-  W.register('load', {
-    create(node, o, h) {
-      const cells = [];
-      for (let i = 0; i < 16; i++) cells.push(node.appendChild(h.el('span')));
-      return { cells, sampler: h.makeSampler(), text: o.text || 'LOADING', prev: new Array(16).fill('') };
-    },
-    update(s, t) {
-      const len = s.text.length;
-      let i = 0;
-      for (let r = 0; r < 4; r++)
-        for (let c = 0; c < 4; c++, i++) {
-          const v = s.sampler.sample(c * 0.5 + t, t + r * 0.9);
-          let idx = Math.floor((v + 1) / 2 * len);
-          idx = idx < 0 ? 0 : idx >= len ? len - 1 : idx;
-          const ch = s.text[idx];
-          if (ch !== s.prev[i]) { s.prev[i] = ch; s.cells[i].textContent = ch; }
-        }
-    }
-  });
-
-  // types registered before DOMContentLoaded → engine auto-init wires them up
-</script>
 </body>
 </html>
