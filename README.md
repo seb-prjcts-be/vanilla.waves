@@ -1,5 +1,7 @@
 # vanilla.waves
 
+> **Pure mathematical waves for DOM objects.**
+
 **The wave dialect, without p5 and without a canvas.** A zero-dependency,
 vanilla-JS port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves): the
 same `wave()` / `createSampler()` math, plus a tiny DOM engine that drives plain
