@@ -18,12 +18,19 @@
   var NS = 'http://www.w3.org/2000/svg';
   function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
+  // coffeehouse vanilla tones: espresso · mocha · caramel · latte · cinnamon
+  var COFFEE = ['#33261b', '#6f4e37', '#a9763f', '#c8a878', '#8a5a3c'];
+
   /* ── eq — equalizer bars ─────────────────────────────────
      Each bar's height is a sampler value; one shared loop drives all. */
   W.register('eq', {
     create: function (node, o, h) {
       var n = h.num(o.count, 18), bars = [];
-      for (var i = 0; i < n; i++) bars.push(node.appendChild(h.el('span')));
+      for (var i = 0; i < n; i++) {
+        var b = h.el('span');
+        b.style.background = COFFEE[i % COFFEE.length];   // coffee tones across the meter
+        bars.push(node.appendChild(b));
+      }
       return { bars: bars, n: n, s: h.makeSampler() };
     },
     update: function (st, t) {
@@ -39,7 +46,11 @@
   W.register('line', {
     create: function (node, o, h) {
       var n = h.num(o.count, 80), dots = [];
-      for (var i = 0; i < n; i++) dots.push(node.appendChild(h.el('span')));
+      for (var i = 0; i < n; i++) {
+        var d = h.el('span');
+        d.style.background = COFFEE[i % COFFEE.length];   // coffee tones along the line
+        dots.push(node.appendChild(d));
+      }
       return { dots: dots, n: n, s: h.makeSampler({ amplitude: 1 }) };
     },
     update: function (st, t) {
@@ -118,6 +129,7 @@
       for (var r = 0; r < rows; r++) {
         var p = document.createElementNS(NS, 'polyline');
         p.setAttribute('class', 'wv-trace');
+        p.setAttribute('stroke', COFFEE[r % COFFEE.length]);   // a coffee tone per ribbon
         svg.appendChild(p);
         lines.push(p);
       }
@@ -180,8 +192,11 @@
       var i = 0;
       for (var r = 0; r < st.rows; r++)
         for (var c = 0; c < st.cols; c++, i++) {
-          var v = st.s.sample(c * 0.4, t + r * 0.5);
-          st.cells[i].style.opacity = (0.06 + (clamp(v, -1, 1) + 1) / 2 * 0.94).toFixed(3);
+          var nv = (clamp(st.s.sample(c * 0.4, t + r * 0.5), -1, 1) + 1) / 2;   // 0..1
+          var cell = st.cells[i];
+          // warm heatmap: high value → espresso, low → latte, with depth from opacity
+          cell.style.background = COFFEE[clamp(Math.floor((1 - nv) * COFFEE.length), 0, COFFEE.length - 1)];
+          cell.style.opacity = (0.2 + nv * 0.8).toFixed(3);
         }
     }
   });
