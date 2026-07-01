@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — vanilla.waves</title>
+  <meta name="description" content="Why a canvasless, zero-dependency port of p5.waves? How the math was lifted byte-for-byte, verified, and given a tiny DOM engine.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo"><a href="index.html">vanilla<b>.waves</b></a></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Showcase</a></li>
+      <li><a href="waves.html">Waves</a></li>
+      <li><a href="guide.html">Guide</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <main class="wrap">
+    <h1>about</h1>
+    <p class="intro">Pass a number in, get a number back. Behind that one promise lives a curated set of 34 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos, each a tiny formula tuned to drive motion, colour, shape, or pattern. vanilla.waves is that set — with nothing else loaded, and nothing drawn on a canvas.</p>
+
+    <h2>The math never needed p5</h2>
+    <p><strong>vanilla.waves</strong> is the plain-DOM sibling of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a>. Look at the p5.waves source: <code class="inl">wave()</code>, <code class="inl">createSampler()</code>, the 34 formulas, the seeded shift/morph engine — all of it is pure <code class="inl">Math.*</code>. The only p5 touchpoint is an 8-line prototype hook at the very bottom of the file.</p>
+    <p>So this port is that canonical core, byte-for-byte, with the p5 hook removed and its own global exposed. You get the full wave dialect — the same breathing, shifting, morphing motion — to drive loaders, backgrounds, text fields, meters, <em>any DOM element</em>, with zero dependencies.</p>
+
+    <div class="callout"><p><span class="note">lineage</span> <code class="inl">p5.waves</code> → p5 / canvas &nbsp;·&nbsp; <code class="inl">processing.waves</code> → Java / Processing &nbsp;·&nbsp; <code class="inl">vanilla.waves</code> → plain DOM, zero deps. Same dialect, different runtime — <code class="inl">processing.waves</code> is the precedent for "same language, maintained apart."</p></div>
+
+    <h2>The challenge of a faithful port</h2>
+    <p>Most ports rename and retype. This one had an easier and a harder job at once: the source language <em>is</em> JavaScript, so the math could be lifted verbatim — but that also means any drift from the canon is a bug, not a translation choice. The discipline:</p>
+    <ul class="step-list">
+      <li><div><p><strong>Byte-for-byte core.</strong> <code class="inl">waves-core.js</code> is the canonical <code class="inl">p5.waves.js</code> math with only the 8 p5-prototype lines removed. No re-implementation, no "cleanup" — the numbers stay identical because the code is identical.</p></div></li>
+      <li><div><p><strong>Own global, drop-in name.</strong> The library exposes <code class="inl">VanillaWaves</code> (alias <code class="inl">vWaves</code>), and answers to <code class="inl">Waves</code> as a drop-in when p5.waves isn't present.</p></div></li>
+      <li><div><p><strong>Faithful entropy.</strong> <code class="inl">shift</code> mixes in a per-session random offset, so the same seed yields a different sequence each page load — exactly as p5.waves does. No determinism mode; the per-load variation is the point.</p></div></li>
+    </ul>
+
+    <h2>Trust, then verify</h2>
+    <p>To prove the port never drifts, the repo runs a parity harness: it evaluates the JS reference and the ported core over the same inputs and asserts equality.</p>
+    <table class="opts-table">
+      <thead><tr><th>Metric</th><th class="desc" colspan="2">Value</th></tr></thead>
+      <tbody>
+        <tr><td>Parity checks</td><td class="desc" colspan="2">1009 (all 34 waves + morph, range, wild, sampler)</td></tr>
+        <tr><td>Result</td><td class="desc" colspan="2">bit-identical — 1009 / 1009 pass</td></tr>
+        <tr><td>Baseline</td><td class="desc" colspan="2">p5.waves v3.4.0 (commit 6ce959e, 34 waves)</td></tr>
+        <tr><td>Drift watch</td><td class="desc" colspan="2">weekly routine compares canon ↔ port</td></tr>
+      </tbody>
+    </table>
+    <p>See <a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves.feature.md" target="_blank" rel="noopener">waves.feature.md</a> for the port-coverage and drift-watch changedoc.</p>
+
+    <h2>34 shapes, three temperaments</h2>
+    <p>Every wave has a character. The library splits them into three groups so you can lean into the one you want:</p>
+    <ul class="step-list">
+      <li><div><p><strong>Gentle</strong>: pure functions of x. Deterministic, repeatable, made of sines, cosines and modulos. The dependable section.</p></div></li>
+      <li><div><p><strong>Harsh</strong>: noise-driven or tangent-spiked. They pull from a seeded PRNG, so they jitter and surprise within the wave's envelope.</p></div></li>
+      <li><div><p><strong>Closing</strong>: a pool whose period divides 2π·n cleanly. A shape swept over a full cycle joins back to itself without a seam — what you want for a ring.</p></div></li>
+    </ul>
+    <p>You don't have to pick by hand. Ask for "a gentle one" and let a seed decide, ask for a name, ask for two names and crossfade with <code class="inl">mix</code>, or flip <code class="inl">shift</code> on and watch the library cycle formulas at a tempo you set. All from one call.</p>
+
+    <h2>How it differs from its parent</h2>
+    <ul class="step-list">
+      <li><div><p><strong>No canvas, no p5.</strong> There is no drawing surface. The math returns numbers; <em>you</em> map them onto DOM — a bar height, a character, an opacity, an SVG point.</p></div></li>
+      <li><div><p><strong>A tiny DOM engine included.</strong> Register an element type, mark it with <code class="inl">data-wv</code>, and one shared 30&nbsp;fps loop animates it. Offscreen elements pause via <code class="inl">IntersectionObserver</code>; <code class="inl">prefers-reduced-motion</code> renders one static frame instead of animating.</p></div></li>
+      <li><div><p><strong>Core stays pure.</strong> The engine augments the same global but never touches the math. Element libraries import the core; the core never imports them.</p></div></li>
+    </ul>
+
+    <h2>Where the components live</h2>
+    <p>This repo is the <strong>library</strong> — the math plus the engine. Concrete components (loaders, controls, draggables) live in a separate package, <strong>vanilla.waves_elements</strong>, built on this engine. First bib, then plugin.</p>
+
+    <h2>License &amp; credits</h2>
+    <p>vanilla.waves is <a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>, like its parent. The original p5.waves library lives at <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">seb-prjcts-be/p5.waves</a>. Bug reports, sketches built with the library, and pull requests are welcome on <a href="https://github.com/seb-prjcts-be/vanilla.waves/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+
+    <h3>Maker</h3>
+    <ul class="step-list">
+      <li><div><p><a href="https://prjcts.be" target="_blank" rel="noopener">Sebastien Vanblaere — prjcts.be</a></p></div></li>
+    </ul>
+
+    <h3>Contributors (wave formula dataset)</h3>
+    <ul class="step-list">
+      <li><div><p><a href="https://twitter.com/GenerativePunk" target="_blank" rel="noopener">tw@GenerativePunk</a> — original dataset contributor</p></div></li>
+      <li><div><p><a href="https://github.com/ffd8" target="_blank" rel="noopener">gh@ffd8 (Ted Davis)</a> — original dataset contributor, Oscillation Sandbox</p></div></li>
+    </ul>
+  </main>
+
+  <footer>
+    <p>Zero-dependency vanilla-JS port of the <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> dialect · baseline v3.4.0</p>
+    <p class="footer-sub">MIT License · v0.1.0 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+</body>
+</html>

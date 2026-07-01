@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examples — vanilla.waves</title>
+  <meta name="description" content="Canvasless demos built on the vanilla.waves engine — equalizer, wave line, text loader, ASCII flow field, tone field, ribbons. Each with its register() code.">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"></script>
+  <script src="waves-demos.js"></script>
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo"><a href="index.html">vanilla<b>.waves</b></a></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Showcase</a></li>
+      <li><a href="waves.html">Waves</a></li>
+      <li><a href="guide.html">Guide</a></li>
+      <li><a href="examples.html" class="active">Examples</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <main class="wrap" style="max-width:1000px;">
+    <h1>examples</h1>
+    <p class="intro">Six canvasless renderers, all driven by the same shared 30&nbsp;fps loop. Each is a registered element type: <code class="inl">create</code> builds the DOM, <code class="inl">update</code> maps a sampler value onto a property every frame. Everything below is live on this page — no <code class="inl">&lt;canvas&gt;</code> anywhere. The full set lives in <a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves-demos.js" target="_blank" rel="noopener">waves-demos.js</a>.</p>
+
+    <div class="ex-list" style="margin-top:2.4rem;">
+
+      <!-- EQUALIZER -->
+      <div class="ex-block">
+        <div class="ex-head"><h3>equalizer</h3><span class="ex-tag">sampler · scaleY</span></div>
+        <p class="lead">One sampler read at a different position per bar. Height comes straight off the wave; because shift is on, the meter cycles through formulas and never settles.</p>
+        <div class="ex-grid">
+          <div class="ex-stage"><div class="wv-eq" data-wv="eq" data-seed="13" data-count="24"></div></div>
+          <pre class="code-block">VanillaWaves.register('eq', {
+  create(node, o, h) {
+    const n = h.num(o.count, 18), bars = [];
+    for (let i = 0; i &lt; n; i++)
+      bars.push(node.appendChild(h.el('span')));
+    return { bars, n, s: h.makeSampler() };
+  },
+  update(st, t) {
+    for (let i = 0; i &lt; st.n; i++) {
+      const v = 0.08 + st.s.sample(i*0.55, t) * 0.92;
+      st.bars[i].style.transform = 'scaleY(' + v + ')';
+    }
+  }
+});</pre>
+        </div>
+        <div class="ex-links"><a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves-demos.js" target="_blank" rel="noopener">Source &rarr;</a></div>
+      </div>
+
+      <!-- WAVE LINE -->
+      <div class="ex-block">
+        <div class="ex-head"><h3>wave line</h3><span class="ex-tag">sampler · translateY · closing</span></div>
+        <p class="lead">A single sampler traced across position and drawn as a row of dots. The row <em>is</em> the live waveform. Restrict the pool with <code class="inl">data-group="closing"</code> and it keeps its shape while it shifts.</p>
+        <div class="ex-grid">
+          <div class="ex-stage"><div class="wv-line" data-wv="line" data-seed="4" data-count="80" data-group="closing"></div></div>
+          <pre class="code-block">VanillaWaves.register('line', {
+  create(node, o, h) {
+    const n = h.num(o.count, 80), dots = [];
+    for (let i = 0; i &lt; n; i++)
+      dots.push(node.appendChild(h.el('span')));
+    return { dots, n, s: h.makeSampler({ amplitude: 1 }) };
+  },
+  update(st, t) {
+    for (let i = 0; i &lt; st.n; i++) {
+      const v = st.s.sample(i*0.18, t);
+      st.dots[i].style.transform =
+        'translateY(' + (v*38).toFixed(1) + 'px)';
+    }
+  }
+});
+
+&lt;div data-wv="line" data-group="closing"&gt;&lt;/div&gt;</pre>
+        </div>
+        <div class="ex-links"><a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves-demos.js" target="_blank" rel="noopener">Source &rarr;</a></div>
+      </div>
+
+      <!-- TEXT LOADER -->
+      <div class="ex-block">
+        <div class="ex-head"><h3>text loader</h3><span class="ex-tag">wave · character</span></div>
+        <p class="lead">A 4×4 grid where each cell picks a glyph from a wave value. Feed it any character ramp via <code class="inl">data-text</code>. Cheap enough to run dozens at once — the canvasless loader technique.</p>
+        <div class="ex-grid">
+          <div class="ex-stage" style="gap:22px;">
+            <div class="wv-load" data-wv="load" data-seed="13"></div>
+            <div class="wv-load" data-wv="load" data-seed="7" data-text="WAVES···"></div>
+            <div class="wv-load" data-wv="load" data-seed="21" data-text="·:░▒▓█"></div>
+          </div>
+          <pre class="code-block">VanillaWaves.register('load', {
+  create(node, o, h) {
+    const cells = [];
+    for (let i = 0; i &lt; 16; i++)
+      cells.push(node.appendChild(h.el('span')));
+    return { cells, s: h.makeSampler(),
+             text: o.text || 'LOADING',
+             prev: Array(16).fill('') };
+  },
+  update(st, t) {
+    const len = st.text.length; let i = 0;
+    for (let r = 0; r &lt; 4; r++)
+      for (let c = 0; c &lt; 4; c++, i++) {
+        const v = st.s.sample(c*0.5 + t, t + r*0.9);
+        let idx = Math.floor((v+1)/2 * len);
+        idx = Math.max(0, Math.min(len-1, idx));
+        const ch = st.text[idx];
+        if (ch !== st.prev[i]) {
+          st.prev[i] = ch; st.cells[i].textContent = ch;
+        }
+      }
+  }
+});</pre>
+        </div>
+        <div class="ex-links"><a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves-demos.js" target="_blank" rel="noopener">Source &rarr;</a></div>
+      </div>
+
+      <!-- ASCII FLOW FIELD -->
+      <div class="ex-block">
+        <div class="ex-head"><h3>ASCII flow field</h3><span class="ex-tag">shift · character ramp · grid</span></div>
+        <p class="lead">A grid of characters, each glyph chosen from a shift-sampler — like noise, but with structure that keeps re-forming as the wave shifts. One <code class="inl">&lt;pre&gt;</code>, rebuilt from a string each frame.</p>
+        <div class="ex-grid">
+          <div class="ex-stage"><div data-wv="ascii" data-seed="8" data-cols="30" data-rows="12"></div></div>
+          <pre class="code-block">VanillaWaves.register('ascii', {
+  create(node, o, h) {
+    const pre = h.el('pre', 'wv-ascii');
+    node.appendChild(pre);
+    return { pre,
+      cols: h.num(o.cols, 34), rows: h.num(o.rows, 12),
+      chars: o.chars || ' ·-=+*#%@',
+      s: h.makeSampler({ range: [-1, 1],
+        shiftInterval: 4, shiftDuration: 2 }) };
+  },
+  update(st, t) {
+    let out = '', len = st.chars.length;
+    for (let r = 0; r &lt; st.rows; r++) {
+      for (let c = 0; c &lt; st.cols; c++) {
+        const v = st.s.sample(c*0.5, t + r*0.4);
+        const i = Math.floor((v+1)/2 * len);
+        out += st.chars[Math.max(0, Math.min(len-1, i))];
+      }
+      out += '\n';
+    }
+    st.pre.textContent = out;
+  }
+});</pre>
+        </div>
+        <div class="ex-links"><a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves-demos.js" target="_blank" rel="noopener">Source &rarr;</a></div>
+      </div>
+
+      <!-- TONE FIELD -->
+      <div class="ex-block">
+        <div class="ex-head"><h3>tone field</h3><span class="ex-tag">wave · opacity · grid</span></div>
+        <p class="lead">A grid of ink cells whose opacity is a sampler value. A wave-driven take on a static field — every cell drifts inside a moving window, so it stays organised while it breathes.</p>
+        <div class="ex-grid">
+          <div class="ex-stage"><div class="wv-field" data-wv="field" data-seed="5" data-cols="24" data-rows="10"></div></div>
+          <pre class="code-block">VanillaWaves.register('field', {
+  create(node, o, h) {
+    const cols = h.num(o.cols, 24),
+          rows = h.num(o.rows, 10), cells = [];
+    node.style.gridTemplateColumns =
+      `repeat(${cols}, 1fr)`;
+    for (let i = 0; i &lt; cols*rows; i++)
+      cells.push(node.appendChild(h.el('span')));
+    return { cells, cols, rows,
+      s: h.makeSampler({ range: [-1, 1] }) };
+  },
+  update(st, t) {
+    let i = 0;
+    for (let r = 0; r &lt; st.rows; r++)
+      for (let c = 0; c &lt; st.cols; c++, i++) {
+        const v = (st.s.sample(c*0.4, t + r*0.5) + 1) / 2;
+        st.cells[i].style.opacity = 0.06 + v * 0.94;
+      }
+  }
+});</pre>
+        </div>
+        <div class="ex-links"><a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves-demos.js" target="_blank" rel="noopener">Source &rarr;</a></div>
+      </div>
+
+      <!-- RIBBONS -->
+      <div class="ex-block">
+        <div class="ex-head"><h3>ribbons</h3><span class="ex-tag">SVG · stacked lines · shift</span></div>
+        <p class="lead">Stacked wave lines from one shift-sampler, each row offset in phase — the field this page's hero uses. SVG is still DOM: canvasless, ink on paper, morphing through all 34 formulas.</p>
+        <div class="ex-grid">
+          <div class="ex-stage" style="padding:0;">
+            <div class="hero-wave" style="position:relative;opacity:1;width:100%;height:200px;" data-wv="ribbons" data-seed="3" data-rows="7"></div>
+          </div>
+          <pre class="code-block">VanillaWaves.register('ribbons', {
+  create(node, o, h) {
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 120 60');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    const rows = h.num(o.rows, 7), lines = [];
+    for (let r = 0; r &lt; rows; r++) {
+      const p = document.createElementNS(NS, 'polyline');
+      p.setAttribute('class', 'wv-trace');
+      svg.appendChild(p); lines.push(p);
+    }
+    node.appendChild(svg);
+    return { lines, rows, n: h.num(o.count, 90),
+             s: h.makeSampler({ amplitude: 1 }) };
+  },
+  update(st, t) {
+    for (let r = 0; r &lt; st.rows; r++) {
+      const base = 8 + r * (44 / (st.rows - 1));
+      let pts = '';
+      for (let i = 0; i &lt;= st.n; i++) {
+        const x = (i/st.n)*46 + r*7;
+        const v = st.s.sample(x, t + r*0.35);
+        pts += (i/st.n*120) + ',' + (base + v*9) + ' ';
+      }
+      st.lines[r].setAttribute('points', pts);
+    }
+  }
+});</pre>
+        </div>
+        <div class="ex-links"><a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves-demos.js" target="_blank" rel="noopener">Source &rarr;</a></div>
+      </div>
+
+    </div>
+
+    <div class="callout" style="margin-top:2.4rem;">
+      <p>Done animating (e.g. content finished loading)? <code class="inl">VanillaWaves.destroy(el)</code> stops and cleans up — pass an element, a selector, a NodeList, or nothing to clear them all.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Zero-dependency vanilla-JS port of the <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> dialect · baseline v3.4.0</p>
+    <p class="footer-sub">MIT License · v0.1.0 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+</body>
+</html>

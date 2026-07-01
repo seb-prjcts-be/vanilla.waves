@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide — vanilla.waves</title>
+  <meta name="description" content="Install, the math, the DOM engine, options, sampler, shift, morph, wild, and canvasless starters for vanilla.waves.">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"></script>
+  <script src="waves-demos.js"></script>
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo"><a href="index.html">vanilla<b>.waves</b></a></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Showcase</a></li>
+      <li><a href="waves.html">Waves</a></li>
+      <li><a href="guide.html" class="active">Guide</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <main class="wrap">
+    <h1>guide</h1>
+    <p class="intro">Everything you need to use <strong>vanilla.waves</strong> — the wave dialect with no p5 and no <code class="inl">&lt;canvas&gt;</code>. The math mirrors <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank" rel="noopener">p5.waves</a> v3.4.0 exactly; on top of it sits a tiny DOM engine that drives plain HTML.</p>
+
+    <div class="quicklinks">
+      <a class="chip" href="#install">Install</a>
+      <a class="chip" href="#engine">First element</a>
+      <a class="chip" href="#math">The math</a>
+      <a class="chip" href="#options">Options</a>
+      <a class="chip" href="#sampler">Sampler</a>
+      <a class="chip" href="#api">Engine API</a>
+      <a class="chip" href="#shift">Shift</a>
+      <a class="chip" href="#closing">Closing</a>
+      <a class="chip" href="#morph">Morph</a>
+      <a class="chip" href="#wild">Wild</a>
+      <a class="chip" href="#all-waves">All 34</a>
+      <a class="chip" href="#parity">Parity</a>
+      <a class="chip" href="#starters">Starters</a>
+    </div>
+
+    <!-- INSTALL -->
+    <h2 id="install">Install</h2>
+    <p>vanilla.waves is a single file with no runtime dependencies. No npm, no bundler, no build step.</p>
+
+    <h3>Route A: CDN (jsDelivr)</h3>
+    <p>One tag pulls the math (<code class="inl">waves-core.js</code>) plus the DOM engine (<code class="inl">engine.js</code>):</p>
+    <pre class="code-block">&lt;script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"&gt;&lt;/script&gt;</pre>
+
+    <h3>Route B: Local</h3>
+    <p>Copy <code class="inl">vanilla.waves.min.js</code> (or <code class="inl">vanilla.waves.js</code> for the readable build) next to your HTML and point a <code class="inl">&lt;script&gt;</code> at it. Want <em>only</em> the math, no engine? Load <code class="inl">waves-core.js</code> on its own.</p>
+
+    <div class="callout">
+      <p><span class="note">global</span> The library exposes <code class="inl">VanillaWaves</code> (alias <code class="inl">vWaves</code>, and <code class="inl">Waves</code> as a drop-in when p5.waves isn't present).</p>
+    </div>
+
+    <!-- FIRST ELEMENT -->
+    <h2 id="engine">Your first element</h2>
+    <p>Register an element <em>type</em> once, mark elements with <code class="inl">data-wv="&lt;type&gt;"</code>. The shared loop calls your <code class="inl">update</code> every frame; offscreen elements pause automatically.</p>
+    <pre class="code-block">&lt;div data-wv="bars" data-seed="13" data-count="20"&gt;&lt;/div&gt;
+
+&lt;script src="vanilla.waves.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  VanillaWaves.register('bars', {
+    create(node, opts, h) {
+      const n = h.num(opts.count, 16);
+      const bars = [];
+      for (let i = 0; i &lt; n; i++) bars.push(node.appendChild(h.el('span')));
+      return { bars, s: h.makeSampler() };        <span class="c">// state</span>
+    },
+    update(state, t) {                             <span class="c">// every frame</span>
+      state.bars.forEach((b, i) =&gt; {
+        const v = 0.1 + state.s.sample(i * 0.5, t) * 0.9;
+        b.style.transform = 'scaleY(' + v.toFixed(3) + ')';
+      });
+    }
+  });
+  <span class="c">// auto-inits on DOMContentLoaded; call VanillaWaves.init() after adding nodes</span>
+&lt;/script&gt;</pre>
+    <div class="callout"><p>Types must be registered <strong>before</strong> the engine's auto-init (DOMContentLoaded). If you register or add nodes later, call <code class="inl">VanillaWaves.init()</code> again — it skips elements already wired.</p></div>
+
+    <!-- THE MATH -->
+    <h2 id="math">The math: three ways to call it</h2>
+
+    <h3>1. Lazy: <code class="inl">wave(y)</code></h3>
+    <p>One argument. A deterministic value from seed 0 at amplitude 100. Same input, same output.</p>
+    <pre class="code-block">const v = VanillaWaves.wave(x);   <span class="c">// amplitude 100, wave picked by seed 0</span></pre>
+
+    <h3>2. Quick: by name or seed</h3>
+    <pre class="code-block">const a = VanillaWaves.wave(x, 'mountain peaks');  <span class="c">// by name</span>
+const b = VanillaWaves.wave(x, 42);                <span class="c">// by seed (deterministic pick)</span></pre>
+
+    <h3>3. Full control: options object</h3>
+    <pre class="code-block">const y = VanillaWaves.wave(x, {
+  wave: 'bumpy sine',
+  amplitude: 80,
+  frequency: 1,
+  t: performance.now() / 1000,
+  phase: 0,
+  seed: 7
+});</pre>
+
+    <!-- OPTIONS -->
+    <h2 id="options">Options</h2>
+    <p>Every option, its default, and what it does. All are optional.</p>
+
+    <h3>Start here</h3>
+    <table class="opts-table">
+      <thead><tr><th>Option</th><th>Default</th><th class="desc">Description</th></tr></thead>
+      <tbody>
+        <tr><td>wave</td><td>null</td><td class="desc">A name, an index (0…33), or <code class="inl">[a, b]</code> to morph. <code class="inl">null</code> → picked by seed.</td></tr>
+        <tr><td>amplitude</td><td>100</td><td class="desc">Output is scaled to <code class="inl">[&minus;amp/2, +amp/2]</code>.</td></tr>
+        <tr><td>frequency</td><td>1</td><td class="desc">Multiplier on x. Higher = faster cycles.</td></tr>
+        <tr><td>t</td><td>0</td><td class="desc">Time, in seconds. Anything that moves reads this.</td></tr>
+        <tr><td>seed</td><td>0</td><td class="desc">Picks the wave when <code class="inl">wave</code> is null; seeds the PRNG for harsh waves.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Level up</h3>
+    <table class="opts-table">
+      <thead><tr><th>Option</th><th>Default</th><th class="desc">Description</th></tr></thead>
+      <tbody>
+        <tr><td>phase</td><td>0</td><td class="desc">Added to x before evaluation. Shifts the wave horizontally.</td></tr>
+        <tr><td>range</td><td>null</td><td class="desc"><code class="inl">[lo, hi]</code> — map output to this range instead of amplitude scaling. Great for opacity 0–1, hue 0–360, etc.</td></tr>
+        <tr><td>mix</td><td>0.5</td><td class="desc">Morph position (0…1) when two waves are set.</td></tr>
+        <tr><td>group</td><td>'all'</td><td class="desc"><code class="inl">'gentle'</code>, <code class="inl">'harsh'</code>, <code class="inl">'closing'</code>, <code class="inl">'all'</code>, or an array of names. Restricts which waves seed/shift can pick.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Go deeper</h3>
+    <table class="opts-table">
+      <thead><tr><th>Option</th><th>Default</th><th class="desc">Description</th></tr></thead>
+      <tbody>
+        <tr><td>shift</td><td>false</td><td class="desc">Auto-cycle through the group, smoothly morphing between waves.</td></tr>
+        <tr><td>shiftInterval</td><td>3</td><td class="desc">Seconds each wave is held.</td></tr>
+        <tr><td>shiftDuration</td><td>1</td><td class="desc">Seconds to morph between consecutive waves.</td></tr>
+        <tr><td>mode</td><td>'stable'</td><td class="desc"><code class="inl">'wild'</code> enables noise modulation on top of the wave.</td></tr>
+        <tr><td>unpredictability</td><td>0</td><td class="desc">0…1, wild only. 0 = clean, 1 = chaotic.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- SAMPLER -->
+    <h2 id="sampler">createSampler(): cache for tight loops</h2>
+    <p>Calling <code class="inl">wave(x, opts)</code> hundreds of times per frame re-resolves the wave, group, and stats every call. <code class="inl">createSampler()</code> resolves all of that once and hands you a fast <code class="inl">sample()</code>.</p>
+    <pre class="code-block">const s = VanillaWaves.createSampler({
+  shift: true,
+  group: 'gentle',
+  amplitude: 120
+});
+
+<span class="c">// per frame:</span>
+const v = s.sample(x, t);   <span class="c">// position + time</span></pre>
+    <p>Use <code class="inl">sample(y, t)</code> when shift or time-based motion is on; <code class="inl">sample(y)</code> when t doesn't matter. Live getters: <code class="inl">waveName</code>, <code class="inl">targetName</code>, <code class="inl">shifting</code>, <code class="inl">mix</code>, <code class="inl">period</code>, <code class="inl">targetPeriod</code>.</p>
+
+    <!-- ENGINE API -->
+    <h2 id="api">Engine API</h2>
+    <p>The DOM engine adds three calls to the same global. Core stays pure — the engine only wires DOM to it.</p>
+    <table class="opts-table">
+      <thead><tr><th>Call</th><th class="desc" colspan="2">Does</th></tr></thead>
+      <tbody>
+        <tr><td>register(name, def)</td><td class="desc" colspan="2">Define an element type. <code class="inl">def.create(node, opts, h)</code> returns state; <code class="inl">def.update(state, t)</code> mutates the DOM each frame.</td></tr>
+        <tr><td>init(target?)</td><td class="desc" colspan="2">Wire up <code class="inl">[data-wv]</code> — no arg for all, or a selector / element / NodeList.</td></tr>
+        <tr><td>destroy(target?)</td><td class="desc" colspan="2">Stop and clean up (e.g. when loading finishes).</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Helpers</strong> passed to <code class="inl">create</code>: <code class="inl">makeSampler(extra?)</code> (a sampler with element-friendly defaults — shift on, gentle, low frequency), <code class="inl">norm(v)</code> (maps ≈[&minus;1,1] to [0,1]), <code class="inl">num(v, default)</code>, <code class="inl">el(tag, class?)</code>.</p>
+    <p><strong>Conventions:</strong> marker <code class="inl">data-wv</code>, ready class <code class="inl">wv--ready</code>, shared loop at 30&nbsp;fps, all <code class="inl">data-*</code> become <code class="inl">opts</code>, <code class="inl">data-speed</code> scales time. CSS class and element names use a <code class="inl">wv-</code> prefix — never dots (<code class="inl">p5.waves.loader</code> is not a valid selector).</p>
+
+    <!-- SHIFT -->
+    <h2 id="shift">Wave shift</h2>
+    <p>The killer feature: set <code class="inl">shift: true</code> and the library picks a wave, holds it for <code class="inl">shiftInterval</code> seconds, then morphs into the next over <code class="inl">shiftDuration</code> seconds. Forever.</p>
+    <pre class="code-block">const s = VanillaWaves.createSampler({
+  shift: true,
+  shiftInterval: 2,    <span class="c">// hold each wave 2s</span>
+  shiftDuration: 1.5,  <span class="c">// morph over 1.5s</span>
+  group: 'gentle',
+  amplitude: 80
+});
+
+s.waveName;    <span class="c">// "mountain peaks"</span>
+s.targetName;  <span class="c">// "batman" (what's coming next)</span>
+s.shifting;    <span class="c">// true while morphing</span>
+s.mix;         <span class="c">// 0 → 1 during the morph</span></pre>
+    <div class="callout"><p><span class="note">note</span> Shift is <strong>not</strong> deterministic across page loads: a per-session random offset is mixed in, so the same seed yields a different <em>sequence</em> each reload (identical within one session). This is faithful to p5.waves and intentional — the per-load variation is richer than a fixed one.</p></div>
+
+    <!-- CLOSING -->
+    <h2 id="closing">Closing shapes</h2>
+    <p>When you sweep a wave around a ring, the last point rarely lands on the first — you get an ugly seam. The fix is to sweep over an integer multiple of the wave's <strong>period</strong>: the x-distance over which <code class="inl">wave(x)</code> repeats. Every periodic wave has a measured period, listed on the <a href="waves.html#periodicity">Waves page</a>.</p>
+    <p>Shift and closed shapes normally fight: a ring tears its seam open the moment it lands on a new wave, because every formula has its own period. The <code class="inl">'closing'</code> pool ends that — its 17 waves all share one base period (<code class="inl">62.8319</code> = <code class="inl">2π/0.1</code>), so a sweep of <code class="inl">sampler.period × lobes</code> closes seamlessly through every transition.</p>
+    <pre class="code-block"><span class="c">// Read the sweep straight off the sampler.</span>
+const ring = VanillaWaves.createSampler({
+  shift: true, group: 'closing', amplitude: 30
+});
+const sweep = ring.period * 8;   <span class="c">// 8 lobes, holds across every shift</span></pre>
+    <p><code class="inl">sampler.period</code> returns the current wave's measured period (the shared base period for a closing pool, <code class="inl">null</code> for non-periodic waves). Full canvasless SVG-ring recipe on the <a href="waves.html#periodicity">Waves page</a>.</p>
+    <div class="callout"><p><span class="note">experimental</span> Period values may drift by ~0.001 in minor versions. Perfect for visuals; not for plotters or anything that gets angry about sub-unit drift.</p></div>
+
+    <!-- MORPH -->
+    <h2 id="morph">Morph between two waves</h2>
+    <p>Pass two names, control the blend with <code class="inl">mix</code> from 0 to 1.</p>
+    <pre class="code-block">const y = VanillaWaves.wave(x, {
+  wave: ['classic sine', 'mountain peaks'],
+  mix: 0.5   <span class="c">// 0 = first wave, 1 = second</span>
+});</pre>
+    <p>Sweep <code class="inl">mix</code> over time for a smooth crossfade between two specific shapes — useful when shift is too wild for the look you want.</p>
+
+    <!-- WILD -->
+    <h2 id="wild">Wild mode</h2>
+    <p>One dial, <code class="inl">unpredictability</code> (0…1), adds noise modulation on top of any wave. At 0 you get the clean wave; at 1, chaos that still respects the wave's envelope.</p>
+    <pre class="code-block">const y = VanillaWaves.wave(x, {
+  wave: 'mountain peaks',
+  mode: 'wild',
+  unpredictability: 0.7
+});</pre>
+
+    <!-- ALL WAVES -->
+    <h2 id="all-waves">All 34 waves</h2>
+    <p>Each name is also accessible by its index. <a href="waves.html">See the visual gallery &rarr;</a></p>
+    <div class="wave-grid">
+      <div class="wave-item"><span class="wi">00</span>classic sine</div>
+      <div class="wave-item"><span class="wi">01</span>sine</div>
+      <div class="wave-item"><span class="wi">02</span>sharp peaks</div>
+      <div class="wave-item"><span class="wi">03</span>square</div>
+      <div class="wave-item"><span class="wi">04</span>pulse</div>
+      <div class="wave-item"><span class="wi">05</span>stepped sine</div>
+      <div class="wave-item"><span class="wi">06</span>mountain peaks</div>
+      <div class="wave-item"><span class="wi">07</span>valleys</div>
+      <div class="wave-item"><span class="wi">08</span>zig-zag sine</div>
+      <div class="wave-item"><span class="wi">09</span>batman</div>
+      <div class="wave-item"><span class="wi">10</span>offset sine</div>
+      <div class="wave-item"><span class="wi">11</span>steps down</div>
+      <div class="wave-item"><span class="wi">12</span>steps</div>
+      <div class="wave-item"><span class="wi">13</span>squared sine</div>
+      <div class="wave-item"><span class="wi">14</span>bumpy sine</div>
+      <div class="wave-item"><span class="wi">15</span>wobble sine</div>
+      <div class="wave-item"><span class="wi">16</span>up down noise</div>
+      <div class="wave-item"><span class="wi">17</span>meta sine</div>
+      <div class="wave-item"><span class="wi">18</span>triangle</div>
+      <div class="wave-item"><span class="wi">19</span>ramp</div>
+      <div class="wave-item"><span class="wi">20</span>saw down</div>
+      <div class="wave-item"><span class="wi">21</span>saw up</div>
+      <div class="wave-item"><span class="wi">22</span>fade out</div>
+      <div class="wave-item"><span class="wi">23</span>grow random</div>
+      <div class="wave-item"><span class="wi">24</span>noise</div>
+      <div class="wave-item"><span class="wi">25</span>fuzzy pulse</div>
+      <div class="wave-item"><span class="wi">26</span>up down pulse</div>
+      <div class="wave-item"><span class="wi">27</span>bald patch</div>
+      <div class="wave-item"><span class="wi">28</span>fuzzy peak sine</div>
+      <div class="wave-item"><span class="wi">29</span>ramp up sine</div>
+      <div class="wave-item"><span class="wi">30</span>triangle sine</div>
+      <div class="wave-item"><span class="wi">31</span>round linked sine</div>
+      <div class="wave-item"><span class="wi">32</span>half sine</div>
+      <div class="wave-item"><span class="wi">33</span>smooth solid sine</div>
+    </div>
+    <p>Discover them at runtime too: <code class="inl">VanillaWaves.list()</code>, <code class="inl">.count</code>, <code class="inl">.data</code>.</p>
+
+    <!-- PARITY -->
+    <h2 id="parity">Parity &amp; drift</h2>
+    <p><code class="inl">waves-core.js</code> is the canonical <code class="inl">p5.waves.js</code> math with only the 8-line p5 prototype hook removed. It tracks p5.waves as the source of truth — bit-identical output, verified across 1009 parity checks (all 34 waves, morph, range, wild, sampler). A weekly drift-watch compares the two so the port can never silently fall behind. Dialect baseline: <strong>p5.waves v3.4.0</strong>.</p>
+    <p>Time is just a number: you pass <code class="inl">t</code> in seconds — the library never calls a clock itself. So you can scrub time, run faster than real-time, run backwards, or freeze a moment.</p>
+
+    <!-- STARTERS -->
+    <h2 id="starters">Copy-paste starters (canvasless)</h2>
+
+    <h3>Animated bars</h3>
+    <pre class="code-block">&lt;div id="bars" style="display:flex;align-items:flex-end;gap:3px;height:100px"&gt;&lt;/div&gt;
+&lt;script&gt;
+  const box = document.getElementById('bars');
+  const bars = Array.from({length: 24}, () =&gt; {
+    const b = document.createElement('span');
+    b.style.cssText = 'width:8px;height:100%;background:#14140f;transform-origin:bottom';
+    return box.appendChild(b);
+  });
+  const s = VanillaWaves.createSampler({ shift: true, amplitude: 1 });
+  (function tick(now){
+    const t = now / 1000;
+    bars.forEach((b, i) =&gt; {
+      const v = 0.1 + (s.sample(i*0.5, t) + 0.5) * 0.9;
+      b.style.transform = 'scaleY(' + v.toFixed(3) + ')';
+    });
+    requestAnimationFrame(tick);
+  })(0);
+&lt;/script&gt;</pre>
+
+    <h3>Wave as opacity (breathing element)</h3>
+    <pre class="code-block">const s = VanillaWaves.createSampler({ wave: 'classic sine', range: [0.15, 1] });
+(function tick(now){
+  el.style.opacity = s.sample(0, now / 1000);
+  requestAnimationFrame(tick);
+})(0);</pre>
+
+    <h3>Wave as hue (colour drift)</h3>
+    <pre class="code-block">const s = VanillaWaves.createSampler({ wave: 'bumpy sine', range: [0, 360] });
+(function tick(now){
+  el.style.backgroundColor = 'hsl(' + s.sample(0, now / 1000) + ' 70% 55%)';
+  requestAnimationFrame(tick);
+})(0);</pre>
+
+    <h3>Shift-driven text loader</h3>
+    <pre class="code-block">const ramp = ' ·:-=+*#%@';
+const s = VanillaWaves.createSampler({ shift: true, range: [-1, 1] });
+(function tick(now){
+  const v = s.sample(0, now / 1000);
+  const i = Math.max(0, Math.min(ramp.length-1, Math.floor((v+1)/2 * ramp.length)));
+  el.textContent = ramp[i];
+  requestAnimationFrame(tick);
+})(0);</pre>
+
+    <h3>Morph between two waves</h3>
+    <pre class="code-block">(function tick(now){
+  const mix = (Math.sin(now * 0.0005) + 1) / 2;
+  const v = VanillaWaves.wave(0, {
+    wave: ['classic sine', 'triangle'], mix, range: [0, 100]
+  });
+  bar.style.height = v + '%';
+  requestAnimationFrame(tick);
+})(0);</pre>
+
+  </main>
+
+  <footer>
+    <p>Zero-dependency vanilla-JS port of the <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> dialect · baseline v3.4.0</p>
+    <p class="footer-sub">MIT License · v0.1.0 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+</body>
+</html>
