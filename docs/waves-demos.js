@@ -21,6 +21,17 @@
   // coffeehouse vanilla tones: espresso · mocha · caramel · latte · cinnamon
   var COFFEE = ['#33261b', '#6f4e37', '#a9763f', '#c8a878', '#8a5a3c'];
 
+  // a continuous coffee spectrum (dark espresso → light latte) for gradient bands
+  var SPECTRUM = ['#241811', '#3a2a1e', '#5a3f2b', '#7a5334', '#a9763f', '#c08a4a', '#cbab7f'];
+  function hx(h) { h = h.replace('#', ''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
+  function mix(a, b, t) { var A = hx(a), B = hx(b); return 'rgb(' + Math.round(A[0] + (B[0] - A[0]) * t) + ',' + Math.round(A[1] + (B[1] - A[1]) * t) + ',' + Math.round(A[2] + (B[2] - A[2]) * t) + ')'; }
+  function spectrum(t) {
+    t = clamp(t, 0, 1);
+    var f = t * (SPECTRUM.length - 1), i = Math.floor(f);
+    if (i >= SPECTRUM.length - 1) return SPECTRUM[SPECTRUM.length - 1];
+    return mix(SPECTRUM[i], SPECTRUM[i + 1], f - i);
+  }
+
   /* ── eq — equalizer bars ─────────────────────────────────
      Each bar's height is a sampler value; one shared loop drives all. */
   W.register('eq', {
@@ -129,7 +140,7 @@
       for (var r = 0; r < rows; r++) {
         var p = document.createElementNS(NS, 'polyline');
         p.setAttribute('class', 'wv-trace');
-        p.setAttribute('stroke', COFFEE[r % COFFEE.length]);   // a coffee tone per ribbon
+        p.setAttribute('stroke', spectrum(rows > 1 ? r / (rows - 1) : 0.5));   // full coffee spectrum across the band
         svg.appendChild(p);
         lines.push(p);
       }
