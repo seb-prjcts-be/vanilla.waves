@@ -13,10 +13,10 @@
 
 :root {
   /* coffeehouse vanilla palette */
-  --bg:          #fff5cf;   /* pale vanilla cream      */
-  --bg2:         #f0e6c2;   /* raised panel            */
-  --bg3:         #dbcdad;   /* sand — recessed strip   */
-  --surface:     #fffbea;   /* foam — cards, stages    */
+  --bg:          #f5f5f5;   /* neutral, same as p5.waves */
+  --bg2:         #eeeeee;   /* raised panel            */
+  --bg3:         #e4e4e4;   /* recessed strip          */
+  --surface:     #ffffff;   /* cards, stages           */
   --ink:         #453020;   /* espresso — text + lines */
   --text:        #453020;
   --text-muted:  #6f5c3d;   /* dark taupe              */
@@ -28,8 +28,8 @@
   --border-mid:  rgba(69, 48, 32, 0.26);
   --border-hard: rgba(69, 48, 32, 0.50);
 
-  --code-bg:     #fbf2ce;
-  --code-inl:    #efe3bd;
+  --code-bg:     #ececec;
+  --code-inl:    #e4e4e4;
   --mono:        'Consolas', 'Courier New', monospace;
 
   /* animation tones: espresso · taupe · teal · sand · brown */
@@ -68,7 +68,7 @@ a:hover { color: var(--ink); }
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 2.5rem;
-  background: rgba(255, 245, 207, 0.92);
+  background: rgba(245, 245, 245, 0.92);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-mid);
 }
@@ -113,8 +113,8 @@ a:hover { color: var(--ink); }
   background: linear-gradient(to bottom,
     var(--bg) 0%,
     var(--bg) 34%,
-    rgba(255, 245, 207, 0.55) 48%,
-    rgba(255, 245, 207, 0) 74%);
+    rgba(245, 245, 245, 0.55) 48%,
+    rgba(245, 245, 245, 0) 74%);
 }
 
 .hero-text { position: relative; z-index: 1; text-align: center; max-width: 780px; }
@@ -396,7 +396,7 @@ section[id], h2[id] { scroll-margin-top: 62px; }
     top: 52px; left: 0; right: 0;
     flex-direction: column;
     gap: 0;
-    background: rgba(255, 245, 207, 0.97);
+    background: rgba(245, 245, 245, 0.97);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-mid);
     padding: 0.5rem 0 1rem;
