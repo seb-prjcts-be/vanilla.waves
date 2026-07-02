@@ -1,8 +1,8 @@
 /*!
- * vanilla.waves docs — waves-demos.js
+ * vanilla.waves docs - waves-demos.js
  * The canvasless demo vocabulary used across the docs site. Every renderer
  * below is registered on the shared vanilla.waves engine and reads a sampler
- * (or wave()) to drive plain DOM/SVG — no p5, no <canvas>.
+ * (or wave()) to drive plain DOM/SVG - no p5, no <canvas>.
  *
  * Load AFTER vanilla.waves(.min).js. The engine auto-inits [data-wv] on
  * DOMContentLoaded; these register() calls run first, so wiring is automatic.
@@ -32,7 +32,7 @@
     return mix(SPECTRUM[i], SPECTRUM[i + 1], f - i);
   }
 
-  /* ── eq — equalizer bars ─────────────────────────────────
+  /* ── eq - equalizer bars ─────────────────────────────────
      Each bar's height is a sampler value; one shared loop drives all. */
   W.register('eq', {
     create: function (node, o, h) {
@@ -52,7 +52,7 @@
     }
   });
 
-  /* ── line — a sampler traced as a row of dots ────────────
+  /* ── line - a sampler traced as a row of dots ────────────
      One sampler sampled across position; the dots trace the live waveform. */
   W.register('line', {
     create: function (node, o, h) {
@@ -72,7 +72,7 @@
     }
   });
 
-  /* ── load — 4x4 text loader ──────────────────────────────
+  /* ── load - 4x4 text loader ──────────────────────────────
      Each cell picks a character from a wave value. Cheap in bulk. */
   W.register('load', {
     create: function (node, o, h) {
@@ -92,9 +92,9 @@
     }
   });
 
-  /* ── wave — single named wave, traced as an SVG polyline ──
+  /* ── wave - single named wave, traced as an SVG polyline ──
      Catalog previews. A fixed (non-shifting) wave, drifting slowly in x so
-     even the pure sines show life. amplitude 1 → output ~[-0.5, 0.5]. */
+     even the pure sines show life. amplitude 1 → output ~[-1, 1]. */
   W.register('wave', {
     create: function (node, o, h) {
       var svg = document.createElementNS(NS, 'svg');
@@ -128,7 +128,7 @@
     }
   });
 
-  /* ── ribbons — hero backdrop: stacked shifting wave lines ─
+  /* ── ribbons - hero backdrop: stacked shifting wave lines ─
      One shift-sampler, offset per row. The whole field morphs through the
      34 formulas over time. Rendered as SVG polylines, ink on paper. */
   W.register('ribbons', {
@@ -140,7 +140,9 @@
       for (var r = 0; r < rows; r++) {
         var p = document.createElementNS(NS, 'polyline');
         p.setAttribute('class', 'wv-trace');
-        p.setAttribute('stroke', spectrum(rows > 1 ? r / (rows - 1) : 0.5));   // full coffee spectrum across the band
+        // full coffee spectrum across the band - as inline style: a stroke
+        // *attribute* would lose from the .wv-trace CSS rule (stroke: var(--ink))
+        p.style.stroke = spectrum(rows > 1 ? r / (rows - 1) : 0.5);
         svg.appendChild(p);
         lines.push(p);
       }
@@ -149,7 +151,7 @@
     },
     update: function (st, t) {
       for (var r = 0; r < st.rows; r++) {
-        var base = 8 + r * (44 / (st.rows - 1)), pts = '';
+        var base = st.rows > 1 ? 8 + r * (44 / (st.rows - 1)) : 30, pts = '';
         for (var i = 0; i <= st.n; i++) {
           var x = (i / st.n) * 46 + r * 7;
           var v = clamp(st.s.sample(x, t + r * 0.35), -1.2, 1.2);
@@ -160,7 +162,7 @@
     }
   });
 
-  /* ── ascii — a flow field of characters ──────────────────
+  /* ── ascii - a flow field of characters ──────────────────
      Each cell's glyph comes from a shift-sampler: like noise, but with
      structure that keeps re-forming as the wave shifts. */
   W.register('ascii', {
@@ -189,13 +191,12 @@
     }
   });
 
-  /* ── field — a breathing grid of ink cells ───────────────
+  /* ── field - a breathing grid of ink cells ───────────────
      A wave-driven tone field: each cell's opacity is a sampler value. */
   W.register('field', {
     create: function (node, o, h) {
       var cols = h.num(o.cols, 24), rows = h.num(o.rows, 10), cells = [];
-      var el = node.querySelector ? node : node;
-      el.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+      node.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
       for (var i = 0; i < cols * rows; i++) cells.push(node.appendChild(h.el('span')));
       return { cells: cells, cols: cols, rows: rows, s: h.makeSampler({ range: [-1, 1], frequency: h.num(o.freq, 0.5) }) };
     },

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nocturne for 34 waves - vanilla.waves</title>
+  <meta name="description" content="A canvasless composition. Every motion on this page - the woven field, the seamless ring, the breathing title, the meter - is one shared 30fps DOM loop reading pure wave mathematics. No p5, no canvas, no dependencies.">
+  <meta property="og:title" content="nocturne for 34 waves - a canvasless composition">
+  <meta property="og:description" content="Everything moving on this page is plain HTML driven by vanilla.waves. Zero dependencies, zero canvas, one loop.">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      --bg:     #fff5cf;
+      --surface:#fffbea;
+      --ink:    #453020;
+      --muted:  #6f5c3d;
+      --faint:  #b39c7d;
+      --accent: #72bab8;
+      --accent-deep: #3f8f8c;
+      --mono: 'Consolas', 'Courier New', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--mono);
+      overflow: hidden;
+    }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+    }
+
+    /* every layer fades in once the engine marks it ready */
+    [data-wv] { opacity: 0; transition: opacity 1.6s ease; }
+    [data-wv].wv--ready { opacity: 1; }
+
+    /* ── layer 1: the woven field (full viewport) ── */
+    #field {
+      position: fixed; inset: 0; z-index: 0;
+      display: grid; gap: 3px; padding: 3px;
+    }
+    #field span { display: block; border-radius: 1px; }
+
+    /* ── layer 2: the seamless ring ── */
+    #ring {
+      position: fixed; inset: 0; z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    #ring svg { width: min(88vmin, 900px); height: min(88vmin, 900px); overflow: visible; }
+    #ring .r-ink  { fill: none; stroke: var(--ink);    stroke-width: 1.1; vector-effect: non-scaling-stroke; opacity: .85; }
+    #ring .r-teal { fill: none; stroke: var(--accent-deep); stroke-width: 1.1; vector-effect: non-scaling-stroke; opacity: .55; }
+    #ring .r-ghost{ fill: none; stroke: var(--faint);  stroke-width: 1;   vector-effect: non-scaling-stroke; opacity: .4; }
+
+    /* ── layer 3: the title, letter by letter ── */
+    #stage {
+      position: fixed; inset: 0; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    #title { display: flex; }
+    #title span {
+      display: inline-block;
+      font-size: clamp(2.2rem, 7.5vw, 5.4rem);
+      font-weight: bold; letter-spacing: .02em;
+      text-shadow: 0 0 18px var(--bg), 0 0 6px var(--bg);
+      will-change: transform;
+    }
+    #title span.dot { color: var(--accent-deep); }
+    #subtitle {
+      margin-top: 1.1rem;
+      font-size: clamp(.62rem, 1.6vw, .8rem);
+      letter-spacing: .34em; text-transform: uppercase;
+      color: var(--muted);
+      text-shadow: 0 0 12px var(--bg);
+    }
+    #claim {
+      margin-top: 1.5rem;
+      font-size: clamp(.6rem, 1.5vw, .78rem);
+      letter-spacing: .22em; text-transform: uppercase;
+      color: var(--ink);
+      background: color-mix(in srgb, var(--surface) 78%, transparent);
+      border: 1px solid var(--accent-deep);
+      padding: .5rem .95rem;
+      text-align: center;
+    }
+    #claim b { color: var(--accent-deep); font-weight: bold; }
+
+    /* ── layer 4: the HUD (live sampler getters) ── */
+    .hud {
+      position: fixed; z-index: 3;
+      font-size: .66rem; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--muted); line-height: 1.9;
+      background: color-mix(in srgb, var(--surface) 55%, transparent);
+      padding: .45rem .7rem; border: 1px solid rgba(69,48,32,.14);
+    }
+    .hud b { color: var(--ink); font-weight: bold; }
+    .hud .tick { color: var(--accent-deep); }
+    #hud-nw { top: 1rem;   left: 1rem; }
+    #hud-ne { top: 1rem;   right: 1rem; text-align: right; }
+    #hud-sw { bottom: 3.4rem; left: 1rem; }
+    #hud-se { bottom: 3.4rem; right: 1rem; text-align: right; }
+
+    /* ── layer 5: the meter along the floor ── */
+    #meter {
+      position: fixed; left: 0; right: 0; bottom: 0; height: 2.6rem; z-index: 2;
+      display: flex; align-items: flex-end; gap: 3px; padding: 0 3px;
+      pointer-events: none;
+    }
+    #meter span {
+      flex: 1; height: 100%; background: var(--ink);
+      transform-origin: bottom; will-change: transform;
+    }
+
+    @media (max-width: 640px) {
+      #hud-sw, #hud-se { display: none; }
+      .hud { font-size: .58rem; }
+      #claim { font-size: .5rem; letter-spacing: .05em; white-space: nowrap; padding: .4rem .6rem; }
+      #sig { font-size: .52rem; letter-spacing: .16em; white-space: nowrap; }
+    }
+
+    /* signature strip */
+    #sig {
+      position: fixed; bottom: .55rem; left: 50%; transform: translateX(-50%);
+      z-index: 4; font-size: .6rem; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--bg); mix-blend-mode: difference; pointer-events: auto;
+    }
+    #sig a { color: inherit; }
+  </style>
+</head>
+<body>
+
+  <h1 class="sr-only">nocturne for 34 waves - a canvasless vanilla.waves composition</h1>
+
+  <!-- layer 1: interference field - the canonical two-sampler 2D pattern -->
+  <div id="field" data-wv="nocturne-field" data-seed="34"></div>
+
+  <!-- layer 2: seamless polar ring - group:'closing' + sampler.period -->
+  <div id="ring" data-wv="nocturne-ring" data-seed="9" data-lobes="6"></div>
+
+  <!-- layer 3: each letter rides its own shifting wave -->
+  <div id="stage">
+    <div id="title" data-wv="nocturne-title" data-seed="13" aria-label="vanilla.waves"></div>
+    <div id="subtitle">34 waves &middot; 0 canvas &middot; 1 loop</div>
+    <div id="claim">everything moving here is <b>plain html</b> + a little inline svg</div>
+  </div>
+
+  <!-- layer 4: live HUD read from the ring's sampler getters -->
+  <div class="hud" id="hud-nw" data-wv="nocturne-hud"></div>
+  <div class="hud" id="hud-ne"></div>
+  <div class="hud" id="hud-sw"></div>
+  <div class="hud" id="hud-se"></div>
+
+  <!-- layer 5: the meter -->
+  <div id="meter" data-wv="nocturne-meter" data-seed="4" data-count="48"></div>
+
+  <div id="sig"><a href="../index.html">vanilla.waves</a></div>
+
+  <script src="../vanilla.waves.min.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    var W = window.VanillaWaves;
+    var NS = 'http://www.w3.org/2000/svg';
+    var TAU = Math.PI * 2;
+
+    function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+
+    // the coffeehouse spectrum, espresso → teal → cream
+    var SPECTRUM = ['#453020', '#6a5138', '#b39c7d', '#72bab8', '#a9cfc8', '#dbcdad'];
+
+    // one gentle pointer influence, shared by the layers (0..1, eased)
+    var px = 0.5, py = 0.5, tx = 0.5, ty = 0.5;
+    addEventListener('pointermove', function (e) {
+      tx = e.clientX / innerWidth; ty = e.clientY / innerHeight;
+    }, { passive: true });
+    function easePointer() { px += (tx - px) * 0.04; py += (ty - py) * 0.04; }
+
+    // the ring's sampler doubles as the piece's conductor: the HUD reads it
+    var conductor = null;
+
+    /* ── the woven field ──
+       Two samplers, one per axis, summed per cell - the canonical 2D pattern.
+       Color is position (the spectrum along the diagonal); the wave only
+       breathes the opacity, so the paint per frame stays cheap. */
+    W.register('nocturne-field', {
+      create: function (node, o, h) {
+        var cw = Math.max(26, Math.floor(Math.min(innerWidth, 1600) / 44));
+        var cols = Math.max(18, Math.floor(innerWidth / (cw + 3)));
+        var rows = Math.max(10, Math.floor(innerHeight / (cw + 3)));
+        if (cols * rows > 1400) rows = Math.floor(1400 / cols);
+        node.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+        var cells = [];
+        for (var r = 0; r < rows; r++) {
+          for (var c = 0; c < cols; c++) {
+            var s = h.el('span');
+            var d = (c / cols + r / rows) / 2;                  // diagonal 0..1
+            s.style.background = SPECTRUM[Math.min(SPECTRUM.length - 1,
+              Math.floor(d * SPECTRUM.length))];
+            cells.push(node.appendChild(s));
+          }
+        }
+        return {
+          cells: cells, cols: cols, rows: rows,
+          rowS: h.makeSampler({ range: [-1, 1], frequency: 0.5 }),
+          colS: h.makeSampler({ range: [-1, 1], frequency: 0.5, seed: 89 })
+        };
+      },
+      update: function (st, t) {
+        easePointer();
+        var i = 0, r, c, rv, v;
+        for (r = 0; r < st.rows; r++) {
+          rv = st.rowS.sample(r * 0.55 + py * 2.2, t);
+          for (c = 0; c < st.cols; c++, i++) {
+            v = (rv + st.colS.sample(c * 0.38 + px * 2.2, t * 0.9)) * 0.5; // -1..1
+            st.cells[i].style.opacity = (0.05 + (clamp(v, -1, 1) + 1) * 0.5 * 0.5).toFixed(3);
+          }
+        }
+      }
+    });
+
+    /* ── the seamless ring ──
+       group:'closing' waves share one base period, so sweeping
+       sampler.period × lobes around the circle closes without a seam -
+       even mid-shift, while the formula is morphing into the next one. */
+    W.register('nocturne-ring', {
+      create: function (node, o, h) {
+        var svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('viewBox', '-110 -110 220 220');
+        var ghost = document.createElementNS(NS, 'polyline'); ghost.setAttribute('class', 'r-ghost');
+        var teal  = document.createElementNS(NS, 'polyline'); teal.setAttribute('class', 'r-teal');
+        var ink   = document.createElementNS(NS, 'polyline'); ink.setAttribute('class', 'r-ink');
+        svg.appendChild(ghost); svg.appendChild(teal); svg.appendChild(ink);
+        node.appendChild(svg);
+        var s = h.makeSampler({ group: 'closing', range: [-16, 16], frequency: 1, shiftInterval: 5, shiftDuration: 2.5 });
+        conductor = s;
+        return { ink: ink, teal: teal, ghost: ghost, s: s, lobes: h.num(o.lobes, 6), n: 220 };
+      },
+      update: function (st, t) {
+        var P = st.s.period || TAU;
+        var trace = function (radius, tt, rot, squish) {
+          var pts = '';
+          for (var i = 0; i <= st.n; i++) {
+            var a = (i / st.n) * TAU + rot;
+            var u = (i / st.n) * P * st.lobes;
+            var rr = radius + st.s.sample(u, tt);
+            pts += (Math.cos(a) * rr).toFixed(2) + ',' + (Math.sin(a) * rr * squish).toFixed(2) + ' ';
+          }
+          return pts;
+        };
+        st.ink.setAttribute('points',   trace(88, t,        t * 0.02, 1));
+        st.teal.setAttribute('points',  trace(88, t - 0.45, t * 0.02 + 0.05, 1));
+        st.ghost.setAttribute('points', trace(70, t - 0.9,  -t * 0.013, 1));
+      }
+    });
+
+    /* ── the title ──
+       Thirteen letters, thirteen samplers, thirteen seeds: each glyph rides
+       its own shifting wave - the word itself never repeats. */
+    W.register('nocturne-title', {
+      create: function (node, o, h) {
+        var word = 'vanilla.waves', letters = [];
+        for (var i = 0; i < word.length; i++) {
+          var sp = h.el('span');
+          sp.textContent = word[i];
+          if (i >= 7) sp.className = 'dot';
+          node.appendChild(sp);
+          letters.push({ el: sp, s: h.makeSampler({ seed: 13 + i * 7, range: [-1, 1] }) });
+        }
+        return { letters: letters };
+      },
+      update: function (st, t) {
+        for (var i = 0; i < st.letters.length; i++) {
+          var L = st.letters[i];
+          var v = clamp(L.s.sample(i * 0.4, t), -1.4, 1.4);
+          L.el.style.transform = 'translateY(' + (v * 9).toFixed(1) + 'px)';
+        }
+      }
+    });
+
+    /* ── the HUD ──
+       Nothing here is scripted content - every readout is a live sampler
+       getter: waveName, targetName, mix, shifting, period. */
+    W.register('nocturne-hud', {
+      create: function () {
+        return {
+          nw: document.getElementById('hud-nw'),
+          ne: document.getElementById('hud-ne'),
+          sw: document.getElementById('hud-sw'),
+          se: document.getElementById('hud-se'),
+          bar: function (m) {
+            var out = '', n = 10;
+            for (var i = 0; i < n; i++) out += (i < Math.round(m * n)) ? '&#9646;' : '&#9647;';
+            return out;
+          }
+        };
+      },
+      update: function (st, t) {
+        if (!conductor) return;
+        st.nw.innerHTML = 'now playing<br><b>' + conductor.waveName + '</b>';
+        st.ne.innerHTML = 'next<br><b>' + (conductor.targetName || '&mdash;') + '</b><br>' +
+          '<span class="tick">' + st.bar(conductor.mix) + '</span> ' +
+          (conductor.shifting ? 'morphing' : 'holding');
+        st.sw.innerHTML = 'period <b>' + (conductor.period ? conductor.period.toFixed(4) : 'n/a') +
+          '</b><br>group <b>closing</b> &middot; seam <b>none</b>';
+        st.se.innerHTML = 't <b>' + t.toFixed(1) + '</b><br>34 formulas &middot; 30 fps &middot; 1 loop';
+      }
+    });
+
+    /* ── the meter ── */
+    W.register('nocturne-meter', {
+      create: function (node, o, h) {
+        var n = h.num(o.count, 48), bars = [];
+        for (var i = 0; i < n; i++) {
+          var b = h.el('span');
+          b.style.background = SPECTRUM[i % SPECTRUM.length];
+          bars.push(node.appendChild(b));
+        }
+        return { bars: bars, n: n, s: h.makeSampler({ range: [0, 1], frequency: 0.8 }) };
+      },
+      update: function (st, t) {
+        for (var i = 0; i < st.n; i++) {
+          var v = clamp(st.s.sample(i * 0.5, t), 0, 1);
+          st.bars[i].style.transform = 'scaleY(' + (0.06 + v * 0.94).toFixed(3) + ')';
+        }
+      }
+    });
+
+    // types registered after the engine's auto-init already ran on this page
+    // (script order), so wire the layers up explicitly.
+    W.init();
+  })();
+  </script>
+
+</body>
+</html>

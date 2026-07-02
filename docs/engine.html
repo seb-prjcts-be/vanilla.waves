@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Engine — vanilla.waves</title>
+  <title>The Engine - vanilla.waves</title>
   <meta name="description" content="How the canvasless DOM engine works: one shared 30fps rAF loop, IntersectionObserver pause, reduced-motion, register / init / destroy, and the helpers that turn a wave value into DOM.">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"></script>
+  <!-- lokaal geladen: de Pages-site is de repo, dus de site toont altijd de actuele code -->
+  <script src="../vanilla.waves.min.js"></script>
   <script src="waves-demos.js"></script>
 </head>
 <body>
 
   <nav id="navbar">
     <div class="nav-logo"><a href="../index.html">vanilla<b>.waves</b></a></div>
-    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+    <button class="nav-hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-menu" onclick="var n=this.closest('nav');n.classList.toggle('nav-open');this.setAttribute('aria-expanded',n.classList.contains('nav-open'))">
       <span></span><span></span><span></span>
     </button>
-    <ul class="nav-links">
+    <ul class="nav-links" id="nav-menu">
       <li><a href="../index.html">Showcase</a></li>
       <li><a href="examples.html">Examples</a></li>
-      <li><a href="engine.html" class="active">Engine</a></li>
+      <li><a href="engine.html" class="active" aria-current="page">Engine</a></li>
       <li><a href="waves.html">Waves</a></li>
       <li><a href="guide.html">Guide</a></li>
+      <li><a href="art.html">Nocturne</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
@@ -29,7 +31,7 @@
 
   <main class="wrap">
     <h1>the <b>engine</b></h1>
-    <p class="intro">This is what makes vanilla.waves more than a maths library. Where p5.waves hands you numbers to draw on a canvas, vanilla.waves adds a tiny DOM engine — one shared loop that turns wave values into plain HTML. It's the signature piece: no p5, no <code class="inl">&lt;canvas&gt;</code>, cheap enough to run dozens of live elements on one page. This page is the deep-dive; the <a href="guide.html#api">guide</a> is the quick reference.</p>
+    <p class="intro">This is what makes vanilla.waves more than a maths library. Where p5.waves hands you numbers to draw on a canvas, vanilla.waves adds a tiny DOM engine - one shared loop that turns wave values into plain HTML. It's the signature piece: no p5, no <code class="inl">&lt;canvas&gt;</code>, cheap enough to run dozens of live elements on one page. This page is the deep-dive; the <a href="guide.html#api">guide</a> is the quick reference.</p>
 
     <div class="quicklinks">
       <a class="chip" href="#idea">The idea</a>
@@ -44,8 +46,8 @@
 
     <!-- IDEA -->
     <h2 id="idea">The idea: one number, any property</h2>
-    <p>A wave is a function: pass a number in, get a number back. p5.waves feeds that number to a canvas. vanilla.waves feeds it to the DOM — a bar's <code class="inl">scaleY</code>, a cell's <code class="inl">opacity</code>, a character index, an SVG point. The engine's whole job is to call your mapping function every frame, for every marked element, as efficiently as possible.</p>
-    <p>You describe an element <em>type</em> once. Then any number of elements marked <code class="inl">data-wv="&lt;type&gt;"</code> come alive — driven by the same loop, each with its own sampler and its own phase.</p>
+    <p>A wave is a function: pass a number in, get a number back. p5.waves feeds that number to a canvas. vanilla.waves feeds it to the DOM - a bar's <code class="inl">scaleY</code>, a cell's <code class="inl">opacity</code>, a character index, an SVG point. The engine's whole job is to call your mapping function every frame, for every marked element, as efficiently as possible.</p>
+    <p>You describe an element <em>type</em> once. Then any number of elements marked <code class="inl">data-wv="&lt;type&gt;"</code> come alive - driven by the same loop, each with its own sampler and its own phase.</p>
     <div class="demo" style="margin:1.4rem 0;">
       <div data-wv="ascii" data-seed="8" data-cols="30" data-rows="10"></div>
     </div>
@@ -53,7 +55,7 @@
 
     <!-- LOOP -->
     <h2 id="loop">One shared loop, capped at 30 fps</h2>
-    <p>Every marked element does <strong>not</strong> get its own <code class="inl">requestAnimationFrame</code>. That would multiply the browser's work by the number of elements. Instead there is exactly one loop; it walks a <code class="inl">Map</code> of registered elements and calls each one's <code class="inl">update</code>. A DOM element doesn't need 60&nbsp;fps, so the loop caps itself at 30 — half the work, no visible difference for this kind of motion.</p>
+    <p>Every marked element does <strong>not</strong> get its own <code class="inl">requestAnimationFrame</code>. That would multiply the browser's work by the number of elements. Instead there is exactly one loop; it walks a <code class="inl">Map</code> of registered elements and calls each one's <code class="inl">update</code>. A DOM element doesn't need 60&nbsp;fps, so the loop caps itself at 30 - half the work, no visible difference for this kind of motion.</p>
     <pre class="code-block"><span class="c">// conceptually, the shared frame:</span>
 function frame(now) {
   requestAnimationFrame(frame);
@@ -69,7 +71,7 @@ function frame(now) {
 
     <!-- PAUSE -->
     <h2 id="pause">Pause what you can't see</h2>
-    <p>An <code class="inl">IntersectionObserver</code> watches every element. When one scrolls out of view (plus a 120&nbsp;px margin), its <code class="inl">visible</code> flag flips and the loop skips it — no samples, no DOM writes. Scroll it back and it resumes. That's what makes "dozens of live elements on one page" honest: only the ones on screen cost anything.</p>
+    <p>An <code class="inl">IntersectionObserver</code> watches every element. When one scrolls out of view (plus a 120&nbsp;px margin), its <code class="inl">visible</code> flag flips and the loop skips it - no samples, no DOM writes. Scroll it back and it resumes. That's what makes "dozens of live elements on one page" honest: only the ones on screen cost anything.</p>
     <div class="callout"><p><span class="note">try it</span> The tone field below is only being sampled while it's in your viewport. Scroll it off and its work stops; the shared loop keeps serving whatever is still visible.</p></div>
     <div class="demo" style="margin:1.4rem 0;">
       <div class="wv-field" data-wv="field" data-seed="5" data-cols="26" data-rows="10"></div>
@@ -77,7 +79,7 @@ function frame(now) {
 
     <!-- MOTION -->
     <h2 id="motion">Respect reduced motion</h2>
-    <p>If the visitor's system asks for <code class="inl">prefers-reduced-motion: reduce</code>, the engine never starts the loop. It renders <strong>one static frame</strong> so the element still looks intentional — a shape, not a blank box — then leaves it be. You get the design without the movement, for free, no extra code in your renderer.</p>
+    <p>If the visitor's system asks for <code class="inl">prefers-reduced-motion: reduce</code>, the engine never starts the loop. It renders <strong>one static frame</strong> so the element still looks intentional - a shape, not a blank box - then leaves it be. The preference is watched live: flip it off and the loop starts, flip it on and everything freezes on a fresh static frame. You get the design without the movement, for free, no extra code in your renderer.</p>
     <pre class="code-block"><span class="c">// on init, when reduced motion is requested:</span>
 if (REDUCED) items.forEach(it =&gt; { it.t += 0.6; it.update(it.state, it.t); });
 else startLoop();</pre>
@@ -86,9 +88,9 @@ else startLoop();</pre>
     <h2 id="lifecycle">The lifecycle: register → init → destroy</h2>
     <p>Three calls, on the same <code class="inl">VanillaWaves</code> global the maths lives on.</p>
     <ul class="step-list">
-      <li><div><p><strong><code class="inl">register(name, def)</code></strong> — teach the engine an element type. <code class="inl">def.create(node, opts, h)</code> builds the DOM and returns a state object; <code class="inl">def.update(state, t)</code> mutates it each frame (optional — leave it out for a static element).</p></div></li>
-      <li><div><p><strong><code class="inl">init(target?)</code></strong> — scan for <code class="inl">[data-wv]</code> and wire them up. No argument does the whole document; pass a selector, element, or NodeList to wire a subtree. It auto-runs once on <code class="inl">DOMContentLoaded</code>, and safely skips anything already wired, so calling it again after you add nodes is free.</p></div></li>
-      <li><div><p><strong><code class="inl">destroy(target?)</code></strong> — stop and clean up. The element keeps its last frame but leaves the loop and the observer. Perfect for a loader once the real content has arrived.</p></div></li>
+      <li><div><p><strong><code class="inl">register(name, def)</code></strong> - teach the engine an element type. <code class="inl">def.create(node, opts, h)</code> builds the DOM and returns a state object; <code class="inl">def.update(state, t)</code> mutates it each frame (optional - leave it out for a static element).</p></div></li>
+      <li><div><p><strong><code class="inl">init(target?)</code></strong> - scan for <code class="inl">[data-wv]</code> and wire them up. No argument does the whole document; pass a selector, element, or NodeList to wire a subtree. It auto-runs once on <code class="inl">DOMContentLoaded</code>, and safely skips anything already wired, so calling it again after you add nodes is free.</p></div></li>
+      <li><div><p><strong><code class="inl">destroy(target?)</code></strong> - stop and clean up. The element leaves the loop and the observer, and the engine removes its own attributes again. By default it keeps its last frame; give the type an optional <code class="inl">destroy(state, node)</code> hook if you want the DOM that <code class="inl">create</code> built removed too. Perfect for a loader once the real content has arrived.</p></div></li>
     </ul>
     <pre class="code-block"><span class="c">// a loader that stops itself when the page is ready:</span>
 VanillaWaves.init('#boot-loader');
@@ -99,14 +101,14 @@ window.addEventListener('load', () =&gt; {
 
     <!-- HELPERS -->
     <h2 id="helpers">The helpers do the boring parts</h2>
-    <p>Your <code class="inl">create</code> receives a small helper kit, so a renderer stays about the mapping — not about plumbing.</p>
+    <p>Your <code class="inl">create</code> receives a small helper kit, so a renderer stays about the mapping - not about plumbing.</p>
     <table class="opts-table">
       <thead><tr><th>Helper</th><th class="desc" colspan="2">Does</th></tr></thead>
       <tbody>
-        <tr><td>makeSampler(extra?)</td><td class="desc" colspan="2">A sampler with element-friendly defaults — shift on, gentle group, low frequency, seeded from the element's <code class="inl">data-seed</code>. Pass <code class="inl">extra</code> to override (e.g. <code class="inl">{ range: [0,1] }</code>).</td></tr>
-        <tr><td>norm(v)</td><td class="desc" colspan="2">Map a wave value (≈[&minus;1,1]) to [0,1], clamped — handy for opacity, scale, colour stops.</td></tr>
+        <tr><td>makeSampler(extra?)</td><td class="desc" colspan="2">A sampler with element-friendly defaults - shift on, gentle group, low frequency, seeded from the element's <code class="inl">data-seed</code>. Pass <code class="inl">extra</code> to override (e.g. <code class="inl">{ range: [0,1] }</code>).</td></tr>
+        <tr><td>norm(v)</td><td class="desc" colspan="2">Map a wave value (≈[&minus;1,1]) to [0,1], clamped - handy for opacity, scale, colour stops.</td></tr>
         <tr><td>num(v, default)</td><td class="desc" colspan="2">Read a <code class="inl">data-*</code> value as a number with a fallback.</td></tr>
-        <tr><td>el(tag, class?)</td><td class="desc" colspan="2">Create an element (optionally classed) — the one-liner every renderer needs.</td></tr>
+        <tr><td>el(tag, class?)</td><td class="desc" colspan="2">Create an element (optionally classed) - the one-liner every renderer needs.</td></tr>
         <tr><td>W</td><td class="desc" colspan="2">The library itself, if you want <code class="inl">W.createSampler(...)</code> with your own options instead of the element defaults.</td></tr>
       </tbody>
     </table>
@@ -114,7 +116,7 @@ window.addEventListener('load', () =&gt; {
 
     <!-- BUILD -->
     <h2 id="build">Build an element, start to finish</h2>
-    <p>Here is the entire <code class="inl">eq</code> renderer — the bars on the showcase. Twenty lines, and it scales from one bar to a hundred, on one shared loop, paused when offscreen.</p>
+    <p>Here is the entire <code class="inl">eq</code> renderer - the bars on the showcase. Twenty lines, and it scales from one bar to a hundred, on one shared loop, paused when offscreen.</p>
     <pre class="code-block">VanillaWaves.register('eq', {
   create(node, opts, h) {
     const n = h.num(opts.count, 18);          <span class="c">// data-count, default 18</span>
@@ -125,8 +127,9 @@ window.addEventListener('load', () =&gt; {
   },
   update(st, t) {
     for (let i = 0; i &lt; st.n; i++) {
-      const v = 0.08 + st.s.sample(i * 0.55, t) * 0.92;   <span class="c">// wave → height</span>
-      st.bars[i].style.transform = 'scaleY(' + v.toFixed(3) + ')';
+      const v = 0.08 + st.s.sample(i * 0.55, t) * 0.92;   <span class="c">// wave → height, sample ≈ [-1,1]</span>
+      st.bars[i].style.transform =
+        'scaleY(' + Math.max(0.04, Math.min(v, 1.4)).toFixed(3) + ')';   <span class="c">// clamp: nooit negatief</span>
     }
   }
 });
@@ -135,16 +138,16 @@ window.addEventListener('load', () =&gt; {
     <div class="demo" style="margin:1.4rem 0;">
       <div class="wv-eq" data-wv="eq" data-seed="13" data-count="28"></div>
     </div>
-    <p>The <a href="examples.html">Examples</a> page gives you five more of these — wave line, text loader, ASCII field, tone field, ribbons — each with its full source. They all share this exact shape: <code class="inl">create</code> builds, <code class="inl">update</code> maps.</p>
+    <p>The <a href="examples.html">Examples</a> page gives you five more of these - wave line, text loader, ASCII field, tone field, ribbons - each with its full source. They all share this exact shape: <code class="inl">create</code> builds, <code class="inl">update</code> maps.</p>
 
     <!-- PURE -->
     <h2 id="pure">The core stays pure</h2>
-    <p>The engine <em>augments</em> the <code class="inl">VanillaWaves</code> global with <code class="inl">register / init / destroy</code>, but it never touches the maths. <code class="inl">waves-core.js</code> knows nothing about the DOM; <code class="inl">engine.js</code> knows nothing about specific elements. And concrete components — loaders, controls, draggables — live one layer up again, in <strong>vanilla.waves_elements</strong>, importing this engine.</p>
-    <pre class="code-block">waves-core.js   <span class="c">// the maths — zero DOM, byte-identical to p5.waves</span>
+    <p>The engine <em>augments</em> the <code class="inl">VanillaWaves</code> global with <code class="inl">register / init / destroy</code>, but it never touches the maths. <code class="inl">waves-core.js</code> knows nothing about the DOM; <code class="inl">engine.js</code> knows nothing about specific elements. And concrete components - loaders, controls, draggables - live one layer up again, in <strong>vanilla.waves_elements</strong>, importing this engine.</p>
+    <pre class="code-block">waves-core.js   <span class="c">// the maths - zero DOM, byte-identical to p5.waves</span>
 engine.js       <span class="c">// this: shared loop + register/init/destroy + helpers</span>
 vanilla.waves.js<span class="c">// the two, bundled (the CDN artifact)</span>
                 <span class="c">// ── elements import the engine; the engine never imports them ──</span></pre>
-    <p>Want just the maths, no engine? Load <code class="inl">waves-core.js</code> alone and drive your own loop — see <a href="guide.html#starters">the starters</a>. Want the whole thing in one tag? That's the <a href="guide.html#install">CDN build</a>. Either way, the numbers are the same numbers as p5.waves.</p>
+    <p>Want just the maths, no engine? Load <code class="inl">waves-core.js</code> alone and drive your own loop - see <a href="guide.html#starters">the starters</a>. Want the whole thing in one tag? That's the <a href="guide.html#install">CDN build</a>. Either way, the numbers are the same numbers as p5.waves.</p>
 
     <div class="cta-row" style="margin-top:2.4rem;">
       <a href="examples.html" class="cta-btn">See the examples &rarr;</a>

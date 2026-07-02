@@ -4,5 +4,5 @@ Thumbs.db
 *.log
 .claude/
 
-# project working log — local only
+# project working log - local only
 cloud.md

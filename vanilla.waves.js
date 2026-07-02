@@ -1,9 +1,9 @@
 /*!
- * vanilla.waves — gebundelde build (waves-core.js + engine.js).
- * GEGENEREERD — niet met de hand bewerken; pas de bronbestanden aan en hergenereer.
+ * vanilla.waves - gebundelde build (waves-core.js + engine.js).
+ * GEGENEREERD - niet met de hand bewerken; draai: node tools/build.js
  * Zero-dependency vanilla-JS port van het p5.waves-dialect + DOM-engine.
  */
-﻿/*!
+/*!
  * vanilla.waves — waves-core.js
  * Het wave-dialect als ZERO-DEPENDENCY vanilla-JS port van p5.waves.
  *
@@ -861,12 +861,12 @@
    typeof window !== 'undefined' ? window : this);
 
 /*!
- * vanilla.waves — engine.js
+ * vanilla.waves - engine.js
  * De canvasloze DOM-motor: één gedeelde requestAnimationFrame-loop (FPS-cap),
  * IntersectionObserver-pauze voor offscreen elementen, een register/init/destroy
  * plugin-API, en sampler-helpers voor renderers. Geen p5, geen canvas.
  *
- * Vereist waves-core.js (de VanillaWaves-global) VÓÓR dit bestand — of laad de
+ * Vereist waves-core.js (de VanillaWaves-global) VÓÓR dit bestand - of laad de
  * gebundelde vanilla.waves.js. Augmenteert dezelfde VanillaWaves-global met
  * register/init/destroy, zodat de hele bib één namespace is.
  *
@@ -887,8 +887,22 @@
 
   var FPS = 30;                       // een DOM-element heeft geen 60fps nodig
   var FRAME_MS = 1000 / FPS;
-  var REDUCED = !!(global.matchMedia &&
-    global.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var _mq = global.matchMedia ? global.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var REDUCED = !!(_mq && _mq.matches);
+  // Live volgen: OS-voorkeur kan wisselen zonder reload.
+  if (_mq && typeof _mq.addEventListener === 'function') {
+    _mq.addEventListener('change', function (e) {
+      REDUCED = e.matches;
+      if (REDUCED) {
+        if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+        items.forEach(function (it) {           // één statisch frame
+          if (it.update) { it.t += 0.6; it.update(it.state, it.t); }
+        });
+      } else {
+        startLoop();
+      }
+    });
+  }
 
   var items = new Map();              // element → { state, update, visible, t, speed }
   var types = new Map();              // naam → { create, update? }
@@ -940,6 +954,7 @@
     });
   }
   function startLoop() {
+    if (REDUCED) return;               // statisch frame is al gerenderd
     if (rafId === null && items.size > 0) {
       prevNow = nowMs(); lastFrame = 0;
       rafId = requestAnimationFrame(frame);
@@ -957,8 +972,9 @@
   }
 
   // ─── Publieke API (op dezelfde VanillaWaves-global) ─────────────────────────
-  // Registreer een elementtype: register(naam, { create, update? }).
+  // Registreer een elementtype: register(naam, { create, update?, destroy? }).
   // create(node, opts, helpers) → state. update(state, t) muteert (optioneel).
+  // destroy(state, node) ruimt op wat create aanmaakte (optioneel).
   W.register = function (name, def) { types.set(name, def); return W; };
 
   // Init: init(), init(element), init('.selector') of init(NodeList).
@@ -987,6 +1003,7 @@
       items.set(node, {
         state: state,
         update: def.update || null,
+        destroy: def.destroy || null,
         visible: true,
         speed: num(opts.speed, 1),
         t: (seed % 97) * 0.37          // eigen startpunt per seed
@@ -1003,12 +1020,17 @@
     return W;
   };
 
-  // Stop en ruim op (bv. wanneer het laden klaar is).
+  // Stop en ruim op (bv. wanneer het laden klaar is). Roept de optionele
+  // destroy-hook van het type aan en haalt de engine-attributen weer weg;
+  // DOM die create() aanmaakte blijft staan tenzij de hook hem opruimt.
   W.destroy = function (target) {
     Array.prototype.forEach.call(resolveTargets(target), function (node) {
-      if (!items.has(node)) return;
+      var it = items.get(node);
+      if (!it) return;
       if (io) io.unobserve(node);
       items.delete(node);
+      if (it.destroy) it.destroy(it.state, node);
+      node.removeAttribute('aria-hidden');
       node.classList.remove('wv--ready');
     });
     stopLoopIfEmpty();

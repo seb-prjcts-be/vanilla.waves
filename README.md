@@ -100,11 +100,11 @@ The shared loop calls your `update` every frame; offscreen elements pause.
       const n = h.num(opts.count, 16);
       const bars = [];
       for (let i = 0; i < n; i++) bars.push(node.appendChild(h.el('span')));
-      return { bars, sampler: h.makeSampler() };   // state
+      return { bars, sampler: h.makeSampler({ range: [0, 1] }) };   // state
     },
     update(state, t) {                              // every frame
       state.bars.forEach((b, i) => {
-        // sampler value mapped to a scaleY
+        // sampler value (range [0,1] keeps scaleY positive) mapped to a scaleY
         const v = 0.1 + state.sampler.sample(i * 0.5, t) * 0.9;
         b.style.transform = 'scaleY(' + v.toFixed(3) + ')';
       });
@@ -142,8 +142,10 @@ VanillaWaves.destroy(myElement);   // or a selector, NodeList, or nothing for al
 `group` `'gentle'`/`'harsh'`/`'closing'`/`'all'`/array, `shiftInterval` (3),
 `shiftDuration` (1).
 
-**Sampler:** `sample(y)`, `sample(y, t)`, `sample(y, t, mix)`. Live getters:
-`waveName`, `targetName`, `shifting`, `mix`, `period`, `targetPeriod`.
+**Sampler:** `sample(y)`, `sample(y, t)`, `sample(y, t, mix)`. A **shift**
+sampler exposes live getters: `waveIndex`, `waveName`, `targetName`,
+`shifting`, `mix`, `period`, `targetPeriod`; a non-shift sampler is static and
+carries only `waveIndex`, `waveName` and `period`.
 
 > **Note:** `shift` is **not** deterministic across page loads. A per-session
 > random offset is mixed in, so the same `seed` yields a different wave
@@ -155,7 +157,7 @@ VanillaWaves.destroy(myElement);   // or a selector, NodeList, or nothing for al
 
 | Call | Does |
 |---|---|
-| `VanillaWaves.register(name, { create, update? })` | define an element type |
+| `VanillaWaves.register(name, { create, update?, destroy? })` | define an element type |
 | `VanillaWaves.init(target?)` | wire up `[data-wv]` (or a selector / element / NodeList) |
 | `VanillaWaves.destroy(target?)` | stop and clean up |
 
@@ -178,6 +180,13 @@ hook removed. It tracks p5.waves as the source of truth; a weekly drift-watch
 routine compares the two so the port can never silently fall behind. See
 [`docs/waves.feature.md`](docs/waves.feature.md).
 
+Build and verify locally - the bundles are generated, never hand-edited:
+
+```
+node tools/build.js    # regenerate vanilla.waves(.min).js from the sources
+node tools/parity.js   # prove core / bundle / min are bit-identical (1539 checks)
+```
+
 Dialect baseline: **p5.waves v3.4.0** (commit `6ce959e`, 34 waves).
 
 ---
@@ -189,12 +198,14 @@ waves-core.js        the math (zero-dep port of p5.waves)
 engine.js            the DOM engine (shared loop, register/init/destroy)
 vanilla.waves.js     generated bundle (core + engine, readable)
 vanilla.waves.min.js generated bundle, minified, the CDN artifact
+tools/               build.js (regenerate bundles) + parity.js (verify)
 index.html           the Showcase (Pages landing, repo root)
 docs/                the rest of the GitHub Pages site
   examples.html      the canvasless demo vocabulary, with source
   engine.html        the DOM engine, deep-dive
   waves.html         all 34 waves + periodicity
   guide.html         install, math, engine API, starters
+  art.html           "nocturne for 34 waves" - the canvasless art piece
   about.html         why it exists, parity, credits
   style.css          shared skin
   waves-demos.js     demo renderers (eq/line/load/wave/ribbons/ascii/field)
@@ -202,8 +213,8 @@ docs/                the rest of the GitHub Pages site
 ```
 
 The Pages site follows the same structure as `p5.waves` (Showcase at the repo
-root, the rest under `docs/`) and the same nav — Showcase · Examples · Engine ·
-Waves · Guide · About — in vanilla.waves' own monospace identity, with every
+root, the rest under `docs/`) and the same nav - Showcase · Examples · Engine ·
+Waves · Guide · About - in vanilla.waves' own monospace identity, with every
 demo driven canvaslessly by the engine (no p5, no `<canvas>`). `p5.waves` calls
 its signature page *Curation Engine*; vanilla's is **Engine**, the DOM loop that
 makes the port more than maths. Publish by serving Pages from the repo root.

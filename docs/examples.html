@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Examples — vanilla.waves</title>
-  <meta name="description" content="Canvasless demos built on the vanilla.waves engine — equalizer, wave line, text loader, ASCII flow field, tone field, ribbons. Each with its register() code.">
+  <title>Examples - vanilla.waves</title>
+  <meta name="description" content="Canvasless demos built on the vanilla.waves engine - equalizer, wave line, text loader, ASCII flow field, tone field, ribbons. Each with its register() code.">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"></script>
+  <!-- lokaal geladen: de Pages-site is de repo, dus de site toont altijd de actuele code -->
+  <script src="../vanilla.waves.min.js"></script>
   <script src="waves-demos.js"></script>
 </head>
 <body>
 
   <nav id="navbar">
-    <div class="nav-logo"><a href="index.html">vanilla<b>.waves</b></a></div>
-    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+    <div class="nav-logo"><a href="../index.html">vanilla<b>.waves</b></a></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-menu" onclick="var n=this.closest('nav');n.classList.toggle('nav-open');this.setAttribute('aria-expanded',n.classList.contains('nav-open'))">
       <span></span><span></span><span></span>
     </button>
-    <ul class="nav-links">
+    <ul class="nav-links" id="nav-menu">
       <li><a href="../index.html">Showcase</a></li>
-      <li><a href="examples.html" class="active">Examples</a></li>
+      <li><a href="examples.html" class="active" aria-current="page">Examples</a></li>
       <li><a href="engine.html">Engine</a></li>
       <li><a href="waves.html">Waves</a></li>
       <li><a href="guide.html">Guide</a></li>
+      <li><a href="art.html">Nocturne</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
@@ -29,7 +31,7 @@
 
   <main class="wrap" style="max-width:1000px;">
     <h1>examples</h1>
-    <p class="intro">Six canvasless renderers, all driven by the same shared 30&nbsp;fps loop. Each is a registered element type: <code class="inl">create</code> builds the DOM, <code class="inl">update</code> maps a sampler value onto a property every frame. Everything below is live on this page — no <code class="inl">&lt;canvas&gt;</code> anywhere. The full set lives in <a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves-demos.js" target="_blank" rel="noopener">waves-demos.js</a>.</p>
+    <p class="intro">Six canvasless renderers, all driven by the same shared 30&nbsp;fps loop. Each is a registered element type: <code class="inl">create</code> builds the DOM, <code class="inl">update</code> maps a sampler value onto a property every frame. Everything below is live on this page - no <code class="inl">&lt;canvas&gt;</code> anywhere. The full set lives in <a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves-demos.js" target="_blank" rel="noopener">waves-demos.js</a>.</p>
 
     <div class="ex-list" style="margin-top:2.4rem;">
 
@@ -48,8 +50,10 @@
   },
   update(st, t) {
     for (let i = 0; i &lt; st.n; i++) {
+      // sample ≈ [-1,1] → clamp keeps scaleY positive
       const v = 0.08 + st.s.sample(i*0.55, t) * 0.92;
-      st.bars[i].style.transform = 'scaleY(' + v + ')';
+      st.bars[i].style.transform =
+        'scaleY(' + Math.max(0.04, Math.min(v, 1.4)) + ')';
     }
   }
 });</pre>
@@ -87,7 +91,7 @@
       <!-- TEXT LOADER -->
       <div class="ex-block">
         <div class="ex-head"><h3>text loader</h3><span class="ex-tag">wave · character</span></div>
-        <p class="lead">A 4×4 grid where each cell picks a glyph from a wave value. Feed it any character ramp via <code class="inl">data-text</code>. Cheap enough to run dozens at once — the canvasless loader technique.</p>
+        <p class="lead">A 4×4 grid where each cell picks a glyph from a wave value. Feed it any character ramp via <code class="inl">data-text</code>. Cheap enough to run dozens at once - the canvasless loader technique.</p>
         <div class="ex-grid">
           <div class="ex-stage" style="gap:22px;">
             <div class="wv-load" data-wv="load" data-seed="13"></div>
@@ -124,7 +128,7 @@
       <!-- ASCII FLOW FIELD -->
       <div class="ex-block">
         <div class="ex-head"><h3>ASCII flow field</h3><span class="ex-tag">shift · character ramp · grid</span></div>
-        <p class="lead">A grid of characters, each glyph chosen from a shift-sampler — like noise, but with structure that keeps re-forming as the wave shifts. One <code class="inl">&lt;pre&gt;</code>, rebuilt from a string each frame.</p>
+        <p class="lead">A grid of characters, each glyph chosen from a shift-sampler - like noise, but with structure that keeps re-forming as the wave shifts. One <code class="inl">&lt;pre&gt;</code>, rebuilt from a string each frame.</p>
         <div class="ex-grid">
           <div class="ex-stage"><div data-wv="ascii" data-seed="8" data-cols="30" data-rows="12"></div></div>
           <pre class="code-block">VanillaWaves.register('ascii', {
@@ -157,7 +161,7 @@
       <!-- TONE FIELD -->
       <div class="ex-block">
         <div class="ex-head"><h3>tone field</h3><span class="ex-tag">wave · opacity · grid</span></div>
-        <p class="lead">A grid of ink cells whose opacity is a sampler value. A wave-driven take on a static field — every cell drifts inside a moving window, so it stays organised while it breathes.</p>
+        <p class="lead">A grid of ink cells whose opacity is a sampler value. A wave-driven take on a static field - every cell drifts inside a moving window, so it stays organised while it breathes.</p>
         <div class="ex-grid">
           <div class="ex-stage"><div class="wv-field" data-wv="field" data-seed="5" data-cols="24" data-rows="10"></div></div>
           <pre class="code-block">VanillaWaves.register('field', {
@@ -187,7 +191,7 @@
       <!-- RIBBONS -->
       <div class="ex-block">
         <div class="ex-head"><h3>ribbons</h3><span class="ex-tag">SVG · stacked lines · shift</span></div>
-        <p class="lead">Stacked wave lines from one shift-sampler, each row offset in phase — the field this page's hero uses. SVG is still DOM: canvasless, ink on paper, morphing through all 34 formulas.</p>
+        <p class="lead">Stacked wave lines from one shift-sampler, each row offset in phase - the field this page's hero uses. SVG is still DOM: canvasless, ink on paper, morphing through all 34 formulas.</p>
         <div class="ex-grid">
           <div class="ex-stage" style="padding:0;">
             <div class="hero-wave" style="position:relative;opacity:1;width:100%;height:200px;" data-wv="ribbons" data-seed="3" data-rows="7"></div>
@@ -227,7 +231,7 @@
     </div>
 
     <div class="callout" style="margin-top:2.4rem;">
-      <p>Done animating (e.g. content finished loading)? <code class="inl">VanillaWaves.destroy(el)</code> stops and cleans up — pass an element, a selector, a NodeList, or nothing to clear them all.</p>
+      <p>Done animating (e.g. content finished loading)? <code class="inl">VanillaWaves.destroy(el)</code> stops and cleans up - pass an element, a selector, a NodeList, or nothing to clear them all.</p>
     </div>
   </main>
 

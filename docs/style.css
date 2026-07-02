@@ -1,8 +1,8 @@
 /* ============================================================
-   vanilla.waves — docs skin
+   vanilla.waves - docs skin
    A p5.waves family member: same typography + layout system
    (Oswald titles, Inter body, the sibling component set), with
-   vanilla.waves' own accent — a coffeehouse-vanilla palette
+   vanilla.waves' own accent - a coffeehouse-vanilla palette
    (cream · sand · taupe · espresso + a teal pop) used across the
    site and in the canvasless animations. The way p5.waves leans
    on lime, vanilla leans on teal-on-cream. No red anywhere.
@@ -15,13 +15,13 @@
   /* coffeehouse vanilla palette */
   --bg:          #fff5cf;   /* pale vanilla cream      */
   --bg2:         #f0e6c2;   /* raised panel            */
-  --bg3:         #dbcdad;   /* sand — recessed strip   */
-  --surface:     #fffbea;   /* foam — cards, stages    */
-  --ink:         #453020;   /* espresso — text + lines */
+  --bg3:         #dbcdad;   /* sand - recessed strip   */
+  --surface:     #fffbea;   /* foam - cards, stages    */
+  --ink:         #453020;   /* espresso - text + lines */
   --text:        #453020;
   --text-muted:  #6f5c3d;   /* dark taupe              */
   --text-faint:  #b39c7d;   /* taupe                   */
-  --accent:      #72bab8;   /* teal — the pop          */
+  --accent:      #72bab8;   /* teal - the pop          */
   --accent-deep: #3f8f8c;   /* deep teal (text/hover)  */
 
   --border:      rgba(69, 48, 32, 0.14);
@@ -32,12 +32,8 @@
   --code-inl:    #efe3bd;
   --mono:        'Consolas', 'Courier New', monospace;
 
-  /* animation tones: espresso · taupe · teal · sand · brown */
-  --c1: #453020;
-  --c2: #b39c7d;
-  --c3: #72bab8;
-  --c4: #dbcdad;
-  --c5: #8a6f4a;
+  /* animation tones (espresso · taupe · teal · sand · brown) live as the
+     COFFEE/SPECTRUM arrays in waves-demos.js - one source, not two */
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -57,7 +53,7 @@ h1, h2, h3, .nav-logo, .stat-num, .cta-btn, .hero-badge, .section-tag { font-fam
 a { color: var(--accent-deep); text-decoration: underline; text-underline-offset: 3px; }
 a:hover { color: var(--ink); }
 
-.accent, h1 b, h2 b, h3 b { color: var(--accent-deep); font-weight: inherit; }
+h1 b, h2 b, h3 b { color: var(--accent-deep); font-weight: inherit; }
 
 /* ── NAV ─────────────────────────────────────────────────── */
 #navbar {
@@ -193,7 +189,6 @@ a:hover { color: var(--ink); }
   margin-bottom: 1rem;
 }
 .section-header p { color: var(--text-muted); line-height: 1.7; font-size: 0.97rem; }
-.section-header p.fine { font-size: 0.8rem; margin-top: 0.9rem; font-style: italic; }
 
 /* ── DEMO STAGE ──────────────────────────────────────────── */
 .demo {
@@ -253,7 +248,7 @@ pre.code, .code-block {
   white-space: pre;
 }
 .ex-grid .code-block { margin: 0; }
-pre .c, .code-block .c { color: var(--text-faint); font-style: italic; }   /* comment */
+pre .c, .code-block .c { color: var(--text-muted); font-style: italic; }   /* comment - muted: faint haalt geen WCAG AA op de code-achtergrond */
 pre .k, .code-block .k { color: var(--accent-deep); }                      /* keyword */
 pre .s, .code-block .s { color: #5f7a48; }                                 /* string  */
 code.inl { font-family: var(--mono); font-size: 0.88em; background: var(--code-inl); padding: 0.1em 0.35em; }
@@ -368,7 +363,7 @@ code.inl { font-family: var(--mono); font-size: 0.88em; background: var(--code-i
 footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border-mid); color: var(--text-muted); font-size: 0.85rem; line-height: 1.9; }
 footer a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 footer a:hover { color: var(--accent-deep); }
-.footer-sub { font-size: 0.75rem; color: var(--text-faint); }
+.footer-sub { font-size: 0.75rem; color: var(--text-muted); }
 
 /* ── SCROLLBAR ───────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }

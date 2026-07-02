@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guide — vanilla.waves</title>
+  <title>Guide - vanilla.waves</title>
   <meta name="description" content="Install, the math, the DOM engine, options, sampler, shift, morph, wild, and canvasless starters for vanilla.waves.">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"></script>
+  <!-- lokaal geladen: de Pages-site is de repo, dus de site toont altijd de actuele code -->
+  <script src="../vanilla.waves.min.js"></script>
   <script src="waves-demos.js"></script>
 </head>
 <body>
 
   <nav id="navbar">
-    <div class="nav-logo"><a href="index.html">vanilla<b>.waves</b></a></div>
-    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+    <div class="nav-logo"><a href="../index.html">vanilla<b>.waves</b></a></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-menu" onclick="var n=this.closest('nav');n.classList.toggle('nav-open');this.setAttribute('aria-expanded',n.classList.contains('nav-open'))">
       <span></span><span></span><span></span>
     </button>
-    <ul class="nav-links">
+    <ul class="nav-links" id="nav-menu">
       <li><a href="../index.html">Showcase</a></li>
       <li><a href="examples.html">Examples</a></li>
       <li><a href="engine.html">Engine</a></li>
       <li><a href="waves.html">Waves</a></li>
-      <li><a href="guide.html" class="active">Guide</a></li>
+      <li><a href="guide.html" class="active" aria-current="page">Guide</a></li>
+      <li><a href="art.html">Nocturne</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
@@ -29,7 +31,7 @@
 
   <main class="wrap">
     <h1>guide</h1>
-    <p class="intro">Everything you need to use <strong>vanilla.waves</strong> — the wave dialect with no p5 and no <code class="inl">&lt;canvas&gt;</code>. The math mirrors <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank" rel="noopener">p5.waves</a> v3.4.0 exactly; on top of it sits a tiny DOM engine that drives plain HTML.</p>
+    <p class="intro">Everything you need to use <strong>vanilla.waves</strong> - the wave dialect with no p5 and no <code class="inl">&lt;canvas&gt;</code>. The math mirrors <a href="https://p5waves.org/" target="_blank" rel="noopener">p5.waves</a> v3.4.0 exactly; on top of it sits a tiny DOM engine that drives plain HTML.</p>
 
     <div class="quicklinks">
       <a class="chip" href="#install">Install</a>
@@ -85,7 +87,7 @@
   });
   <span class="c">// auto-inits on DOMContentLoaded; call VanillaWaves.init() after adding nodes</span>
 &lt;/script&gt;</pre>
-    <div class="callout"><p>Types must be registered <strong>before</strong> the engine's auto-init (DOMContentLoaded). If you register or add nodes later, call <code class="inl">VanillaWaves.init()</code> again — it skips elements already wired.</p></div>
+    <div class="callout"><p>Types must be registered <strong>before</strong> the engine's auto-init (DOMContentLoaded). If you register or add nodes later, call <code class="inl">VanillaWaves.init()</code> again - it skips elements already wired.</p></div>
 
     <!-- THE MATH -->
     <h2 id="math">The math: three ways to call it</h2>
@@ -117,7 +119,7 @@ const b = VanillaWaves.wave(x, 42);                <span class="c">// by seed (d
       <thead><tr><th>Option</th><th>Default</th><th class="desc">Description</th></tr></thead>
       <tbody>
         <tr><td>wave</td><td>null</td><td class="desc">A name, an index (0…33), or <code class="inl">[a, b]</code> to morph. <code class="inl">null</code> → picked by seed.</td></tr>
-        <tr><td>amplitude</td><td>100</td><td class="desc">Output is scaled to <code class="inl">[&minus;amp/2, +amp/2]</code>.</td></tr>
+        <tr><td>amplitude</td><td>100</td><td class="desc">Output is normalised to [&minus;1, 1] and scaled to <code class="inl">[&minus;amp, +amp]</code>. Default <code class="inl">wave(y)</code> swings &plusmn;100.</td></tr>
         <tr><td>frequency</td><td>1</td><td class="desc">Multiplier on x. Higher = faster cycles.</td></tr>
         <tr><td>t</td><td>0</td><td class="desc">Time, in seconds. Anything that moves reads this.</td></tr>
         <tr><td>seed</td><td>0</td><td class="desc">Picks the wave when <code class="inl">wave</code> is null; seeds the PRNG for harsh waves.</td></tr>
@@ -129,7 +131,7 @@ const b = VanillaWaves.wave(x, 42);                <span class="c">// by seed (d
       <thead><tr><th>Option</th><th>Default</th><th class="desc">Description</th></tr></thead>
       <tbody>
         <tr><td>phase</td><td>0</td><td class="desc">Added to x before evaluation. Shifts the wave horizontally.</td></tr>
-        <tr><td>range</td><td>null</td><td class="desc"><code class="inl">[lo, hi]</code> — map output to this range instead of amplitude scaling. Great for opacity 0–1, hue 0–360, etc.</td></tr>
+        <tr><td>range</td><td>null</td><td class="desc"><code class="inl">[lo, hi]</code> - map output to this range instead of amplitude scaling. Great for opacity 0–1, hue 0–360, etc.</td></tr>
         <tr><td>mix</td><td>0.5</td><td class="desc">Morph position (0…1) when two waves are set.</td></tr>
         <tr><td>group</td><td>'all'</td><td class="desc"><code class="inl">'gentle'</code>, <code class="inl">'harsh'</code>, <code class="inl">'closing'</code>, <code class="inl">'all'</code>, or an array of names. Restricts which waves seed/shift can pick.</td></tr>
       </tbody>
@@ -158,21 +160,21 @@ const b = VanillaWaves.wave(x, 42);                <span class="c">// by seed (d
 
 <span class="c">// per frame:</span>
 const v = s.sample(x, t);   <span class="c">// position + time</span></pre>
-    <p>Use <code class="inl">sample(y, t)</code> when shift or time-based motion is on; <code class="inl">sample(y)</code> when t doesn't matter. Live getters: <code class="inl">waveName</code>, <code class="inl">targetName</code>, <code class="inl">shifting</code>, <code class="inl">mix</code>, <code class="inl">period</code>, <code class="inl">targetPeriod</code>.</p>
+    <p>Use <code class="inl">sample(y, t)</code> when shift or time-based motion is on; <code class="inl">sample(y)</code> when t doesn't matter (a morph sampler also takes <code class="inl">sample(y, t, mix)</code>). A <strong>shift</strong> sampler exposes live getters: <code class="inl">waveIndex</code>, <code class="inl">waveName</code>, <code class="inl">targetName</code>, <code class="inl">shifting</code>, <code class="inl">mix</code>, <code class="inl">period</code>, <code class="inl">targetPeriod</code>. A non-shift sampler is static and carries only <code class="inl">waveIndex</code>, <code class="inl">waveName</code> and <code class="inl">period</code>.</p>
 
     <!-- ENGINE API -->
     <h2 id="api">Engine API</h2>
-    <p>The DOM engine adds three calls to the same global. Core stays pure — the engine only wires DOM to it.</p>
+    <p>The DOM engine adds three calls to the same global. Core stays pure - the engine only wires DOM to it.</p>
     <table class="opts-table">
       <thead><tr><th>Call</th><th class="desc" colspan="2">Does</th></tr></thead>
       <tbody>
         <tr><td>register(name, def)</td><td class="desc" colspan="2">Define an element type. <code class="inl">def.create(node, opts, h)</code> returns state; <code class="inl">def.update(state, t)</code> mutates the DOM each frame.</td></tr>
-        <tr><td>init(target?)</td><td class="desc" colspan="2">Wire up <code class="inl">[data-wv]</code> — no arg for all, or a selector / element / NodeList.</td></tr>
-        <tr><td>destroy(target?)</td><td class="desc" colspan="2">Stop and clean up (e.g. when loading finishes).</td></tr>
+        <tr><td>init(target?)</td><td class="desc" colspan="2">Wire up <code class="inl">[data-wv]</code> - no arg for all, or a selector / element / NodeList.</td></tr>
+        <tr><td>destroy(target?)</td><td class="desc" colspan="2">Stop and clean up (e.g. when loading finishes). Give the type an optional <code class="inl">def.destroy(state, node)</code> hook to also remove the DOM that <code class="inl">create</code> built.</td></tr>
       </tbody>
     </table>
-    <p><strong>Helpers</strong> passed to <code class="inl">create</code>: <code class="inl">makeSampler(extra?)</code> (a sampler with element-friendly defaults — shift on, gentle, low frequency), <code class="inl">norm(v)</code> (maps ≈[&minus;1,1] to [0,1]), <code class="inl">num(v, default)</code>, <code class="inl">el(tag, class?)</code>.</p>
-    <p><strong>Conventions:</strong> marker <code class="inl">data-wv</code>, ready class <code class="inl">wv--ready</code>, shared loop at 30&nbsp;fps, all <code class="inl">data-*</code> become <code class="inl">opts</code>, <code class="inl">data-speed</code> scales time. CSS class and element names use a <code class="inl">wv-</code> prefix — never dots (<code class="inl">p5.waves.loader</code> is not a valid selector).</p>
+    <p><strong>Helpers</strong> passed to <code class="inl">create</code>: <code class="inl">makeSampler(extra?)</code> (a sampler with element-friendly defaults - shift on, gentle, low frequency), <code class="inl">norm(v)</code> (maps ≈[&minus;1,1] to [0,1]), <code class="inl">num(v, default)</code>, <code class="inl">el(tag, class?)</code>.</p>
+    <p><strong>Conventions:</strong> marker <code class="inl">data-wv</code>, ready class <code class="inl">wv--ready</code>, shared loop at 30&nbsp;fps, all <code class="inl">data-*</code> become <code class="inl">opts</code>, <code class="inl">data-speed</code> scales time. CSS class and element names use a <code class="inl">wv-</code> prefix - never dots (<code class="inl">p5.waves.loader</code> is not a valid selector).</p>
 
     <!-- SHIFT -->
     <h2 id="shift">Wave shift</h2>
@@ -189,12 +191,12 @@ s.waveName;    <span class="c">// "mountain peaks"</span>
 s.targetName;  <span class="c">// "batman" (what's coming next)</span>
 s.shifting;    <span class="c">// true while morphing</span>
 s.mix;         <span class="c">// 0 → 1 during the morph</span></pre>
-    <div class="callout"><p><span class="note">note</span> Shift is <strong>not</strong> deterministic across page loads: a per-session random offset is mixed in, so the same seed yields a different <em>sequence</em> each reload (identical within one session). This is faithful to p5.waves and intentional — the per-load variation is richer than a fixed one.</p></div>
+    <div class="callout"><p><span class="note">note</span> Shift is <strong>not</strong> deterministic across page loads: a per-session random offset is mixed in, so the same seed yields a different <em>sequence</em> each reload (identical within one session). This is faithful to p5.waves and intentional - the per-load variation is richer than a fixed one.</p></div>
 
     <!-- CLOSING -->
     <h2 id="closing">Closing shapes</h2>
-    <p>When you sweep a wave around a ring, the last point rarely lands on the first — you get an ugly seam. The fix is to sweep over an integer multiple of the wave's <strong>period</strong>: the x-distance over which <code class="inl">wave(x)</code> repeats. Every periodic wave has a measured period, listed on the <a href="waves.html#periodicity">Waves page</a>.</p>
-    <p>Shift and closed shapes normally fight: a ring tears its seam open the moment it lands on a new wave, because every formula has its own period. The <code class="inl">'closing'</code> pool ends that — its 17 waves all share one base period (<code class="inl">62.8319</code> = <code class="inl">2π/0.1</code>), so a sweep of <code class="inl">sampler.period × lobes</code> closes seamlessly through every transition.</p>
+    <p>When you sweep a wave around a ring, the last point rarely lands on the first - you get an ugly seam. The fix is to sweep over an integer multiple of the wave's <strong>period</strong>: the x-distance over which <code class="inl">wave(x)</code> repeats. Every periodic wave has a measured period, listed on the <a href="waves.html#periodicity">Waves page</a>.</p>
+    <p>Shift and closed shapes normally fight: a ring tears its seam open the moment it lands on a new wave, because every formula has its own period. The <code class="inl">'closing'</code> pool ends that - its 17 waves all share one base period (<code class="inl">62.8319</code> = <code class="inl">2π/0.1</code>), so a sweep of <code class="inl">sampler.period × lobes</code> closes seamlessly through every transition.</p>
     <pre class="code-block"><span class="c">// Read the sweep straight off the sampler.</span>
 const ring = VanillaWaves.createSampler({
   shift: true, group: 'closing', amplitude: 30
@@ -210,7 +212,7 @@ const sweep = ring.period * 8;   <span class="c">// 8 lobes, holds across every 
   wave: ['classic sine', 'mountain peaks'],
   mix: 0.5   <span class="c">// 0 = first wave, 1 = second</span>
 });</pre>
-    <p>Sweep <code class="inl">mix</code> over time for a smooth crossfade between two specific shapes — useful when shift is too wild for the look you want.</p>
+    <p>Sweep <code class="inl">mix</code> over time for a smooth crossfade between two specific shapes - useful when shift is too wild for the look you want.</p>
 
     <!-- WILD -->
     <h2 id="wild">Wild mode</h2>
@@ -264,8 +266,8 @@ const sweep = ring.period * 8;   <span class="c">// 8 lobes, holds across every 
 
     <!-- PARITY -->
     <h2 id="parity">Parity &amp; drift</h2>
-    <p><code class="inl">waves-core.js</code> is the canonical <code class="inl">p5.waves.js</code> math with only the 8-line p5 prototype hook removed. It tracks p5.waves as the source of truth — bit-identical output, verified across 1009 parity checks (all 34 waves, morph, range, wild, sampler). A weekly drift-watch compares the two so the port can never silently fall behind. Dialect baseline: <strong>p5.waves v3.4.0</strong>.</p>
-    <p>Time is just a number: you pass <code class="inl">t</code> in seconds — the library never calls a clock itself. So you can scrub time, run faster than real-time, run backwards, or freeze a moment.</p>
+    <p><code class="inl">waves-core.js</code> is the canonical <code class="inl">p5.waves.js</code> math with only the 8-line p5 prototype hook removed. It tracks p5.waves as the source of truth - bit-identical output, verified across 1009 parity checks (all 34 waves, morph, range, wild, sampler). A weekly drift-watch compares the two so the port can never silently fall behind. Dialect baseline: <strong>p5.waves v3.4.0</strong>.</p>
+    <p>Time is just a number: you pass <code class="inl">t</code> in seconds - the library never calls a clock itself. So you can scrub time, run faster than real-time, run backwards, or freeze a moment.</p>
 
     <!-- STARTERS -->
     <h2 id="starters">Copy-paste starters (canvasless)</h2>
@@ -279,11 +281,11 @@ const sweep = ring.period * 8;   <span class="c">// 8 lobes, holds across every 
     b.style.cssText = 'width:8px;height:100%;background:#14140f;transform-origin:bottom';
     return box.appendChild(b);
   });
-  const s = VanillaWaves.createSampler({ shift: true, amplitude: 1 });
+  const s = VanillaWaves.createSampler({ shift: true, range: [0, 1] });
   (function tick(now){
     const t = now / 1000;
     bars.forEach((b, i) =&gt; {
-      const v = 0.1 + (s.sample(i*0.5, t) + 0.5) * 0.9;
+      const v = 0.1 + s.sample(i*0.5, t) * 0.9;   // range [0,1] keeps scaleY positive
       b.style.transform = 'scaleY(' + v.toFixed(3) + ')';
     });
     requestAnimationFrame(tick);
