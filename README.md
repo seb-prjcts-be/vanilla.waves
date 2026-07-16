@@ -44,7 +44,7 @@ fields, meters, any DOM element**, with nothing else loaded.
 ### CDN (jsDelivr): one tag, everything
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.2.0/vanilla.waves.min.js"></script>
 ```
 
 That bundle is `waves-core.js` (the math) plus `engine.js` (the DOM loop). Want
