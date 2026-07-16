@@ -18,13 +18,15 @@ Status-legenda: ⬜ te porten · ✅ gedaan · 🚫 n.v.t. (p5/canvas-specifiek)
 
 | veld | waarde | gemeten |
 |---|---|---|
-| version | **3.4.0** | 2026-06-29 |
-| commit | `6ce959e` | 2026-06-29 |
-| wave_count | **34** | 2026-06-29 |
+| version | **3.6.0** | 2026-07-16 |
+| commit | `804f91e` (lokaal, release volgt) | 2026-07-16 |
+| wave_count | **35** | 2026-07-16 |
 
 Recente canonieke wijzigingen die de port meteen goed moet zetten:
 - **v3.3.0** — `Waves.createGrid()` *verwijderd* → 2D-veld = twee samplers + handmatige loop. `group: 'closing'` + `sampler.period`/`targetPeriod` *toegevoegd* (experimenteel).
 - **v3.4.0** — lib volledig **eval-free / CSP-safe** (`new Function`/`eval` weg; elke wave draagt een vooraf-gecompileerde `fn` naast z'n `algo`-string). Geen API-wijziging; output bit-identiek aan 3.3.0.
+- **v3.5.0** — wave 34 `spike sine` toegevoegd (sin^5, closing). `group: 'ghost'` toegevoegd (6 gecureerde closing-waves). Herclassificatie gentle→harsh: `bald patch`, `half sine`, `fade out` (harsh = "breaks rhythm", niet enkel randomness). Pools 25/10/18/6.
+- **v3.6.0** — **breaking op idx 22**: `fade out` vervangen door `shake out`, een gespiegelde log-chirp `sin(log(sq(min(abs(x)%62.8319,62.8319-abs(x)%62.8319))+1)*3)*.5`, gentle, periode 62.8319 → closing-pool 19. Pools 26/9/19/6. `.wave('fade out')` valt STIL terug op een seed-pick.
 
 ---
 
@@ -40,9 +42,9 @@ Recente canonieke wijzigingen die de port meteen goed moet zetten:
 ### A1. Wave-math (de kern — dit MOET de port zelf bezitten) — ✅ in waves-core.js
 | onderdeel | canoniek | port-status |
 |---|---|---|
-| 34 wave-formules (`classic sine` … `smooth solid sine`) | `waves[]` in manifest | ⬜ |
+| 35 wave-formules (`classic sine` … `spike sine`) | `waves[]` in manifest | ⬜ |
 | seed→wave via **FNV-1a hash** | `seed` opt | ⬜ |
-| groups als pools: `gentle`(27) · `harsh`(7) · `closing`(17) · `all`(34) · array | `group` opt | ⬜ |
+| groups als pools: `gentle`(26) · `harsh`(9) · `closing`(19) · `ghost`(6) · `all`(35) · array | `group` opt | ⬜ |
 | shift (auto-cyclen naar nieuwe wave) + morph-transitie | `shift`/`shiftInterval`/`shiftDuration` | ⬜ |
 | morph/mix tussen twee formules (`wave:[a,b]` + `mix`) | `mix` opt | ⬜ |
 | wild-mode + `unpredictability` | `mode`/`unpredictability` | ⬜ |
@@ -55,7 +57,7 @@ Recente canonieke wijzigingen die de port meteen goed moet zetten:
 | `Waves.wave(y, secondParam)` | losse sample (getal→getal) | ⬜ |
 | `Waves.createSampler(opts)` | sampler-object (hergebruik) | ⬜ |
 | `Waves.list()` | `[{index,name,algo}]` | ⬜ |
-| `Waves.count` | aantal waves (34) | ⬜ |
+| `Waves.count` | aantal waves (35) | ⬜ |
 | `Waves.data` | ruwe WAVES-array (+ custom toevoegen, vereist `algo`+`fn`) | ⬜ |
 | ~~`Waves.createGrid()`~~ | **verwijderd v3.3.0** | 🚫 niet porten |
 | `waves()` / `createWaveSampler()` / `p.waves()` | p5 global/instance-shorthands | 🚫 p5-gebonden → port exposeert eigen global (`VanillaWaves`/`vWaves`) |
@@ -104,8 +106,8 @@ De manifest tracket alleen JS-derived-repos (`p5.waves_svg`, `p5.waves_pulse`),
 
 | port | pin | dialect-status (2026-06-29, bron-geverifieerd) |
 |---|---|---|
-| **processing.waves** (Java) | v1.0.0, "port of p5.waves **v3.3.0**" | ✅ **in sync.** Heeft 34 waves in v3.3.0-volgorde, gentle/harsh/**closing** (`Waves.java:129-141`), `period` (`:42`), shift+entropie, morph/mix, wild/unpredictability. `WaveDef` draagt al `algo`+`fn`. v3.4.0 (eval-free/CSP) is **JS-specifiek → N.V.T. voor Java**, output bit-identiek. Enige actie: label naar 3.4.0 overwegen + bevestigen dat geen latere dialect-wijziging gemist is. **Loopt NIET achter op groups** (eerdere aanname weerlegd). |
-| **vanilla.waves** (JS vanilla) | — | ⬜ nog te bouwen; alles ⬜ (zie A). |
+| **processing.waves** (Java) | v1.6.0 (lokaal klaar, release volgt), "port of p5.waves **v3.6.0**" | ✅ **in sync.** Heeft 34 waves in v3.3.0-volgorde, gentle/harsh/**closing** (`Waves.java:129-141`), `period` (`:42`), shift+entropie, morph/mix, wild/unpredictability. `WaveDef` draagt al `algo`+`fn`. v3.4.0 (eval-free/CSP) is **JS-specifiek → N.V.T. voor Java**, output bit-identiek. Enige actie: label naar 3.4.0 overwegen + bevestigen dat geen latere dialect-wijziging gemist is. **Loopt NIET achter op groups** (eerdere aanname weerlegd). |
+| **vanilla.waves** (JS vanilla) | v0.2.0 (lokaal klaar, release volgt) | ✅ in sync met v3.6.0 — 10.422/10.422 parity (2026-07-16). |
 
 ## C. Drift-watch — auditlog
 Elke routine-run: manifest ophalen, vergelijken met de Snapshot-tabel hierboven,
@@ -132,3 +134,4 @@ dekt specifiek de **taal-ports** (sectie D).
 3. Verschillend → werk Snapshot + A-tabellen bij, en zet elke `removed_apis[]` op 🚫 ("nooit porten"), elke `added_apis[]` als nieuwe ⬜-regel.
 4. Hercheck de taal-ports (sectie D) tegen de nieuwe canon.
 5. Houd de port-status (⬜/✅) bij naarmate `vanilla.waves` groeit.
+- **2026-07-16** — dubbele sprong uitgevoerd: `waves-core.js` geregenereerd uit canoniek **v3.6.0** (lokale commit `804f91e`; zelfde transformatie: header + exposure-staart gewisseld, math byte-getrouw). Bundel + min hergenereerd (terser 5.49.0 via PowerShell — Git Bash verminkt de `--format "comments=/^!/"`-vlag). **Pariteit: 10.422/10.422** (canon ↔ core ↔ bundel ↔ min; alle 35 waves, morph, range, wild, seeds, samplers, shift/ghost met gestubde entropie). Docs-sweep: 34→35, fade out→shake out, spike sine-kaart, ghost in group-docs, kaart-audit 35/35 (6 tag-drifts gefixt: up down noise/bald patch/half sine →harsh; steps down/up down pulse/smooth solid sine +closing), amplitude-doc [−amp/2,+amp/2]→[−amp,+amp], harsh-legende "uses randomness"→"breaks rhythm". LET OP bij release: docs-pagina's pinnen jsdelivr `@v0.1.0` — pas ná tag v0.2.0 sweepen, anders draaien previews de oude min.

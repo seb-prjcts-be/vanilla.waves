@@ -15,7 +15,7 @@ vanilla.waves    the dialect for plain DOM/CSS, zero dependencies   (you are her
 
 - **Zero dependencies.** No p5, no canvas, no build step. One `<script>`.
 - **Bit-identical math.** The sampler returns the exact same numbers as
-  p5.waves v3.4.0, verified across 1009 parity checks (all 34 waves, morph,
+  p5.waves v3.6.0, verified across 10,422 parity checks (all 35 waves, morph,
   range, wild, sampler).
 - **DOM engine included.** Register an element type, mark it with `data-wv`,
   and one shared 30 fps loop animates it; offscreen elements pause
@@ -28,7 +28,7 @@ vanilla.waves    the dialect for plain DOM/CSS, zero dependencies   (you are her
 ## Why this exists
 
 The p5.waves *math* never actually needed p5. Look at the source: `wave()`,
-`createSampler()`, the 34 wave formulas, the seeded shift/morph engine, all of
+`createSampler()`, the 35 wave formulas, the seeded shift/morph engine, all of
 it is pure `Math.*`. The only p5 touchpoint is an 8-line prototype hook at the
 bottom of the file.
 
@@ -133,13 +133,13 @@ VanillaWaves.destroy(myElement);   // or a selector, NodeList, or nothing for al
 | `VanillaWaves.wave(y, 'triangle')` | wave by name |
 | `VanillaWaves.wave(y, { ... })` | full options (below) |
 | `VanillaWaves.createSampler({ ... })` | a sampler object |
-| `VanillaWaves.list()` / `.count` / `.data` | discover the 34 waves at runtime |
+| `VanillaWaves.list()` / `.count` / `.data` | discover the 35 waves at runtime |
 
 **Options** (all optional): `wave` (name / index / `[a,b]` to morph), `t`,
 `amplitude` (default 100), `range` `[min,max]` (overrides amplitude),
 `frequency` (1), `phase` (0), `seed` (0), `mode` `'stable'`/`'wild'`,
 `unpredictability` (0..1, wild only), `mix` (0..1, for morph), `shift` (bool),
-`group` `'gentle'`/`'harsh'`/`'closing'`/`'all'`/array, `shiftInterval` (3),
+`group` `'gentle'`/`'harsh'`/`'closing'`/`'ghost'`/`'all'`/array, `shiftInterval` (3),
 `shiftDuration` (1).
 
 **Sampler:** `sample(y)`, `sample(y, t)`, `sample(y, t, mix)`. Live getters:
@@ -178,7 +178,7 @@ hook removed. It tracks p5.waves as the source of truth; a weekly drift-watch
 routine compares the two so the port can never silently fall behind. See
 [`docs/waves.feature.md`](docs/waves.feature.md).
 
-Dialect baseline: **p5.waves v3.4.0** (commit `6ce959e`, 34 waves).
+Dialect baseline: **p5.waves v3.6.0** (commit `804f91e`, 35 waves).
 
 ---
 
@@ -193,7 +193,7 @@ index.html           the Showcase (Pages landing, repo root)
 docs/                the rest of the GitHub Pages site
   examples.html      the canvasless demo vocabulary, with source
   engine.html        the DOM engine, deep-dive
-  waves.html         all 34 waves + periodicity
+  waves.html         all 35 waves + periodicity
   guide.html         install, math, engine API, starters
   about.html         why it exists, parity, credits
   style.css          shared skin

@@ -3,11 +3,11 @@
  * GEGENEREERD — niet met de hand bewerken; pas de bronbestanden aan en hergenereer.
  * Zero-dependency vanilla-JS port van het p5.waves-dialect + DOM-engine.
  */
-﻿/*!
+﻿﻿/*!
  * vanilla.waves — waves-core.js
  * Het wave-dialect als ZERO-DEPENDENCY vanilla-JS port van p5.waves.
  *
- * Dit IS de canonieke p5.waves-math (v3.4.0, commit 6ce959e), byte-getrouw —
+ * Dit IS de canonieke p5.waves-math (v3.6.0, commit 804f91e), byte-getrouw —
  * met ALLEEN de p5-prototype-hook verwijderd en een eigen global ervoor in de
  * plaats. De berekening was altijd al puur vanilla (enkel Math.*); p5 was nooit
  * een dependency van de math, enkel van de prototype-extensies onderaan.
@@ -78,8 +78,8 @@
       fn: (x) => x*.03 % .5 },
     { name: 'saw up',            algo: '-x*.03 % .5',
       fn: (x) => -x*.03 % .5 },
-    { name: 'fade out',          algo: 'log(x)*.1',
-      fn: (x) => log(x)*.1 },
+    { name: 'shake out',         algo: 'sin(log(sq(min(abs(x)%62.8319,62.8319-abs(x)%62.8319))+1)*3)*.5',
+      fn: (x) => sin(log(sq(min(abs(x)%62.8319,62.8319-abs(x)%62.8319))+1)*3)*.5 },
     { name: 'grow random',       algo: 'random(x*.003)',
       fn: (x) => random(x*.003) },
     { name: 'noise',             algo: 'noise(x*.1) - .5',
@@ -102,11 +102,15 @@
       fn: (x) => sin(x*.05)*(x*.1%.5) },
     { name: 'smooth solid sine', algo: 'sin(x*3.1)*.25',
       fn: (x) => sin(x*3.1)*.25 },
+    { name: 'spike sine',        algo: 'sq(sq(sin(x*.1)))*sin(x*.1)*.5',
+      fn: (x) => sq(sq(sin(x*.1)))*sin(x*.1)*.5 },
   ];
 
   // ─── Character classification ────────────────────────────────────────────────
-  // Parallel to WAVES. 'harsh' = tan/random/noise-driven (breaks rhythm).
-  // 'gentle' = everything else, including sharp-but-periodic (square, pulse).
+  // Parallel to WAVES. 'harsh' = breaks rhythm: tan/random/noise-driven, OR
+  // otherwise not-calm (unbounded/Inf, or erratic accelerating rhythm).
+  // 'gentle' = calm and bounded, including sharp-but-periodic (square, pulse)
+  // and steady non-periodic waves (ramp up sine, triangle sine, meta sine).
   // See strategy.md §0 — group: 'harsh' picks BEFORE wave selection;
   // mode: 'wild' warps WITHIN one wave. They are orthogonal.
   const CHARACTER = [
@@ -115,14 +119,18 @@
     'harsh',                                     // 11 steps down (tan)
     'gentle', 'gentle', 'gentle', 'gentle',
     'harsh',                                     // 16 up down noise (x*sin grows unbounded)
-    'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle',
+    'gentle', 'gentle', 'gentle', 'gentle', 'gentle',
+    'gentle',                                    // 22 shake out (mirrored log chirp: bounded, shake returns every period)
     'harsh',                                     // 23 grow random (random)
     'harsh',                                     // 24 noise (noise)
     'harsh',                                     // 25 fuzzy pulse (tan hi freq)
     'harsh',                                     // 26 up down pulse (tan)
-    'gentle',
+    'harsh',                                     // 27 bald patch (x² % .5 — same growth mechanism as 16 up down noise)
     'harsh',                                     // 28 fuzzy peak sine (random)
-    'gentle', 'gentle', 'gentle', 'gentle', 'gentle'
+    'gentle', 'gentle', 'gentle',                // 29 ramp up sine, 30 triangle sine, 31 round linked sine
+    'harsh',                                     // 32 half sine (erratic accelerating rhythm)
+    'gentle',                                    // 33 smooth solid sine
+    'gentle'                                     // 34 spike sine (smooth odd sin⁵)
   ];
 
   if (CHARACTER.length !== WAVES.length) {
@@ -167,7 +175,7 @@
     50.0000,  // 19 ramp                1/0.02
     16.6667,  // 20 saw down            0.5/0.03
     16.6667,  // 21 saw up              0.5/0.03
-    null,     // 22 fade out            log(x)
+    62.8319,  // 22 shake out           mirrored log chirp — palindrome over 2π/0.1
     null,     // 23 grow random         non-deterministic
     null,     // 24 noise                non-deterministic
     17.75,    // 25 fuzzy pulse         empirical (tan(x*20) clips oddly)
@@ -178,7 +186,8 @@
     null,     // 30 triangle sine       amplitude varies
     62.8319,  // 31 round linked sine   LCM(2π/0.1, 2π/1)
     null,     // 32 half sine           amplitude varies
-    2.0268    // 33 smooth solid sine   2π/3.1 — fits 31× in base period
+    2.0268,   // 33 smooth solid sine   2π/3.1 — fits 31× in base period
+    62.8319   // 34 spike sine          2π/0.1 (odd sin⁵ preserves full period)
   ];
 
   if (WAVE_PERIODS.length !== WAVES.length) {
@@ -200,6 +209,25 @@
     const ratio = CLOSING_BASE_PERIOD / p;
     if (Math.abs(ratio - Math.round(ratio)) < CLOSING_RATIO_TOL) {
       CLOSING_INDICES.push(i);
+    }
+  }
+
+  // 'ghost' pool = a hand-picked subset of the closing waves that read well
+  // under the ghost-delay embedding (see examples/ghost_delay): plot one wave
+  // against a delayed copy of itself and it closes into a loop ring. Every
+  // member closes over CLOSING_BASE_PERIOD and gives a clean loop, from a plain
+  // ellipse (wobble sine) up to dense rosettes (mountain peaks, valleys). The
+  // tan-based closing waves blow up under that pairing and the very-short-period
+  // ones tangle, so they are left out. Aesthetic selection — discover membership
+  // at runtime via the group, do not hardcode this list in consumer code.
+  const GHOST_NAMES = [
+    'wobble sine', 'bumpy sine', 'batman', 'round linked sine',
+    'mountain peaks', 'valleys'
+  ];
+  const GHOST_INDICES = [];
+  for (let i = 0; i < GHOST_NAMES.length; i++) {
+    for (let j = 0; j < WAVES.length; j++) {
+      if (WAVES[j].name === GHOST_NAMES[i]) { GHOST_INDICES.push(j); break; }
     }
   }
 
@@ -320,6 +348,7 @@
       if (k === 'gentle')  return GENTLE_INDICES;
       if (k === 'harsh')   return HARSH_INDICES;
       if (k === 'closing') { warnClosingExperimental(); return CLOSING_INDICES; }
+      if (k === 'ghost')   return GHOST_INDICES;
       return null;
     }
     return null;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All 34 Waves — vanilla.waves</title>
+  <title>All 35 Waves — vanilla.waves</title>
   <meta name="description" content="Every wave in vanilla.waves, with formula, character, and period. Traced live in SVG — canvasless, bit-identical to p5.waves.">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.1.0/vanilla.waves.min.js"></script>
@@ -28,13 +28,13 @@
   </nav>
 
   <main class="waves-page">
-    <h1>all 34 waves</h1>
-    <p class="waves-intro">Each wave is a deterministic function: pass a number in, get a number back. The output range is roughly [&minus;0.5, +0.5] before you scale it. Every preview here is traced live in <strong>SVG</strong> — no <code class="inl">&lt;canvas&gt;</code> — and the numbers are bit-identical to <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> v3.4.0.</p>
+    <h1>all 35 waves</h1>
+    <p class="waves-intro">Each wave is a deterministic function: pass a number in, get a number back. The output range is roughly [&minus;0.5, +0.5] before you scale it. Every preview here is traced live in <strong>SVG</strong> — no <code class="inl">&lt;canvas&gt;</code> — and the numbers are bit-identical to <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> v3.6.0.</p>
     <div class="waves-legend">
       <span>idx</span>
       <span>name</span>
       <span>formula</span>
-      <span style="border-color:var(--accent);color:var(--accent);">harsh = uses randomness</span>
+      <span style="border-color:var(--accent);color:var(--accent);">harsh = breaks rhythm</span>
       <span style="background:var(--ink);color:var(--bg);border-color:var(--ink);">closing = periodic at 2&pi;&middot;n</span>
       <span style="border-style:dashed;">T = measured period (&mdash; = no clean close)</span>
     </div>
@@ -46,7 +46,7 @@
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="classic sine"></div><div class="wave-meta"><div class="idx">00</div><div class="name">classic sine</div><div class="formula">sin(x*.1)*.4</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.83</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="sine"></div><div class="wave-meta"><div class="idx">01</div><div class="name">sine</div><div class="formula">sin(x*.2)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="sharp peaks"></div><div class="wave-meta"><div class="idx">02</div><div class="name">sharp peaks</div><div class="formula">abs(sin(x*.1))*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="smooth solid sine"></div><div class="wave-meta"><div class="idx">33</div><div class="name">smooth solid sine</div><div class="formula">sin(x*3.1)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T 2.03</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="smooth solid sine"></div><div class="wave-meta"><div class="idx">33</div><div class="name">smooth solid sine</div><div class="formula">sin(x*3.1)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 2.03</span></div></div></article>
       </div>
     </section>
 
@@ -66,7 +66,7 @@
       <p>Quantised waves: ceil / round / modulo carve smooth shapes into plateaus.</p>
       <div class="wave-cards">
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="stepped sine"></div><div class="wave-meta"><div class="idx">05</div><div class="name">stepped sine</div><div class="formula">ceil(sin(x*.1))*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.60</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="steps down"></div><div class="wave-meta"><div class="idx">11</div><div class="name">steps down</div><div class="formula">ceil(tan(x*.1))*.25</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T 31.42</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="steps down"></div><div class="wave-meta"><div class="idx">11</div><div class="name">steps down</div><div class="formula">ceil(tan(x*.1))*.25</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="steps"></div><div class="wave-meta"><div class="idx">12</div><div class="name">steps</div><div class="formula">round(sin(&minus;x*.1))*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.82</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="zig-zag sine"></div><div class="wave-meta"><div class="idx">08</div><div class="name">zig-zag sine</div><div class="formula">sin(x*.2)*.4 % .12</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="square"></div><div class="wave-meta"><div class="idx">03</div><div class="name">square</div><div class="formula">(x*.025)%1 &lt; .5 ? &minus;.5 : .5</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T 40</span></div></div></article>
@@ -85,7 +85,7 @@
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="round linked sine"></div><div class="wave-meta"><div class="idx">31</div><div class="name">round linked sine</div><div class="formula">sin(x*.1)*cos(x*1)*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.83</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="ramp up sine"></div><div class="wave-meta"><div class="idx">29</div><div class="name">ramp up sine</div><div class="formula">sin(x)*(x*.01%.5)</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="triangle sine"></div><div class="wave-meta"><div class="idx">30</div><div class="name">triangle sine</div><div class="formula">sin(x)*(x*.01%1&minus;.5)</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="half sine"></div><div class="wave-meta"><div class="idx">32</div><div class="name">half sine</div><div class="formula">sin(x*.05)*(x*.1%.5)</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="half sine"></div><div class="wave-meta"><div class="idx">32</div><div class="name">half sine</div><div class="formula">sin(x*.05)*(x*.1%.5)</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
       </div>
     </section>
 
@@ -104,21 +104,22 @@
       <h2>Chaos &amp; special</h2>
       <p>Things break loose: tangents, noise, logarithm, random. Most are flagged <em>harsh</em>: they use a seeded PRNG or a non-trig function with surprising spikes.</p>
       <div class="wave-cards">
-        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="up down noise"></div><div class="wave-meta"><div class="idx">16</div><div class="name">up down noise</div><div class="formula">x*sin(x*.1) % .5</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="fade out"></div><div class="wave-meta"><div class="idx">22</div><div class="name">fade out</div><div class="formula">log(x)*.1</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="up down noise"></div><div class="wave-meta"><div class="idx">16</div><div class="name">up down noise</div><div class="formula">x*sin(x*.1) % .5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="shake out"></div><div class="wave-meta"><div class="idx">22</div><div class="name">shake out</div><div class="formula">sin(log(sq(min(abs(x)%62.8319,62.8319-abs(x)%62.8319))+1)*3)*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.83</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="grow random"></div><div class="wave-meta"><div class="idx">23</div><div class="name">grow random</div><div class="formula">random(x*.003)</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="noise"></div><div class="wave-meta"><div class="idx">24</div><div class="name">noise</div><div class="formula">noise(x*.1) &minus; .5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="fuzzy pulse"></div><div class="wave-meta"><div class="idx">25</div><div class="name">fuzzy pulse</div><div class="formula">tan(x*20)*.05</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T 17.75</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="up down pulse"></div><div class="wave-meta"><div class="idx">26</div><div class="name">up down pulse</div><div class="formula">tan(x*.1)*.05</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T 31.42</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="bald patch"></div><div class="wave-meta"><div class="idx">27</div><div class="name">bald patch</div><div class="formula">sq(x*.05) % .5</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="up down pulse"></div><div class="wave-meta"><div class="idx">26</div><div class="name">up down pulse</div><div class="formula">tan(x*.1)*.05</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="bald patch"></div><div class="wave-meta"><div class="idx">27</div><div class="name">bald patch</div><div class="formula">sq(x*.05) % .5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="fuzzy peak sine"></div><div class="wave-meta"><div class="idx">28</div><div class="name">fuzzy peak sine</div><div class="formula">sin(x*.1) &lt; 0 ? random(&minus;.2, .2) : sin(x*.1)*.5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="spike sine"></div><div class="wave-meta"><div class="idx">34</div><div class="name">spike sine</div><div class="formula">sq(sq(sin(x*.1)))*sin(x*.1)*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.83</span></div></div></article>
       </div>
     </section>
 
     <section class="period-section" id="periodicity">
       <h2>Periodicity</h2>
       <p>A wave is <em>periodic</em> when there is a distance <code class="inl">T</code> such that <code class="inl">wave(x) == wave(x + T)</code> for every <code class="inl">x</code>. That distance is the wave's <strong>period</strong>. Knowing it lets you close a shape cleanly: sample a wave around a ring over an integer number of periods and the last point lands exactly on the first — no seam.</p>
-      <p><strong>Why <code class="inl">62.83</code> and not <code class="inl">360</code>?</strong> <code class="inl">wave(x)</code> treats <code class="inl">x</code> as a generic coordinate — the same mental model as <code class="inl">noise(x)</code> — not an angle. Ten of the 34 waves are not sine-based at all (<code class="inl">square</code>, <code class="inl">triangle</code>, <code class="inl">ramp</code>, <code class="inl">noise</code>…), so radians would be meaningless for them.</p>
+      <p><strong>Why <code class="inl">62.83</code> and not <code class="inl">360</code>?</strong> <code class="inl">wave(x)</code> treats <code class="inl">x</code> as a generic coordinate — the same mental model as <code class="inl">noise(x)</code> — not an angle. Nine of the 35 waves are not sine-based at all (<code class="inl">square</code>, <code class="inl">triangle</code>, <code class="inl">ramp</code>, <code class="inl">noise</code>…), so radians would be meaningless for them.</p>
       <p>Every period value was <strong>measured</strong>, not derived: the periodicity harness in the p5.waves repo samples each wave, finds the smallest <code class="inl">T</code> where the mean error between <code class="inl">wave(x)</code> and <code class="inl">wave(x + T)</code> stays below 0.002, then confirms with multiples. vanilla.waves produces numerically identical output, so the same periods hold.</p>
 
       <h3>Closed-ring recipe (canvasless)</h3>
@@ -139,7 +140,7 @@
 path.setAttribute(<span class="s">'d'</span>, d + <span class="s">'Z'</span>);   <span class="c">// Z closes it</span></pre>
 
       <h3>Quick lookup</h3>
-      <p>24 waves close cleanly, 10 don't. Each card above also shows its measured period.</p>
+      <p>26 waves close cleanly, 9 don&rsquo;t. Each card above also shows its measured period.</p>
       <table class="period-table">
         <tr><th>Period T</th><th>Waves</th></tr>
         <tr><td class="num"><strong>2.03</strong></td><td>33 smooth solid sine</td></tr>
@@ -149,8 +150,8 @@ path.setAttribute(<span class="s">'d'</span>, d + <span class="s">'Z'</span>);  
         <tr><td class="num"><strong>33.33</strong></td><td>18 triangle</td></tr>
         <tr><td class="num"><strong>40</strong></td><td>3 square, 4 pulse</td></tr>
         <tr><td class="num"><strong>50</strong></td><td>19 ramp</td></tr>
-        <tr><td class="num"><strong>62.83</strong></td><td>0 classic sine, 5 stepped sine, 6 mountain peaks, 7 valleys, 9 batman, 10 offset sine, 12 steps, 14 bumpy sine, 15 wobble sine, 31 round linked sine</td></tr>
-        <tr><td class="num"><strong>&mdash;</strong></td><td><em>no clean close:</em> 16 up down noise, 17 meta sine, 22 fade out, 23 grow random, 24 noise, 27 bald patch, 28 fuzzy peak sine, 29 ramp up sine, 30 triangle sine, 32 half sine</td></tr>
+        <tr><td class="num"><strong>62.83</strong></td><td>0 classic sine, 5 stepped sine, 6 mountain peaks, 7 valleys, 9 batman, 10 offset sine, 12 steps, 14 bumpy sine, 15 wobble sine, 22 shake out, 31 round linked sine, 34 spike sine</td></tr>
+        <tr><td class="num"><strong>&mdash;</strong></td><td><em>no clean close:</em> 16 up down noise, 17 meta sine, 23 grow random, 24 noise, 27 bald patch, 28 fuzzy peak sine, 29 ramp up sine, 30 triangle sine, 32 half sine</td></tr>
       </table>
 
       <h3>How to read the result</h3>
@@ -163,8 +164,8 @@ path.setAttribute(<span class="s">'d'</span>, d + <span class="s">'Z'</span>);  
   </main>
 
   <footer>
-    <p>Zero-dependency vanilla-JS port of the <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> dialect · baseline v3.4.0</p>
-    <p class="footer-sub">MIT License · v0.1.0 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
+    <p>Zero-dependency vanilla-JS port of the <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> dialect · baseline v3.6.0</p>
+    <p class="footer-sub">MIT License · v0.2.0 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
   </footer>
 
 </body>
