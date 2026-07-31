@@ -17,18 +17,38 @@ rot: niet omdat het slecht is, maar omdat main eronder doorloopt.
 
 ## Controle vóór commit
 
-Twee dingen die niet uit code of `git log` te halen zijn en dus mis kunnen
-gaan zonder dat iemand het ziet:
-
 ```bash
-node check-docs.mjs
+node check-docs.mjs && node check-parity.mjs
 ```
 
-Vergelijkt elk getal-claim in de HTML ("35 shapes", "19 waves") met de aantallen
-die de verscheepte library zélf rapporteert. Faalt met exit 1 bij drift.
-Aanleiding: de landingspagina beweerde maandenlang "34 shapes" terwijl de
-library er 35 had, en de v0.2.0-sweep die claimde dat overal te hebben gefixt
-had index.html en about.html gemist.
+**`check-docs.mjs`** vergelijkt elk getal-claim in de HTML ("35 shapes",
+"19 waves") met de aantallen die de verscheepte library zélf rapporteert.
+Aanleiding: de landingspagina beweerde "34 shapes" terwijl de library er 35 had,
+en de v0.2.0-sweep die claimde dat overal gefixt te hebben had `index.html` en
+`docs/about.html` gemist. Bewezen werkend: zet "34 shapes" terug en hij meldt
+`index.html:42` met exit 1.
+
+**`check-parity.mjs`** bewijst dat `vanilla.waves.js` en `vanilla.waves.min.js`
+dezelfde getallen geven als `waves-core.js`. Vangt "iemand paste de core aan en
+vergat te herbouwen". Laadt de drie bestanden in aparte vm-contexten, 8620
+checks. Bewezen werkend: verander één coëfficiënt in de bundel en hij faalt op
+het laatste float-cijfer.
+
+## Twee sites tegelijk (opgelost 2026-07-31)
+
+Deze repo ligt onder de webroot (`C:\server\htdocs`). Agent-tooling maakt
+tijdelijke git-worktrees onder `.claude/worktrees/`, en zo'n worktree is een
+VOLLEDIGE tweede kopie van de site. Apache serveerde die gewoon mee. Resultaat:
+`/vanilla.waves/` was correct terwijl
+`/vanilla.waves/.claude/worktrees/<naam>/` een oude versie toonde die nog
+"34 shapes" beweerde, allebei met HTTP 200.
+
+Dat is de verklaring voor terugkerende "regressies" die geen regressie waren:
+er werd geverifieerd tegen de ene kopie en gepubliceerd vanuit de andere.
+
+Dichtgezet met een `.htaccess` in de repo-root die alles onder `.claude/`
+404't. Geverifieerd: site, docs en library 200; `.claude/launch.json` en
+`.claude/worktrees/` 404. GitHub Pages doet niets met dat bestand.
 
 ## Open bugs in `engine.js` (in main, niet gefixt)
 
@@ -63,9 +83,13 @@ hierboven. Wat erin zat, staat hier zodat de keuze navolgbaar blijft:
 | `claude/elastic-bell-9ef047` | `tools/build.js`, `tools/parity.js`, `AUDIT.md`, `docs/art.html` | build- en parity-harnas bestaat NIET in main |
 | `claude/tender-elgamal-d720f5` | negen losse voorbeelden onder `examples/` | weg |
 
-**Belangrijk gevolg:** `cloud.md` en `STATUS.md` schrijven voor dat je na elke
-core-wijziging `node tools/build.js` en `node tools/parity.js` draait. Die
-bestanden zitten niet in main en zijn nu ook niet meer op een branch. Die
-werkafspraak verwijst dus naar gereedschap dat niet bestaat, en
-`vanilla.waves.js` / `.min.js` kunnen op dit moment niet gereproduceerd worden.
-Dat is de grootste openstaande schuld.
+**Gevolg, deels opgelost.** De verificatiekant is terug: `check-parity.mjs`
+bewijst dat de bundels overeenkomen met de core, en meldde op 2026-07-31 dat de
+huidige bundels correct zijn (8620 checks, 35 waves overal).
+
+Wat nog ontbreekt is de **bouwkant**. Er is geen script dat
+`vanilla.waves.js` en `vanilla.waves.min.js` opnieuw genereert uit
+`waves-core.js` + `engine.js`. Zolang dat zo is kan de core niet gewijzigd
+worden: elke wijziging maakt de bundels ongeldig en er is geen manier om ze bij
+te werken. Dat blokkeert ook de engine-bugs hierboven. Dit is de grootste
+resterende schuld.

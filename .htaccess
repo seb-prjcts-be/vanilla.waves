@@ -1,0 +1,12 @@
+# Lokale Apache/XAMPP alleen. GitHub Pages doet niets met dit bestand.
+#
+# Waarom dit bestaat: deze repo ligt onder de webroot (C:\server\htdocs), en
+# agent-tooling maakt tijdelijke git-worktrees aan onder .claude/worktrees/.
+# Zo'n worktree is een VOLLEDIGE tweede kopie van deze site, die stilletjes
+# achterloopt zodra main verder gaat. Op 2026-07-31 serveerde Apache daardoor
+# twee sites tegelijk: de echte, en een oude die nog "34 shapes" beweerde.
+#
+# Niets onder .claude/ hoort ooit geserveerd te worden: het zijn agent-config
+# en wegwerp-checkouts, geen site.
+
+RedirectMatch 404 /\.claude(/|$)
