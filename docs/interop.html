@@ -59,6 +59,7 @@ import * as THREE from 'three';
 
 const s = createSampler({ shift: true, group: 'gentle', range: [-1, 1] });</pre>
     <p>That file holds no math of its own. It imports <code class="inl">waves-core.js</code> for its side effect and re-exports the result, so there is exactly one copy of the canonical formulas and the module layer cannot drift away from it. It also leaves the globals in place, so mixing the two routes in one page is harmless.</p>
+    <div class="callout"><p><span class="note">not on the CDN yet</span> <code class="inl">waves-core.mjs</code> landed after the <code class="inl">v0.2.0</code> tag, so <code class="inl">cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.2.0/waves-core.mjs</code> returns 404. Copy the file next to your code, or point at <code class="inl">@main</code> until the next tag ships. The <code class="inl">@v0.2.0</code> bundle itself is fine, it is only the module entry that is missing.</p></div>
     <p>The classic route still works and is what you want when the DOM engine comes along, since the engine is browser-only and self-initialising. Load the script first, read the global inside your module:</p>
     <pre class="code-block">&lt;script src="waves-core.js"&gt;&lt;/script&gt;
 &lt;script type="importmap"&gt;

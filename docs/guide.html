@@ -59,6 +59,12 @@
     <h3>Route B: Local</h3>
     <p>Copy <code class="inl">vanilla.waves.min.js</code> (or <code class="inl">vanilla.waves.js</code> for the readable build) next to your HTML and point a <code class="inl">&lt;script&gt;</code> at it. Want <em>only</em> the math, no engine? Load <code class="inl">waves-core.js</code> on its own.</p>
 
+    <h3>Route C: ES module</h3>
+    <p>Using a bundler, or a module-based renderer like three.js? <code class="inl">waves-core.mjs</code> is the module entry on the math:</p>
+    <pre class="code-block">import { createSampler, wave } from './waves-core.mjs';</pre>
+    <p>It holds no formulas of its own: it imports <code class="inl">waves-core.js</code> for its side effect and re-exports it, so there is exactly one copy of the canonical math and the module layer cannot drift from it. Works in the browser, in Node and in bundlers, and it leaves the globals in place so both routes can coexist on one page. The DOM engine is <em>not</em> part of it, being browser-only and self-initialising. Full detail on the <a href="interop.html#esm">Interop page</a>.</p>
+    <div class="callout"><p><span class="note">not on the CDN yet</span> <code class="inl">waves-core.mjs</code> landed after the <code class="inl">v0.2.0</code> tag, so the pinned jsDelivr path returns 404 for it. Copy the file locally, or point at <code class="inl">@main</code> until the next tag ships.</p></div>
+
     <div class="callout">
       <p><span class="note">global</span> The library exposes <code class="inl">VanillaWaves</code> (alias <code class="inl">vWaves</code>, and <code class="inl">Waves</code> as a drop-in when p5.waves isn't present).</p>
     </div>
