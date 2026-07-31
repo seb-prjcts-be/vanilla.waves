@@ -263,8 +263,11 @@ export default W;</pre>
     <p>Two limits are worth stating plainly. There is no npm package, so a bare specifier like <code class="inl">import ... from 'vanilla.waves'</code> does not resolve: import it by path, or map it yourself. And because the exports come off one frozen object rather than being separate module bindings, a bundler cannot tree-shake the unused waves out. For a zero-dependency file this size that is a fair trade, but it is better known now than halfway into a build setup.</p>
     <div class="callout"><p><span class="note">not included</span> The DOM engine is not part of the module entry. It is browser-only and initialises itself on <code class="inl">DOMContentLoaded</code>, so it stays where it belongs: load <code class="inl">vanilla.waves.js</code> with a <code class="inl">&lt;script&gt;</code> tag when you want <code class="inl">register</code>, <code class="inl">init</code> and <code class="inl">destroy</code>.</p></div>
 
-    <p style="margin-top:2.4rem;"><a href="guide.html">&larr; Back to the guide</a> &nbsp;&middot;&nbsp; <a href="waves.html#periodicity">Periods and closing shapes &rarr;</a></p>
-
+  
+  <nav class="page-nav" aria-label="Page navigation">
+    <a class="prev" href="engine.html"><span class="lbl">&larr; Previous</span><span class="ttl">Engine</span></a>
+    <a class="next" href="waves.html"><span class="lbl">Next &rarr;</span><span class="ttl">Waves</span></a>
+  </nav>
   </main>
 
   <footer>

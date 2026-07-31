@@ -407,3 +407,24 @@ section[id], h2[id] { scroll-margin-top: 62px; }
 }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ── Pager: vorige/volgende pagina, in dezelfde volgorde als het menu ─────── */
+.page-nav {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 1.5rem; flex-wrap: wrap;
+  margin: 4rem auto 0; max-width: 900px;
+  padding: 1.4rem 2rem 0; border-top: 1px solid var(--border-mid);
+}
+.page-nav a { text-decoration: none; display: block; }
+.page-nav .lbl {
+  display: block; font-family: var(--mono); font-size: 0.66rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint);
+  margin-bottom: 0.25rem;
+}
+.page-nav .ttl {
+  font-family: 'Oswald', sans-serif; font-size: 1rem; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--ink);
+  border-bottom: 1px solid var(--ink); padding-bottom: 2px;
+}
+.page-nav a:hover .ttl { color: var(--accent-deep); border-color: var(--accent-deep); }
+.page-nav .next { margin-left: auto; text-align: right; }
