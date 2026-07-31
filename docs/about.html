@@ -28,7 +28,7 @@
 
   <main class="wrap">
     <h1>about</h1>
-    <p class="intro">Pass a number in, get a number back. Behind that one promise lives a curated set of 34 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos, each a tiny formula tuned to drive motion, colour, shape, or pattern. vanilla.waves is that set — with nothing else loaded, and nothing drawn on a canvas.</p>
+    <p class="intro">Pass a number in, get a number back. Behind that one promise lives a curated set of 35 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos, each a tiny formula tuned to drive motion, colour, shape, or pattern. vanilla.waves is that set — with nothing else loaded, and nothing drawn on a canvas.</p>
 
     <h2>The math never needed p5</h2>
     <p><strong>vanilla.waves</strong> is the plain-DOM sibling of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a>. Look at the p5.waves source: <code class="inl">wave()</code>, <code class="inl">createSampler()</code>, the 35 formulas, the seeded shift/morph engine — all of it is pure <code class="inl">Math.*</code>. The only p5 touchpoint is an 8-line prototype hook at the very bottom of the file.</p>
@@ -57,12 +57,13 @@
     </table>
     <p>See <a href="https://github.com/seb-prjcts-be/vanilla.waves/blob/main/docs/waves.feature.md" target="_blank" rel="noopener">waves.feature.md</a> for the port-coverage and drift-watch changedoc.</p>
 
-    <h2>34 shapes, three temperaments</h2>
-    <p>Every wave has a character. The library splits them into three groups so you can lean into the one you want:</p>
+    <h2>35 shapes, four pools</h2>
+    <p>Every wave has a character. The library splits them into four pools so you can lean into the one you want:</p>
     <ul class="step-list">
-      <li><div><p><strong>Gentle</strong>: pure functions of x. Deterministic, repeatable, made of sines, cosines and modulos. The dependable section.</p></div></li>
-      <li><div><p><strong>Harsh</strong>: noise-driven or tangent-spiked. They pull from a seeded PRNG, so they jitter and surprise within the wave's envelope.</p></div></li>
-      <li><div><p><strong>Closing</strong>: a pool whose period divides 2π·n cleanly. A shape swept over a full cycle joins back to itself without a seam — what you want for a ring.</p></div></li>
+      <li><div><p><strong>Gentle</strong> (26): pure functions of x. Deterministic, repeatable, made of sines, cosines and modulos. The dependable section.</p></div></li>
+      <li><div><p><strong>Harsh</strong> (9): noise-driven or tangent-spiked. They pull from a seeded PRNG, so they jitter and surprise within the wave's envelope.</p></div></li>
+      <li><div><p><strong>Closing</strong> (19): a pool that shares one base period, so a shape swept over an integer number of periods joins back to itself without a seam, and stays closed even while <code class="inl">shift</code> moves to the next formula.</p></div></li>
+      <li><div><p><strong>Ghost</strong> (6): a curated subset of closing that still reads clean when you plot a wave against a delayed copy of itself.</p></div></li>
     </ul>
     <p>You don't have to pick by hand. Ask for "a gentle one" and let a seed decide, ask for a name, ask for two names and crossfade with <code class="inl">mix</code>, or flip <code class="inl">shift</code> on and watch the library cycle formulas at a tempo you set. All from one call.</p>
 
