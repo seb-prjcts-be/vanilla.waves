@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interop — vanilla.waves</title>
+  <meta name="description" content="Driving other renderers with vanilla.waves. The sampler is renderer-agnostic: four verified three.js patterns (displaced geometry, seamless closing ring, instanced field, GPU LUT) plus audio, CSS, GSAP and Node.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo"><a href="../index.html">vanilla<b>.waves</b></a></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="../index.html">Showcase</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="engine.html">Engine</a></li>
+      <li><a href="interop.html" class="active">Interop</a></li>
+      <li><a href="waves.html">Waves</a></li>
+      <li><a href="guide.html">Guide</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <main class="wrap">
+    <h1>interop</h1>
+    <p class="intro">The DOM engine is not the edge of this library, it is one consumer of it. Underneath sits a function that takes two numbers and returns one, and that function does not care whether the result becomes a bar height, a vertex, a filter cutoff or a CSS easing curve. This page is about handing that number to something else: <strong>three.js</strong> first, then the other runtimes worth knowing about.</p>
+
+    <div class="quicklinks">
+      <a class="chip" href="#seam">The seam</a>
+      <a class="chip" href="#loading">Loading</a>
+      <a class="chip" href="#adapter">Adapter rule</a>
+      <a class="chip" href="#geometry">Displaced geometry</a>
+      <a class="chip" href="#ring">Seamless ring</a>
+      <a class="chip" href="#instanced">Instanced field</a>
+      <a class="chip" href="#lut">Wave as GPU LUT</a>
+      <a class="chip" href="#runtimes">Other runtimes</a>
+      <a class="chip" href="#esm">Module entry</a>
+    </div>
+
+    <!-- SEAM -->
+    <h2 id="seam">One function is the whole surface</h2>
+    <p>Everything on this page rests on a single call:</p>
+    <pre class="code-block">const s = VanillaWaves.createSampler({ shift: true, group: 'gentle', range: [-1, 1] });
+s.sample(position, time);   <span class="c">// number in, number out</span></pre>
+    <p>That is the entire integration surface. No canvas, no DOM, no renderer, no clock: you pass <code class="inl">t</code> in seconds yourself, so you can scrub it, freeze it, run it backwards or run it faster than real time. A renderer only has to answer one question: <em>which of my numbers should this drive?</em></p>
+    <div class="callout"><p><span class="note">why it matters</span> The wave dialect is not a noise function. It is a curated set of 35 named shapes with periods, groups, and a shift engine that morphs between them. Everything a renderer gains from that comes through <code class="inl">sample()</code>, so nothing about the port's DOM engine limits where it can go.</p></div>
+
+    <!-- LOADING -->
+    <h2 id="loading">Loading it next to a module-based renderer</h2>
+    <p>Most 3D and 2D renderers ship as ES modules today, so the library meets them there. <code class="inl">waves-core.mjs</code> is the module entry point on the math:</p>
+    <pre class="code-block"><span class="c">// the module route - same file works in the browser, in Node and in bundlers</span>
+import { createSampler, wave, list } from './waves-core.mjs';
+import * as THREE from 'three';
+
+const s = createSampler({ shift: true, group: 'gentle', range: [-1, 1] });</pre>
+    <p>That file holds no math of its own. It imports <code class="inl">waves-core.js</code> for its side effect and re-exports the result, so there is exactly one copy of the canonical formulas and the module layer cannot drift away from it. It also leaves the globals in place, so mixing the two routes in one page is harmless.</p>
+    <p>The classic route still works and is what you want when the DOM engine comes along, since the engine is browser-only and self-initialising. Load the script first, read the global inside your module:</p>
+    <pre class="code-block">&lt;script src="waves-core.js"&gt;&lt;/script&gt;
+&lt;script type="importmap"&gt;
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" } }
+&lt;/script&gt;
+&lt;script type="module"&gt;
+  import * as THREE from 'three';
+  const W = globalThis.VanillaWaves;   <span class="c">// globals are visible inside modules</span>
+&lt;/script&gt;</pre>
+    <p>Reach for <code class="inl">waves-core</code> rather than the full bundle when the DOM engine is not going to be used: it is the math alone, with no shared loop and no <code class="inl">[data-wv]</code> scanning.</p>
+    <p>Node takes the same module entry, which is what makes an adapter testable without a browser, a GPU or a renderer:</p>
+    <pre class="code-block">import { createSampler } from '../vanilla.waves/waves-core.mjs';   <span class="c">// 35 waves, ready</span></pre>
+
+    <!-- ADAPTER -->
+    <h2 id="adapter">The adapter rule</h2>
+    <p>The mistake is to sprinkle <code class="inl">sample()</code> calls through renderer code. The pattern that holds up is a thin layer in between that knows the waves but <strong>deliberately does not know the renderer</strong>: it takes a position and a time, and returns plain numbers.</p>
+    <pre class="code-block"><span class="c">// wave-field.js - imports nothing, knows no renderer</span>
+export function createWaveField(W, opts = {}) {
+  const a = W.createSampler({ seed: 7,  shift: true, group: 'gentle', range: [-1, 1] });
+  const b = W.createSampler({ seed: 19, shift: true, group: 'gentle', range: [-1, 1], phase: 1.7 });
+
+  return {
+    sample(x, z, t, out = {}) {
+      const u = a.sample(x * 0.62 + z * 0.31, t);
+      const v = b.sample(z * 0.62 - x * 0.31, t);
+      const angle = (u * 0.78 + v * 0.22) * Math.PI;
+      const y = v * 0.32;                              <span class="c">// tilt</span>
+      const flat = Math.sqrt(Math.max(0, 1 - y * y));  <span class="c">// keep it unit length</span>
+      out.x = Math.cos(angle) * flat;
+      out.y = y;
+      out.z = Math.sin(angle) * flat;
+      return out;
+    },
+    get waveName() { return a.waveName; },
+    get target()   { return a.targetName || ''; }
+  };
+}</pre>
+    <p>Three things fall out of that boundary, and they are the reason to draw it:</p>
+    <ul class="step-list">
+      <li><div><p><strong>It is testable in Node.</strong> Normalisation, finiteness, bounds and reproducibility can all be asserted without a canvas. A field that returns <code class="inl">NaN</code> at one grid position is a silent visual glitch in a renderer and a failing test in Node.</p></div></li>
+      <li><div><p><strong>It outlives the renderer.</strong> The same field can drive line segments today and particles, meshes, cameras, lights or shader uniforms tomorrow, with no change to the wave code.</p></div></li>
+      <li><div><p><strong>It keeps the readout honest.</strong> Exposing <code class="inl">waveName</code> and <code class="inl">targetName</code> means the scene can show which formula is playing and which one is coming, which is how you debug motion you cannot pause.</p></div></li>
+    </ul>
+    <div class="callout"><p><span class="note">worked proof</span> <code class="inl">three.waves</code>, a companion experiment, folds two samplers into one normalised 3D direction and drives 576 line segments through a single <code class="inl">BufferGeometry</code>. Its adapter has no three.js import at all and is covered by Node tests for normalisation, reproducibility, shift and hard height bounds. Measured there: 600 updates of 576 vectors in 125&nbsp;ms, about 0.21&nbsp;ms per full field update, wave math only.</p></div>
+
+    <!-- GEOMETRY -->
+    <h2 id="geometry">three.js: displaced geometry</h2>
+    <p>The plainest useful case. Walk a <code class="inl">BufferAttribute</code>, read one sampler per vertex, flag it dirty. Position enters as the first argument, time as the second, so the line both has a shape along its length and moves.</p>
+    <pre class="code-block">const N = 200;
+const geo = new THREE.BufferGeometry();
+const pos = new Float32Array(N * 3);
+geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+scene.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x00b3a4 })));
+
+const s = W.createSampler({ shift: true, group: 'gentle', range: [-1.2, 1.2] });
+
+function frame(t) {
+  for (let i = 0; i &lt; N; i++) {
+    pos[i*3]     = (i / (N - 1)) * 12 - 6;   <span class="c">// x across the line</span>
+    pos[i*3 + 1] = s.sample(i * 0.6, t);     <span class="c">// y from the wave</span>
+    pos[i*3 + 2] = 0;
+  }
+  geo.attributes.position.needsUpdate = true;
+  geo.computeBoundingSphere();               <span class="c">// or frustum culling misjudges it</span>
+}</pre>
+    <p>Reuse one <code class="inl">Float32Array</code> and one sampler; do not rebuild geometry per frame. Mark the attribute with <code class="inl">setUsage(THREE.DynamicDrawUsage)</code> when it changes every frame.</p>
+
+    <!-- RING -->
+    <h2 id="ring">three.js: the seamless closing ring</h2>
+    <p>This is the pattern that has no equivalent in a noise library, and it is the strongest reason to reach for the wave dialect in 3D.</p>
+    <p>Sweep any wave around a ring and the last point almost never lands on the first, so the shape tears at the seam. The fix is to sweep an integer multiple of the wave's <a href="waves.html#periodicity">period</a>. That alone is easy for one fixed wave and normally impossible with <code class="inl">shift</code> on, because every formula has its own period and the seam rips open the moment the library lands on a new wave. The <code class="inl">'closing'</code> pool exists for exactly this: its 19 waves all share one base period, so a sweep of <code class="inl">sampler.period &times; lobes</code> stays closed <em>through every transition</em>.</p>
+    <pre class="code-block">const SEG = 240, LOBES = 6;
+const ring = W.createSampler({ shift: true, group: 'closing', range: [-0.6, 0.6] });
+
+function frame(t) {
+  const sweep = ring.period * LOBES;   <span class="c">// read the sweep off the sampler</span>
+  for (let i = 0; i &lt;= SEG; i++) {
+    const u   = i / SEG;
+    const ang = u * Math.PI * 2;
+    const r   = 2 + ring.sample(u * sweep, t);
+    pos[i*3]     = Math.cos(ang) * r;
+    pos[i*3 + 1] = 0;
+    pos[i*3 + 2] = Math.sin(ang) * r;
+  }
+  geo.attributes.position.needsUpdate = true;
+}</pre>
+    <p>How closed is closed? Measured on a ring of radius 2 over 120 frames of active shifting, the worst gap between the first and last vertex was <strong>1.3e-5 world units</strong>, which is far below one pixel at any sane camera distance. The same test against the raw sampler shows what the pool buys you: over 30 seconds of shifting at amplitude 30, the worst seam error is <strong>0.005</strong> with <code class="inl">group: 'closing'</code> and <strong>28.7</strong> with <code class="inl">group: 'all'</code>.</p>
+    <p>Anything swept and closed inherits this: rings, tubes, lathe profiles, torus cross-sections, orbit paths, extrusions along a loop.</p>
+    <div class="callout"><p><span class="note">experimental</span> Period values may drift by about 0.001 in minor versions. Perfect for visuals, not for plotters or CNC.</p></div>
+
+    <!-- INSTANCED -->
+    <h2 id="instanced">three.js: an instanced 2D field</h2>
+    <p>There is no <code class="inl">createGrid()</code> in the dialect any more, and it is not missed: a 2D field is two samplers and your own loop, which is also what lets you decide how the two axes combine. Feed the result to an <code class="inl">InstancedMesh</code> and thousands of objects cost one draw call.</p>
+    <pre class="code-block">const GX = 16, GZ = 16;
+const mesh = new THREE.InstancedMesh(
+  new THREE.BoxGeometry(0.4, 1, 0.4),
+  new THREE.MeshStandardMaterial({ color: 0x00b3a4 }),
+  GX * GZ
+);
+const sx = W.createSampler({ seed: 7,  shift: true, group: 'gentle', range: [0, 1] });
+const sz = W.createSampler({ seed: 21, shift: true, group: 'gentle', range: [0, 1] });
+const dummy = new THREE.Object3D();
+
+function frame(t) {
+  let i = 0;
+  for (let gz = 0; gz &lt; GZ; gz++) for (let gx = 0; gx &lt; GX; gx++, i++) {
+    const h = 0.2 + sx.sample(gx * 1.5, t) * sz.sample(gz * 1.5, t) * 3;
+    dummy.position.set(gx - GX/2 + 0.5, h/2, gz - GZ/2 + 0.5);
+    dummy.scale.set(1, h, 1);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(i, dummy.matrix);
+  }
+  mesh.instanceMatrix.needsUpdate = true;
+}</pre>
+    <p>Multiplying the two axes gives interference and standing-wave patterns; adding them gives soft diagonal ridges. Both are one character apart, so try each.</p>
+
+    <!-- LUT -->
+    <h2 id="lut">three.js: the wave as a GPU lookup</h2>
+    <p>Per-vertex CPU sampling stops scaling somewhere in the tens of thousands. The way out is to stop sampling per vertex and sample the wave once into a small texture, then let the shader read it. The CPU does 256 wave evaluations per frame instead of 200,000, and the GPU does the rest.</p>
+    <pre class="code-block">const LUT  = 256;
+const data = new Float32Array(LUT);
+const tex  = new THREE.DataTexture(data, LUT, 1, THREE.RedFormat, THREE.FloatType);
+const s    = W.createSampler({ wave: 'mountain peaks', range: [0, 1] });
+
+const mat = new THREE.ShaderMaterial({
+  uniforms: { uLut: { value: tex } },
+  vertexShader: `varying vec2 vUv;
+    void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `uniform sampler2D uLut; varying vec2 vUv;
+    void main(){
+      float v = texture2D(uLut, vec2(vUv.x, 0.5)).r;
+      gl_FragColor = vec4(vec3(step(vUv.y, v)), 1.0);
+    }`
+});
+
+function frame(t) {
+  for (let k = 0; k &lt; LUT; k++) data[k] = s.sample(k * 0.7, t);
+  tex.needsUpdate = true;   <span class="c">// one small upload per frame</span>
+}</pre>
+    <p>Bake once instead of every frame when the wave is frozen (<code class="inl">shift: false</code> and a fixed <code class="inl">t</code>), and the per-frame cost drops to zero. This is also how a wave reaches a vertex shader: read the LUT in the vertex stage and displace there.</p>
+
+    <!-- RUNTIMES -->
+    <h2 id="runtimes">Other runtimes worth knowing about</h2>
+    <p>Nothing above is specific to 3D. Any host with a number-shaped input is a candidate, and some of these fit the dialect unusually well.</p>
+    <table class="opts-table">
+      <thead><tr><th>Host</th><th class="desc" colspan="2">The seam</th></tr></thead>
+      <tbody>
+        <tr><td>Web Audio</td><td class="desc" colspan="2">A wave <em>is</em> an LFO. Fill a <code class="inl">Float32Array</code> from the sampler and hand it to <code class="inl">AudioParam.setValueCurveAtTime()</code> to steer a cutoff, detune or gain over a fixed span. Same idea in Tone.js.</td></tr>
+        <tr><td>CSS easing</td><td class="desc" colspan="2">Bake N samples into a <code class="inl">linear()</code> timing function once, and the animation runs with no JavaScript at all afterwards. A wave becomes an easing curve.</td></tr>
+        <tr><td>CSS variables</td><td class="desc" colspan="2"><code class="inl">el.style.setProperty('--wv', s.sample(0, t))</code> and let stylesheets decide what it means. One JS write, many visual consequences.</td></tr>
+        <tr><td>GSAP</td><td class="desc" colspan="2">Use it inside a <code class="inl">modifiers</code> function or a ticker callback so GSAP owns the timeline and the wave owns the shaping.</td></tr>
+        <tr><td>Canvas 2D / Pixi</td><td class="desc" colspan="2">Identical to the three.js loop without the geometry step: sample per element, write a coordinate, a radius or a colour.</td></tr>
+        <tr><td>SVG / D3</td><td class="desc" colspan="2">Feed a path generator, or produce plausible placeholder series for skeleton charts that move instead of shimmering.</td></tr>
+        <tr><td>Physics</td><td class="desc" colspan="2">Matter.js and friends: a wave as a force over time, or as the path of a moving platform or attractor.</td></tr>
+        <tr><td>Node, build time</td><td class="desc" colspan="2">No renderer at all. Bake SVG paths, LUT textures or static frames ahead of time, so the browser ships zero wave code.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><p><span class="note">the tell</span> If a host exposes a number you can write every frame, or an array it will interpolate for you, the sampler already fits. Reach for the <a href="#adapter">adapter rule</a> before the second one of these.</p></div>
+
+    <!-- ESM -->
+    <h2 id="esm">The module entry point, and what it is not</h2>
+    <p><code class="inl">waves-core.mjs</code> is a shim of about a dozen lines. It contains no formulas: it imports <code class="inl">waves-core.js</code> for its side effect and re-exports what that installs.</p>
+    <pre class="code-block">import './waves-core.js';
+
+const W = globalThis.VanillaWaves;
+
+export const wave          = W.wave;
+export const createSampler = W.createSampler;
+export const list          = W.list;
+export const data          = W.data;
+export const count         = W.count;
+export default W;</pre>
+    <p>That shape is deliberate. Re-exporting rather than re-implementing means there is one copy of the canonical math in the repo, so the module layer <em>cannot</em> drift from the p5.waves baseline the port is measured against. Verified across both runtimes: the detached exports are bit-identical to the global over a thousand calls, and Node and the browser return the same digits for the same input.</p>
+    <table class="opts-table">
+      <thead><tr><th>Works</th><th class="desc" colspan="2">Detail</th></tr></thead>
+      <tbody>
+        <tr><td>Browser ESM</td><td class="desc" colspan="2"><code class="inl">import { createSampler } from './waves-core.mjs'</code></td></tr>
+        <tr><td>Node</td><td class="desc" colspan="2">Same import. <code class="inl">waves-core.js</code> loads as CommonJS there; the <code class="inl">globalThis</code> assignment is identical either way.</td></tr>
+        <tr><td>Bundlers</td><td class="desc" colspan="2">Resolves as a normal module. No build step: unlike the bundles, this file is written, not generated.</td></tr>
+        <tr><td>Globals</td><td class="desc" colspan="2">Still installed, so the module route and the <code class="inl">&lt;script&gt;</code> route can coexist on one page.</td></tr>
+      </tbody>
+    </table>
+    <p>Two limits are worth stating plainly. There is no npm package, so a bare specifier like <code class="inl">import ... from 'vanilla.waves'</code> does not resolve: import it by path, or map it yourself. And because the exports come off one frozen object rather than being separate module bindings, a bundler cannot tree-shake the unused waves out. For a zero-dependency file this size that is a fair trade, but it is better known now than halfway into a build setup.</p>
+    <div class="callout"><p><span class="note">not included</span> The DOM engine is not part of the module entry. It is browser-only and initialises itself on <code class="inl">DOMContentLoaded</code>, so it stays where it belongs: load <code class="inl">vanilla.waves.js</code> with a <code class="inl">&lt;script&gt;</code> tag when you want <code class="inl">register</code>, <code class="inl">init</code> and <code class="inl">destroy</code>.</p></div>
+
+    <p style="margin-top:2.4rem;"><a href="guide.html">&larr; Back to the guide</a> &nbsp;&middot;&nbsp; <a href="waves.html#periodicity">Periods and closing shapes &rarr;</a></p>
+
+  </main>
+
+  <footer>
+    <p>Zero-dependency vanilla-JS port of the <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> dialect · baseline v3.6.0</p>
+    <p class="footer-sub">MIT License · v0.2.0 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+</body>
+</html>

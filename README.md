@@ -171,6 +171,36 @@ a valid selector).
 
 ---
 
+## Beyond the DOM
+
+The DOM engine is one consumer of the math, not its edge. The whole integration
+surface with any other renderer is `sample(position, time)`, so the same waves
+can drive three.js geometry, a Web Audio param curve, a CSS `linear()` easing
+function, or a build-time bake in Node.
+
+```js
+import { createSampler } from './waves-core.mjs';
+
+// a ring that stays closed through every shift: sweep an integer number of periods
+const ring = createSampler({ shift: true, group: 'closing', range: [-0.6, 0.6] });
+const sweep = ring.period * 6;           // 6 lobes
+const r = 2 + ring.sample(u * sweep, t); // u = 0..1 around the ring
+```
+
+`waves-core.mjs` is the module entry on the math. It holds no formulas: it
+imports `waves-core.js` for its side effect and re-exports it, so there stays
+exactly one copy of the canonical math and the module layer cannot drift from
+it. Works in browsers, in Node and in bundlers, with no build step. The DOM
+engine is not part of it, load `vanilla.waves.js` with a `<script>` tag for
+that. There is no npm package yet, so import by path.
+
+Four verified three.js patterns (displaced geometry, the seamless closing ring,
+an instanced 2D field, and the wave baked into a GPU lookup texture), plus the
+adapter rule that keeps the wave code renderer-agnostic and testable in Node:
+[`docs/interop.html`](docs/interop.html).
+
+---
+
 ## Parity and drift
 
 `waves-core.js` is the canonical `p5.waves.js` math with only the p5 prototype
@@ -186,6 +216,7 @@ Dialect baseline: **p5.waves v3.6.0** (commit `804f91e`, 35 waves).
 
 ```
 waves-core.js        the math (zero-dep port of p5.waves)
+waves-core.mjs       ES-module entry on the math (re-exports, no formulas of its own)
 engine.js            the DOM engine (shared loop, register/init/destroy)
 vanilla.waves.js     generated bundle (core + engine, readable)
 vanilla.waves.min.js generated bundle, minified, the CDN artifact
@@ -195,6 +226,7 @@ docs/                the rest of the GitHub Pages site
   engine.html        the DOM engine, deep-dive
   waves.html         all 35 waves + periodicity
   guide.html         install, math, engine API, starters
+  interop.html       driving other renderers (three.js, audio, CSS, Node)
   about.html         why it exists, parity, credits
   style.css          shared skin
   waves-demos.js     demo renderers (eq/line/load/wave/ribbons/ascii/field)
@@ -202,8 +234,8 @@ docs/                the rest of the GitHub Pages site
 ```
 
 The Pages site follows the same structure as `p5.waves` (Showcase at the repo
-root, the rest under `docs/`) and the same nav — Showcase · Examples · Engine ·
-Waves · Guide · About — in vanilla.waves' own monospace identity, with every
+root, the rest under `docs/`) and a nav of its own: Showcase · Examples ·
+Engine · Waves · Guide · Interop · About, in vanilla.waves' own monospace identity, with every
 demo driven canvaslessly by the engine (no p5, no `<canvas>`). `p5.waves` calls
 its signature page *Curation Engine*; vanilla's is **Engine**, the DOM loop that
 makes the port more than maths. Publish by serving Pages from the repo root.
