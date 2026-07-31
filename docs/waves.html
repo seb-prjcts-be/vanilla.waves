@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All 35 Waves — vanilla.waves</title>
-  <meta name="description" content="Every wave in vanilla.waves, with formula, character, and period. Traced live in SVG — canvasless, bit-identical to p5.waves.">
+  <title>All 35 Waves - vanilla.waves</title>
+  <meta name="description" content="Every wave in vanilla.waves, with formula, character, and period. Traced live in SVG - canvasless, bit-identical to p5.waves.">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.2.0/vanilla.waves.min.js"></script>
   <script src="waves-demos.js"></script>
@@ -30,7 +30,7 @@
 
   <main class="waves-page">
     <h1>all 35 waves</h1>
-    <p class="waves-intro">Each wave is a deterministic function: pass a number in, get a number back. The output range is roughly [&minus;0.5, +0.5] before you scale it. Every preview here is traced live in <strong>SVG</strong> — no <code class="inl">&lt;canvas&gt;</code> — and the numbers are bit-identical to <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> v3.6.0.</p>
+    <p class="waves-intro">Each wave is a deterministic function: pass a number in, get a number back. The output range is roughly [&minus;0.5, +0.5] before you scale it. Every preview here is traced live in <strong>SVG</strong> - no <code class="inl">&lt;canvas&gt;</code> - and the numbers are bit-identical to <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> v3.6.0.</p>
     <div class="waves-legend">
       <span>idx</span>
       <span>name</span>
@@ -119,12 +119,12 @@
 
     <section class="period-section" id="periodicity">
       <h2>Periodicity</h2>
-      <p>A wave is <em>periodic</em> when there is a distance <code class="inl">T</code> such that <code class="inl">wave(x) == wave(x + T)</code> for every <code class="inl">x</code>. That distance is the wave's <strong>period</strong>. Knowing it lets you close a shape cleanly: sample a wave around a ring over an integer number of periods and the last point lands exactly on the first — no seam.</p>
-      <p><strong>Why <code class="inl">62.83</code> and not <code class="inl">360</code>?</strong> <code class="inl">wave(x)</code> treats <code class="inl">x</code> as a generic coordinate — the same mental model as <code class="inl">noise(x)</code> — not an angle. Nine of the 35 waves are not sine-based at all (<code class="inl">square</code>, <code class="inl">triangle</code>, <code class="inl">ramp</code>, <code class="inl">noise</code>…), so radians would be meaningless for them.</p>
+      <p>A wave is <em>periodic</em> when there is a distance <code class="inl">T</code> such that <code class="inl">wave(x) == wave(x + T)</code> for every <code class="inl">x</code>. That distance is the wave's <strong>period</strong>. Knowing it lets you close a shape cleanly: sample a wave around a ring over an integer number of periods and the last point lands exactly on the first - no seam.</p>
+      <p><strong>Why <code class="inl">62.83</code> and not <code class="inl">360</code>?</strong> <code class="inl">wave(x)</code> treats <code class="inl">x</code> as a generic coordinate - the same mental model as <code class="inl">noise(x)</code> - not an angle. Nine of the 35 waves are not sine-based at all (<code class="inl">square</code>, <code class="inl">triangle</code>, <code class="inl">ramp</code>, <code class="inl">noise</code>…), so radians would be meaningless for them.</p>
       <p>Every period value was <strong>measured</strong>, not derived: the periodicity harness in the p5.waves repo samples each wave, finds the smallest <code class="inl">T</code> where the mean error between <code class="inl">wave(x)</code> and <code class="inl">wave(x + T)</code> stays below 0.002, then confirms with multiples. vanilla.waves produces numerically identical output, so the same periods hold.</p>
 
       <h3>Closed-ring recipe (canvasless)</h3>
-      <p>No <code class="inl">&lt;canvas&gt;</code>, no <code class="inl">beginShape</code> — build an SVG path. The integer <code class="inl">lobes</code> is the only thing you tune. Read the sweep straight off the sampler with <code class="inl">.period</code> so a shifting ring never tears its seam (see the <a href="guide.html#closing">guide</a>).</p>
+      <p>No <code class="inl">&lt;canvas&gt;</code>, no <code class="inl">beginShape</code> - build an SVG path. The integer <code class="inl">lobes</code> is the only thing you tune. Read the sweep straight off the sampler with <code class="inl">.period</code> so a shifting ring never tears its seam (see the <a href="guide.html#closing">guide</a>).</p>
       <pre class="code-block"><span class="c">// A closed wobble ring in SVG. No visible seam.</span>
 <span class="k">const</span> ring = VanillaWaves.createSampler({
   group: <span class="s">'closing'</span>, shift: <span class="k">true</span>, amplitude: 30
@@ -157,10 +157,10 @@ path.setAttribute(<span class="s">'d'</span>, d + <span class="s">'Z'</span>);  
 
       <h3>How to read the result</h3>
       <ul>
-        <li><strong>Periodic</strong> — a number. Use any integer multiple of it as your sweep.</li>
-        <li><strong>&mdash;</strong> — quasi-periodic (incommensurate rhythms) or non-periodic (growing amplitude, Perlin noise, random branches). Close with a soft blend back to the starting value instead.</li>
+        <li><strong>Periodic</strong> - a number. Use any integer multiple of it as your sweep.</li>
+        <li><strong>&mdash;</strong> - quasi-periodic (incommensurate rhythms) or non-periodic (growing amplitude, Perlin noise, random branches). Close with a soft blend back to the starting value instead.</li>
       </ul>
-      <p>Want a shape that stays closed <em>while shifting</em> between formulas? Use <code class="inl">group: 'closing'</code> — a pool of 19 waves that all share the base period <code class="inl">62.8319</code> — and read the sweep from <code class="inl">sampler.period</code>. See <a href="guide.html#closing">Closing shapes</a> in the guide.</p>
+      <p>Want a shape that stays closed <em>while shifting</em> between formulas? Use <code class="inl">group: 'closing'</code> - a pool of 19 waves that all share the base period <code class="inl">62.8319</code> - and read the sweep from <code class="inl">sampler.period</code>. See <a href="guide.html#closing">Closing shapes</a> in the guide.</p>
     </section>
   </main>
 

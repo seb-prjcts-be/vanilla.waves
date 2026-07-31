@@ -3,9 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interop — vanilla.waves</title>
+  <title>Interop - vanilla.waves</title>
   <meta name="description" content="Driving other renderers with vanilla.waves. The sampler is renderer-agnostic: four verified three.js patterns (displaced geometry, seamless closing ring, instanced field, GPU LUT) plus audio, CSS, GSAP and Node.">
   <link rel="stylesheet" href="style.css">
+  <!-- Alleen DEZE pagina laadt three.js: ze gaat er nu eenmaal over. De rest van
+       de site blijft canvasloos en zonder dependencies. -->
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" } }
+  </script>
+  <script type="module" src="three-demos.js"></script>
 </head>
 <body>
 
@@ -108,7 +114,9 @@ export function createWaveField(W, opts = {}) {
     <!-- GEOMETRY -->
     <h2 id="geometry">three.js: displaced geometry</h2>
     <p>The plainest useful case. Walk a <code class="inl">BufferAttribute</code>, read one sampler per vertex, flag it dirty. Position enters as the first argument, time as the second, so the line both has a shape along its length and moves.</p>
-    <pre class="code-block">const N = 200;
+    <div class="ex-grid">
+      <div class="ex-stage" data-three="displaced-line"></div>
+      <pre class="code-block">const N = 200;
 const geo = new THREE.BufferGeometry();
 const pos = new Float32Array(N * 3);
 geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -125,13 +133,16 @@ function frame(t) {
   geo.attributes.position.needsUpdate = true;
   geo.computeBoundingSphere();               <span class="c">// or frustum culling misjudges it</span>
 }</pre>
+    </div>
     <p>Reuse one <code class="inl">Float32Array</code> and one sampler; do not rebuild geometry per frame. Mark the attribute with <code class="inl">setUsage(THREE.DynamicDrawUsage)</code> when it changes every frame.</p>
 
     <!-- RING -->
     <h2 id="ring">three.js: the seamless closing ring</h2>
     <p>This is the pattern that has no equivalent in a noise library, and it is the strongest reason to reach for the wave dialect in 3D.</p>
     <p>Sweep any wave around a ring and the last point almost never lands on the first, so the shape tears at the seam. The fix is to sweep an integer multiple of the wave's <a href="waves.html#periodicity">period</a>. That alone is easy for one fixed wave and normally impossible with <code class="inl">shift</code> on, because every formula has its own period and the seam rips open the moment the library lands on a new wave. The <code class="inl">'closing'</code> pool exists for exactly this: its 19 waves all share one base period, so a sweep of <code class="inl">sampler.period &times; lobes</code> stays closed <em>through every transition</em>.</p>
-    <pre class="code-block">const SEG = 240, LOBES = 6;
+    <div class="ex-grid">
+      <div class="ex-stage" data-three="closing-ring"></div>
+      <pre class="code-block">const SEG = 240, LOBES = 6;
 const ring = W.createSampler({ shift: true, group: 'closing', range: [-0.6, 0.6] });
 
 function frame(t) {
@@ -146,6 +157,7 @@ function frame(t) {
   }
   geo.attributes.position.needsUpdate = true;
 }</pre>
+    </div>
     <p>How closed is closed? Measured on a ring of radius 2 over 120 frames of active shifting, the worst gap between the first and last vertex was <strong>1.3e-5 world units</strong>, which is far below one pixel at any sane camera distance. The same test against the raw sampler shows what the pool buys you: over 30 seconds of shifting at amplitude 30, the worst seam error is <strong>0.005</strong> with <code class="inl">group: 'closing'</code> and <strong>28.7</strong> with <code class="inl">group: 'all'</code>.</p>
     <p>Anything swept and closed inherits this: rings, tubes, lathe profiles, torus cross-sections, orbit paths, extrusions along a loop.</p>
     <div class="callout"><p><span class="note">experimental</span> Period values may drift by about 0.001 in minor versions. Perfect for visuals, not for plotters or CNC.</p></div>
@@ -153,7 +165,9 @@ function frame(t) {
     <!-- INSTANCED -->
     <h2 id="instanced">three.js: an instanced 2D field</h2>
     <p>There is no <code class="inl">createGrid()</code> in the dialect any more, and it is not missed: a 2D field is two samplers and your own loop, which is also what lets you decide how the two axes combine. Feed the result to an <code class="inl">InstancedMesh</code> and thousands of objects cost one draw call.</p>
-    <pre class="code-block">const GX = 16, GZ = 16;
+    <div class="ex-grid">
+      <div class="ex-stage" data-three="instanced-field"></div>
+      <pre class="code-block">const GX = 16, GZ = 16;
 const mesh = new THREE.InstancedMesh(
   new THREE.BoxGeometry(0.4, 1, 0.4),
   new THREE.MeshStandardMaterial({ color: 0x00b3a4 }),
@@ -174,12 +188,15 @@ function frame(t) {
   }
   mesh.instanceMatrix.needsUpdate = true;
 }</pre>
+    </div>
     <p>Multiplying the two axes gives interference and standing-wave patterns; adding them gives soft diagonal ridges. Both are one character apart, so try each.</p>
 
     <!-- LUT -->
     <h2 id="lut">three.js: the wave as a GPU lookup</h2>
     <p>Per-vertex CPU sampling stops scaling somewhere in the tens of thousands. The way out is to stop sampling per vertex and sample the wave once into a small texture, then let the shader read it. The CPU does 256 wave evaluations per frame instead of 200,000, and the GPU does the rest.</p>
-    <pre class="code-block">const LUT  = 256;
+    <div class="ex-grid">
+      <div class="ex-stage" data-three="gpu-lut"></div>
+      <pre class="code-block">const LUT  = 256;
 const data = new Float32Array(LUT);
 const tex  = new THREE.DataTexture(data, LUT, 1, THREE.RedFormat, THREE.FloatType);
 const s    = W.createSampler({ wave: 'mountain peaks', range: [0, 1] });
@@ -199,6 +216,7 @@ function frame(t) {
   for (let k = 0; k &lt; LUT; k++) data[k] = s.sample(k * 0.7, t);
   tex.needsUpdate = true;   <span class="c">// one small upload per frame</span>
 }</pre>
+    </div>
     <p>Bake once instead of every frame when the wave is frozen (<code class="inl">shift: false</code> and a fixed <code class="inl">t</code>), and the per-frame cost drops to zero. This is also how a wave reaches a vertex shader: read the LUT in the vertex stage and displace there.</p>
 
     <!-- RUNTIMES -->

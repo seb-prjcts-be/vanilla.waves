@@ -10,12 +10,12 @@ Taal: **Nederlands**.
 Seb is door medische factoren vergeetachtig. Ga er nooit van uit dat hij een
 eerdere uitleg, toolnaam of mogelijkheid nog weet.
 - **Herinner proactief** aan een handige skill/tool/aanpak, ook al is die eerder
-  genoemd — met telkens één zin wat het doet.
+  genoemd - met telkens één zin wat het doet.
 - **Schrijf op wat hij moet kunnen terugvinden** op een vaste, vindbare plek
-  (STATUS.md, README, docs, geheugen) — niet enkel in een chat die morgen weg is.
+  (STATUS.md, README, docs, geheugen) - niet enkel in een chat die morgen weg is.
 
 ## STATUS.md bijhouden (het belangrijkst)
-Aan het einde van elke werksessie — en na elke afgeronde deeltaak — werk je
+Aan het einde van elke werksessie - en na elke afgeronde deeltaak - werk je
 `STATUS.md` in de **projectroot** bij. Leg alleen vast wat je later **niet** uit
 de code of `git log` kan halen. Toets: *"Kan ik dit straks uit code + git halen?"*
 Ja → overslaan. Nee → opschrijven.
@@ -24,7 +24,7 @@ De kopjes moeten **letterlijk** zo staan (een lokaal dashboard leest ze uit):
 
 ```markdown
 ## Nu bezig
-- waar je middenin zit — één regel per onderwerp
+- waar je middenin zit - één regel per onderwerp
 
 ## Volgende stap
 - de éérste concrete actie voor de volgende sessie (begin daar)
@@ -35,7 +35,7 @@ De kopjes moeten **letterlijk** zo staan (een lokaal dashboard leest ze uit):
 ## Gedaan
 - kort afgerond deze sessie
 ```
-Lege secties mag je weglaten. Houd het kort — een kompas, geen logboek.
+Lege secties mag je weglaten. Houd het kort - een kompas, geen logboek.
 Werk je in een git-worktree, schrijf STATUS.md dan in de **hoofd-projectroot**.
 
 ## Hoe je werkt
@@ -47,7 +47,7 @@ Werk je in een git-worktree, schrijf STATUS.md dan in de **hoofd-projectroot**.
 - **Houd het simpel.** Geen framework of extra dependencies tenzij Seb erom vraagt.
 - **Commit/push alleen als Seb erom vraagt**, en werk op een branch, niet op main.
 - **Test in de échte context.** Voor lokale webtools telt de browser
-  (`http://localhost/...`), niet enkel de CLI — resultaten kunnen verschillen.
+  (`http://localhost/...`), niet enkel de CLI - resultaten kunnen verschillen.
 
 ## Secrets & beslissingen
 - **Raak credentials/secrets nooit aan en vul ze nooit in.** Benoem ze als
@@ -55,7 +55,7 @@ Werk je in een git-worktree, schrijf STATUS.md dan in de **hoofd-projectroot**.
 - **Niet-vanzelfsprekende beslissingen + waarom** en **topologie** (deploy-pad,
   repo, branch) horen in `docs/` of de projectnotities.
 
-## Omgeving (deze machine) — LEES DIT VOOR JE IETS AANMAAKT
+## Omgeving (deze machine) - LEES DIT VOOR JE IETS AANMAAKT
 
 **XAMPP draait ALTIJD. Alles onder `C:\server\htdocs` is dus een LIVE site.**
 Die mappen zijn geen werkruimte: ze zijn versiebeheerd met git en gepusht naar

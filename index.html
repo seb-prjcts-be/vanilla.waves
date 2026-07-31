@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>vanilla.waves — the wave dialect, without p5 or canvas</title>
+  <title>vanilla.waves - the wave dialect, without p5 or canvas</title>
   <meta name="description" content="Pure mathematical waves for DOM objects. A zero-dependency vanilla-JS port of p5.waves: the same 35 wave formulas, plus a tiny DOM engine that drives plain HTML instead of a canvas.">
-  <meta property="og:title" content="vanilla.waves — pure mathematical waves for DOM objects">
+  <meta property="og:title" content="vanilla.waves - pure mathematical waves for DOM objects">
   <meta property="og:description" content="Pure mathematical waves for DOM objects. Bit-identical math to p5.waves v3.6.0, zero dependencies, one shared 30fps DOM loop. No p5, no canvas.">
   <meta property="og:url" content="https://seb-prjcts-be.github.io/vanilla.waves/">
   <meta property="og:type" content="website">
@@ -39,7 +39,7 @@
     <div class="hero-text">
       <div class="hero-badge">zero-dependency library</div>
       <h1>vanilla<b>.waves</b></h1>
-      <p class="hero-sub"><strong>Pure mathematical waves for DOM objects.</strong> 35 shapes, one function call — no p5, no <code class="inl">&lt;canvas&gt;</code>. Bit-identical math to <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank" rel="noopener">p5.waves</a>.</p>
+      <p class="hero-sub"><strong>Pure mathematical waves for DOM objects.</strong> 35 shapes, one function call - no p5, no <code class="inl">&lt;canvas&gt;</code>. Bit-identical math to <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank" rel="noopener">p5.waves</a>.</p>
       <div class="hero-stats">
         <div class="stat"><span class="stat-num">35</span><span class="stat-label">waves</span></div>
         <div class="stat"><span class="stat-num">0</span><span class="stat-label">dependencies</span></div>
@@ -57,7 +57,7 @@
     <div class="section-header">
       <div class="section-tag">one dialect, three runtimes</div>
       <h2>same numbers, <b>no canvas</b></h2>
-      <p>The p5.waves <em>math</em> never actually needed p5 — <code class="inl">wave()</code>, the 35 formulas, the seeded shift engine, all of it is pure <code class="inl">Math.*</code>. vanilla.waves is that canonical core, byte-for-byte, with the p5 hook removed and a tiny DOM engine bolted on.</p>
+      <p>The p5.waves <em>math</em> never actually needed p5 - <code class="inl">wave()</code>, the 35 formulas, the seeded shift engine, all of it is pure <code class="inl">Math.*</code>. vanilla.waves is that canonical core, byte-for-byte, with the p5 hook removed and a tiny DOM engine bolted on.</p>
     </div>
     <div style="max-width:720px;margin:0 auto;">
       <table class="opts-table">
@@ -65,7 +65,7 @@
         <tbody>
           <tr><td>p5.waves</td><td>p5.js</td><td class="desc">a &lt;canvas&gt;</td></tr>
           <tr><td>processing.waves</td><td>Java / Processing 4</td><td class="desc">the Processing surface</td></tr>
-          <tr><td>vanilla.waves</td><td>plain DOM, zero deps</td><td class="desc">any HTML element — bars, dots, text, opacity</td></tr>
+          <tr><td>vanilla.waves</td><td>plain DOM, zero deps</td><td class="desc">any HTML element - bars, dots, text, opacity</td></tr>
         </tbody>
       </table>
     </div>
@@ -93,7 +93,7 @@
     <div class="section-header">
       <div class="section-tag">canvasless demos</div>
       <h2>what one loop <b>drives</b></h2>
-      <p>The sampler returns a number; you map it to any DOM property. Height, position, a character, an opacity — all from the same breathing, shifting, morphing motion.</p>
+      <p>The sampler returns a number; you map it to any DOM property. Height, position, a character, an opacity - all from the same breathing, shifting, morphing motion.</p>
     </div>
 
     <div class="ex-list">
@@ -122,7 +122,7 @@ dot.style.transform = <span class="s">'translateY('</span> + v*38 + <span class=
 
       <div class="ex-block">
         <div class="ex-head"><h3>text loader</h3><span class="ex-tag">wave → character</span></div>
-        <p class="lead">A 4×4 grid where each cell picks a glyph from a wave value. Cheap enough to run dozens at once — the canvasless loader technique.</p>
+        <p class="lead">A 4×4 grid where each cell picks a glyph from a wave value. Cheap enough to run dozens at once - the canvasless loader technique.</p>
         <div class="ex-grid">
           <div class="ex-stage" style="gap:22px;">
             <div class="wv-load" data-wv="load" data-seed="13"></div>
@@ -158,7 +158,7 @@ cell.style.opacity = 0.06 + v * 0.94;</pre>
     <div class="section-header">
       <div class="section-tag">Waves.wave(x, "name")</div>
       <h2>35 shapes, four <b>pools</b></h2>
-      <p>Smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos — each a tiny formula tuned to drive motion. Here traced live, canvasless, in SVG.</p>
+      <p>Smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos - each a tiny formula tuned to drive motion. Here traced live, canvasless, in SVG.</p>
     </div>
     <div class="wave-cards" style="max-width:1000px;margin:0 auto;">
       <article class="wave-card"><div class="wave-canvas" data-wv="wave" data-wave="classic sine"></div><div class="wave-meta"><div class="idx">00</div><div class="name">classic sine</div></div></article>
@@ -178,10 +178,10 @@ cell.style.opacity = 0.06 + v * 0.94;</pre>
     <div class="section-header">
       <div class="section-tag">just the math</div>
       <h2>drive any <b>property</b></h2>
-      <p>Skip the engine entirely if you want. A sampler is one value in, one number out — point it at any DOM property in your own loop.</p>
+      <p>Skip the engine entirely if you want. A sampler is one value in, one number out - point it at any DOM property in your own loop.</p>
     </div>
     <div style="max-width:640px;margin:0 auto;">
-      <pre class="code"><span class="c">// same numbers as p5.waves — drive anything</span>
+      <pre class="code"><span class="c">// same numbers as p5.waves - drive anything</span>
 <span class="k">const</span> s = VanillaWaves.createSampler({ shift: <span class="k">true</span>, range: [-50, 50] });
 
 <span class="k">function</span> tick(now) {
