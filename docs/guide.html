@@ -12,7 +12,7 @@
 <body>
 
   <nav id="navbar">
-    <div class="nav-logo"><a href="index.html">vanilla<b>.waves</b></a></div>
+    <div class="nav-logo"><a href="../index.html">vanilla<b>.waves</b></a></div>
     <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
       <span></span><span></span><span></span>
     </button>
@@ -173,13 +173,14 @@ const v = s.sample(x, t);   <span class="c">// position + time</span></pre>
     <table class="opts-table">
       <thead><tr><th>Call</th><th class="desc" colspan="2">Does</th></tr></thead>
       <tbody>
-        <tr><td>register(name, def)</td><td class="desc" colspan="2">Define an element type. <code class="inl">def.create(node, opts, h)</code> returns state; <code class="inl">def.update(state, t)</code> mutates the DOM each frame.</td></tr>
+        <tr><td>register(name, def)</td><td class="desc" colspan="2">Define an element type. <code class="inl">def.create(node, opts, h)</code> returns state; <code class="inl">def.update(state, t)</code> mutates the DOM each frame; optional <code class="inl">def.destroy(state, node)</code> releases resources (timers, listeners).</td></tr>
         <tr><td>init(target?)</td><td class="desc" colspan="2">Wire up <code class="inl">[data-wv]</code> - no arg for all, or a selector / element / NodeList.</td></tr>
-        <tr><td>destroy(target?)</td><td class="desc" colspan="2">Stop and clean up (e.g. when loading finishes).</td></tr>
+        <tr><td>destroy(target?)</td><td class="desc" colspan="2">Stop and clean up. Removes only what <code class="inl">create</code> added (author content stays), runs your <code class="inl">destroy</code> disposer, and restores <code class="inl">aria-hidden</code> - so destroy then init re-renders cleanly instead of duplicating.</td></tr>
       </tbody>
     </table>
     <p><strong>Helpers</strong> passed to <code class="inl">create</code>: <code class="inl">makeSampler(extra?)</code> (a sampler with element-friendly defaults - shift on, gentle, low frequency), <code class="inl">norm(v)</code> (maps ≈[&minus;1,1] to [0,1]), <code class="inl">num(v, default)</code>, <code class="inl">el(tag, class?)</code>.</p>
     <p><strong>Conventions:</strong> marker <code class="inl">data-wv</code>, ready class <code class="inl">wv--ready</code>, shared loop at 30&nbsp;fps, all <code class="inl">data-*</code> become <code class="inl">opts</code>, <code class="inl">data-speed</code> scales time. CSS class and element names use a <code class="inl">wv-</code> prefix - never dots (<code class="inl">p5.waves.loader</code> is not a valid selector).</p>
+    <p><strong>Accessibility &amp; seeds:</strong> decorative elements get <code class="inl">aria-hidden="true"</code> automatically; opt out with <code class="inl">data-decorative="false"</code> (or set your own <code class="inl">aria-hidden</code>) for a meaningful element. <code class="inl">data-seed</code> may be any string - non-numeric seeds are hashed to a stable start offset.</p>
 
     <!-- SHIFT -->
     <h2 id="shift">Wave shift</h2>

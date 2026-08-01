@@ -87,9 +87,9 @@ else startLoop();</pre>
     <h2 id="lifecycle">The lifecycle: register → init → destroy</h2>
     <p>Three calls, on the same <code class="inl">VanillaWaves</code> global the maths lives on.</p>
     <ul class="step-list">
-      <li><div><p><strong><code class="inl">register(name, def)</code></strong> - teach the engine an element type. <code class="inl">def.create(node, opts, h)</code> builds the DOM and returns a state object; <code class="inl">def.update(state, t)</code> mutates it each frame (optional - leave it out for a static element).</p></div></li>
+      <li><div><p><strong><code class="inl">register(name, def)</code></strong> - teach the engine an element type. <code class="inl">def.create(node, opts, h)</code> builds the DOM and returns a state object; <code class="inl">def.update(state, t)</code> mutates it each frame (optional - leave it out for a static element); and an optional <code class="inl">def.destroy(state, node)</code> releases resources (timers, listeners) on teardown.</p></div></li>
       <li><div><p><strong><code class="inl">init(target?)</code></strong> - scan for <code class="inl">[data-wv]</code> and wire them up. No argument does the whole document; pass a selector, element, or NodeList to wire a subtree. It auto-runs once on <code class="inl">DOMContentLoaded</code>, and safely skips anything already wired, so calling it again after you add nodes is free.</p></div></li>
-      <li><div><p><strong><code class="inl">destroy(target?)</code></strong> - stop and clean up. The element keeps its last frame but leaves the loop and the observer. Perfect for a loader once the real content has arrived.</p></div></li>
+      <li><div><p><strong><code class="inl">destroy(target?)</code></strong> - stop and clean up. The engine removes what <code class="inl">create</code> added (the element returns to how it started), runs your optional <code class="inl">destroy</code> disposer, restores <code class="inl">aria-hidden</code>, and stops the shared loop once the last element is gone. So <code class="inl">destroy</code> then <code class="inl">init</code> re-renders cleanly instead of duplicating children. Perfect for a loader once the real content has arrived.</p></div></li>
     </ul>
     <pre class="code-block"><span class="c">// a loader that stops itself when the page is ready:</span>
 VanillaWaves.init('#boot-loader');
@@ -112,6 +112,7 @@ window.addEventListener('load', () =&gt; {
       </tbody>
     </table>
     <p>Every <code class="inl">data-*</code> attribute on the element arrives in <code class="inl">opts</code> (camel-cased): <code class="inl">data-count</code> → <code class="inl">opts.count</code>, <code class="inl">data-text</code> → <code class="inl">opts.text</code>. That's how one registered type serves many configurations from markup alone.</p>
+    <p><strong>Accessibility &amp; seeds.</strong> Decorative elements get <code class="inl">aria-hidden="true"</code> automatically; for a meaningful element, opt out with <code class="inl">data-decorative="false"</code> (or set your own <code class="inl">aria-hidden</code>) and the engine leaves it be. <code class="inl">data-seed</code> may be any string - non-numeric seeds are hashed to a stable start offset, so they animate like numeric ones.</p>
 
     <!-- BUILD -->
     <h2 id="build">Build an element, start to finish</h2>
