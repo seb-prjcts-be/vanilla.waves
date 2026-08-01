@@ -50,11 +50,13 @@ Dichtgezet met een `.htaccess` in de repo-root die alles onder `.claude/`
 404't. Geverifieerd: site, docs en library 200; `.claude/launch.json` en
 `.claude/worktrees/` 404. GitHub Pages doet niets met dat bestand.
 
-## Open bugs in `engine.js` (in main, niet gefixt)
+## engine.js-bugs — GEFIXT (2026-08-01, direct in main)
 
-Deze zaten in een fix-branch die nooit geland is en op 2026-07-31 is opgeruimd.
-Ze staan hier omdat het echte bugs in verscheepte code zijn, niet omdat de
-branch bewaard moet blijven.
+De drie bugs hieronder zijn gefixt in `engine.js`, de bundels hergenereerd met
+het nieuwe `build.mjs`, guards groen, en RED→GREEN bewezen tegen de verscheepte
+`.min.js` in een vm-sandbox (oud: #1/#2/#3 + disposer falen; nieuw: alles groen).
+De beschrijvingen blijven staan als vindbaar spoor van wat er speelde en hoe het
+opgelost is.
 
 1. **`destroy()` ruimt niet op wat `create()` toevoegde.** De aangemaakte
    DOM-kinderen blijven staan na `VanillaWaves.destroy(el)`. Fix: onthoud bij
@@ -69,8 +71,8 @@ branch bewaard moet blijven.
    element bevriest. Fix: string-seeds hashen naar een stabiel getal en speed
    afklemmen op een eindige waarde.
 
-Ontbrekend randje: er is ook geen `def.destroy(state, node)`-haak, zodat
-renderers eigen timers en listeners niet kunnen vrijgeven.
+Toegevoegd bij dezelfde fix: een optionele `def.destroy(state, node)`-haak, zodat
+renderers eigen timers en listeners kunnen vrijgeven wanneer `destroy()` loopt.
 
 ## Weggegooid op 2026-07-31
 
@@ -87,9 +89,8 @@ hierboven. Wat erin zat, staat hier zodat de keuze navolgbaar blijft:
 bewijst dat de bundels overeenkomen met de core, en meldde op 2026-07-31 dat de
 huidige bundels correct zijn (8620 checks, 35 waves overal).
 
-Wat nog ontbreekt is de **bouwkant**. Er is geen script dat
-`vanilla.waves.js` en `vanilla.waves.min.js` opnieuw genereert uit
-`waves-core.js` + `engine.js`. Zolang dat zo is kan de core niet gewijzigd
-worden: elke wijziging maakt de bundels ongeldig en er is geen manier om ze bij
-te werken. Dat blokkeert ook de engine-bugs hierboven. Dit is de grootste
-resterende schuld.
+De **bouwkant** is terug: `build.mjs` genereert `vanilla.waves.js` en
+`vanilla.waves.min.js` uit `waves-core.js` + `engine.js` (terser 5.49.0, en het
+reproduceert de bestaande `.min.js` byte-identiek). Draai `node build.mjs` na
+elke core/engine-wijziging, dan de guards. Daarmee is de grootste schuld weg en
+waren de engine-bugs hierboven veilig te fixen.

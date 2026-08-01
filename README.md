@@ -155,19 +155,30 @@ VanillaWaves.destroy(myElement);   // or a selector, NodeList, or nothing for al
 
 | Call | Does |
 |---|---|
-| `VanillaWaves.register(name, { create, update? })` | define an element type |
+| `VanillaWaves.register(name, { create, update?, destroy? })` | define an element type |
 | `VanillaWaves.init(target?)` | wire up `[data-wv]` (or a selector / element / NodeList) |
 | `VanillaWaves.destroy(target?)` | stop and clean up |
 
 `create(node, opts, helpers)` returns your state object; `update(state, t)`
-mutates the DOM each frame. **Helpers:** `makeSampler(extra?)` (a sampler with
+mutates the DOM each frame; optional `destroy(state, node)` releases anything you
+allocated (timers, listeners). **Helpers:** `makeSampler(extra?)` (a sampler with
 element-friendly defaults), `norm(v)` (maps about [-1,1] to [0,1]),
 `num(v, default)`, `el(tag, class?)`.
+
+`destroy` removes only the nodes `create` added (author content stays), runs your
+`destroy` disposer, and restores `aria-hidden` — so `destroy()` then `init()`
+re-renders cleanly instead of duplicating children.
 
 **Conventions:** marker attribute `data-wv`, ready class `wv--ready`, shared loop
 at 30 fps, `data-*` attributes become `opts`, `data-speed` scales time. CSS
 class and element names use a `wv-` prefix, never dots (`p5.waves.loader` is not
 a valid selector).
+
+**Accessibility & seeds.** Decorative elements get `aria-hidden="true"`
+automatically; opt out with `data-decorative="false"` (or set your own
+`aria-hidden`) and the engine leaves it alone. `data-seed` may be any string —
+non-numeric seeds are hashed to a stable start offset, so they animate like
+numeric ones.
 
 ---
 

@@ -64,6 +64,9 @@
   function norm(v) { return v < -1 ? 0 : v > 1 ? 1 : (v + 1) / 2; }
   function num(v, d) { return (v === undefined || v === '') ? d : Number(v); }
   function el(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
+  // Core accepteert string-seeds; de engine-starttijd niet (Number('abc') = NaN).
+  // Saniteer hier: niet-numerieke seeds → stabiele hash, zodat t nooit NaN wordt.
+  function hashSeed(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
 
   // ─── Loop-beheer ────────────────────────────────────────────────────────────
   function frame(now) {
@@ -121,16 +124,28 @@
         norm: norm, num: num, el: el, W: W
       };
       var seed = Number(opts.seed);
+      if (!isFinite(seed)) seed = hashSeed(String(opts.seed));   // geen NaN-tijd
+      var spd = num(opts.speed, 1);
+      if (!isFinite(spd)) spd = 1;                               // geen NaN-tijd
+      // Onthoud wat er al stond, zodat destroy() exact opruimt wat create()
+      // toevoegt en bestaande auteur-inhoud ongemoeid laat.
+      var baseChildren = node.children ? node.children.length : 0;
       var state = def.create(node, opts, helpers);
+      // aria-hidden alleen forceren als de auteur niets opgaf en niet expliciet
+      // opt-out doet (data-decorative="false"). Niet elk element is decoratief.
+      var ariaSet = node.getAttribute('aria-hidden') === null && opts.decorative !== 'false';
+      if (ariaSet) node.setAttribute('aria-hidden', 'true');
       items.set(node, {
         state: state,
         update: def.update || null,
+        dispose: def.destroy || null,
+        base: baseChildren,
+        ariaSet: ariaSet,
         visible: true,
-        speed: num(opts.speed, 1),
+        speed: spd,
         t: (seed % 97) * 0.37          // eigen startpunt per seed
       });
       if (io) io.observe(node);
-      node.setAttribute('aria-hidden', 'true');   // decoratief
       node.classList.add('wv--ready');
     });
     // Reduced-motion: render één statisch frame i.p.v. te animeren.
@@ -144,8 +159,19 @@
   // Stop en ruim op (bv. wanneer het laden klaar is).
   W.destroy = function (target) {
     Array.prototype.forEach.call(resolveTargets(target), function (node) {
-      if (!items.has(node)) return;
+      var it = items.get(node);
+      if (!it) return;
       if (io) io.unobserve(node);
+      // Optionele disposer: def.destroy(state, node) — voor renderers die
+      // eigen resources moeten vrijgeven (timers, listeners, ...).
+      if (it.dispose) { try { it.dispose(it.state, node); } catch (e) {} }
+      // Ruim enkel op wat create() toevoegde; laat oorspronkelijke inhoud staan.
+      if (node.children) {
+        while (node.children.length > it.base) {
+          node.removeChild(node.children[node.children.length - 1]);
+        }
+      }
+      if (it.ariaSet && node.removeAttribute) node.removeAttribute('aria-hidden');
       items.delete(node);
       node.classList.remove('wv--ready');
     });
