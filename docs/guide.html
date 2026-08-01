@@ -6,7 +6,7 @@
   <title>Guide - vanilla.waves</title>
   <meta name="description" content="Install, the math, the DOM engine, options, sampler, shift, morph, wild, and canvasless starters for vanilla.waves.">
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.0/vanilla.waves.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.1/vanilla.waves.min.js"></script>
   <script src="waves-demos.js"></script>
 </head>
 <body>
@@ -54,7 +54,7 @@
 
     <h3>Route A: CDN (jsDelivr)</h3>
     <p>One tag pulls the math (<code class="inl">waves-core.js</code>) plus the DOM engine (<code class="inl">engine.js</code>):</p>
-    <pre class="code-block">&lt;script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.0/vanilla.waves.min.js"&gt;&lt;/script&gt;</pre>
+    <pre class="code-block">&lt;script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.1/vanilla.waves.min.js"&gt;&lt;/script&gt;</pre>
 
     <h3>Route B: Local</h3>
     <p>Copy <code class="inl">vanilla.waves.min.js</code> (or <code class="inl">vanilla.waves.js</code> for the readable build) next to your HTML and point a <code class="inl">&lt;script&gt;</code> at it. Want <em>only</em> the math, no engine? Load <code class="inl">waves-core.js</code> on its own.</p>
@@ -63,7 +63,7 @@
     <p>Using a bundler, or a module-based renderer like three.js? <code class="inl">waves-core.mjs</code> is the module entry on the math:</p>
     <pre class="code-block">import { createSampler, wave } from './waves-core.mjs';</pre>
     <p>It holds no formulas of its own: it imports <code class="inl">waves-core.js</code> for its side effect and re-exports it, so there is exactly one copy of the canonical math and the module layer cannot drift from it. Works in the browser, in Node and in bundlers, and it leaves the globals in place so both routes can coexist on one page. The DOM engine is <em>not</em> part of it, being browser-only and self-initialising. Full detail on the <a href="interop.html#esm">Interop page</a>.</p>
-    <div class="callout"><p><span class="note">on the CDN</span> From <code class="inl">v0.3.0</code> the module entry ships on jsDelivr too: <code class="inl">import { createSampler, wave } from 'https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.0/waves-core.mjs';</code> Or copy it locally for a fully offline, zero-dependency setup.</p></div>
+    <div class="callout"><p><span class="note">on the CDN</span> From <code class="inl">v0.3.1</code> the module entry ships on jsDelivr too: <code class="inl">import { createSampler, wave } from 'https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.1/waves-core.mjs';</code> Or copy it locally for a fully offline, zero-dependency setup.</p></div>
 
     <div class="callout">
       <p><span class="note">global</span> The library exposes <code class="inl">VanillaWaves</code> (alias <code class="inl">vWaves</code>, and <code class="inl">Waves</code> as a drop-in when p5.waves isn't present).</p>
@@ -341,7 +341,7 @@ const s = VanillaWaves.createSampler({ shift: true, range: [-1, 1] });
 
   <footer>
     <p>Zero-dependency vanilla-JS port of the <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> dialect · baseline v3.6.0</p>
-    <p class="footer-sub">MIT License · v0.3.0 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
+    <p class="footer-sub">MIT License · v0.3.1 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
   </footer>
 
 </body>

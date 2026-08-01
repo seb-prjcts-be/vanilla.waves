@@ -65,7 +65,7 @@ import * as THREE from 'three';
 
 const s = createSampler({ shift: true, group: 'gentle', range: [-1, 1] });</pre>
     <p>That file holds no math of its own. It imports <code class="inl">waves-core.js</code> for its side effect and re-exports the result, so there is exactly one copy of the canonical formulas and the module layer cannot drift away from it. It also leaves the globals in place, so mixing the two routes in one page is harmless.</p>
-    <div class="callout"><p><span class="note">on the CDN</span> Since <code class="inl">v0.3.0</code> the module entry ships on jsDelivr: <code class="inl">import { createSampler, wave, list } from 'https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.0/waves-core.mjs';</code> Or copy it next to your code for a fully local, zero-dependency setup.</p></div>
+    <div class="callout"><p><span class="note">on the CDN</span> Since <code class="inl">v0.3.1</code> the module entry ships on jsDelivr: <code class="inl">import { createSampler, wave, list } from 'https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.1/waves-core.mjs';</code> Or copy it next to your code for a fully local, zero-dependency setup.</p></div>
     <p>The classic route still works and is what you want when the DOM engine comes along, since the engine is browser-only and self-initialising. Load the script first, read the global inside your module:</p>
     <pre class="code-block">&lt;script src="waves-core.js"&gt;&lt;/script&gt;
 &lt;script type="importmap"&gt;
@@ -272,7 +272,7 @@ export default W;</pre>
 
   <footer>
     <p>Zero-dependency vanilla-JS port of the <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank" rel="noopener">p5.waves</a> dialect · baseline v3.6.0</p>
-    <p class="footer-sub">MIT License · v0.3.0 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
+    <p class="footer-sub">MIT License · v0.3.1 · <a href="https://github.com/seb-prjcts-be/vanilla.waves" target="_blank" rel="noopener">GitHub</a></p>
   </footer>
 
 </body>
