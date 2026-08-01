@@ -44,7 +44,7 @@ fields, meters, any DOM element**, with nothing else loaded.
 ### CDN (jsDelivr): one tag, everything
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.2.0/vanilla.waves.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.0/vanilla.waves.min.js"></script>
 ```
 
 That bundle is `waves-core.js` (the math) plus `engine.js` (the DOM loop). Want
@@ -194,9 +194,9 @@ it. Works in browsers, in Node and in bundlers, with no build step. The DOM
 engine is not part of it, load `vanilla.waves.js` with a `<script>` tag for
 that. There is no npm package yet, so import by path.
 
-> **Not on the CDN yet.** `waves-core.mjs` landed after the `v0.2.0` tag, so the
-> pinned jsDelivr path 404s for it. Copy it locally, or use `@main` until the
-> next tag ships. The pinned bundle itself is fine.
+> **On the CDN (from `v0.3.0`).** Import the module entry straight from jsDelivr:
+> `import { createSampler, wave } from 'https://cdn.jsdelivr.net/gh/seb-prjcts-be/vanilla.waves@v0.3.0/waves-core.mjs'`
+> — or copy it locally for a fully offline setup.
 
 Four verified three.js patterns (displaced geometry, the seamless closing ring,
 an instanced 2D field, and the wave baked into a GPU lookup texture), plus the
