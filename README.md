@@ -1,3 +1,5 @@
+https://seb-prjcts-be.github.io/vanilla.waves/
+
 # vanilla.waves
 
 > **Pure mathematical waves for DOM objects.**
