@@ -15,7 +15,9 @@
  * License: MIT · seb@prjcts
  */
 import fs from 'node:fs';
-import { execSync } from 'node:child_process';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 const HEADER =
 `/*!
@@ -30,8 +32,27 @@ const core   = stripBom(fs.readFileSync('waves-core.js', 'utf8')).trimEnd();
 const engine = stripBom(fs.readFileSync('engine.js', 'utf8')).trimEnd();
 
 const bundle = HEADER + core + '\n\n' + engine + '\n';
-fs.writeFileSync('vanilla.waves.js', bundle);
-console.log('wrote vanilla.waves.js  (' + bundle.length + ' chars)');
+const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vanilla.waves-build-'));
+const tempBundle = path.join(tempDir, 'vanilla.waves.js');
+const tempMinified = path.join(tempDir, 'vanilla.waves.min.js');
+const terserArgs = [
+  '--yes', '--package', 'terser@5.49.0', 'terser', tempBundle,
+  '--compress', '--mangle', '--output', tempMinified
+];
 
-execSync('npx --no-install terser vanilla.waves.js --compress --mangle --output vanilla.waves.min.js', { stdio: 'inherit' });
-console.log('wrote vanilla.waves.min.js  (' + fs.statSync('vanilla.waves.min.js').size + ' bytes)');
+try {
+  fs.writeFileSync(tempBundle, bundle);
+  if (process.platform === 'win32') {
+    const npxCli = path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npx-cli.js');
+    execFileSync(process.execPath, [npxCli, ...terserArgs], { stdio: 'inherit' });
+  } else {
+    execFileSync('npx', terserArgs, { stdio: 'inherit' });
+  }
+
+  fs.renameSync(tempBundle, 'vanilla.waves.js');
+  fs.renameSync(tempMinified, 'vanilla.waves.min.js');
+  console.log('wrote vanilla.waves.js  (' + bundle.length + ' chars)');
+  console.log('wrote vanilla.waves.min.js  (' + fs.statSync('vanilla.waves.min.js').size + ' bytes)');
+} finally {
+  fs.rmSync(tempDir, { recursive: true, force: true });
+}

@@ -389,6 +389,7 @@ section[id], h2[id] { scroll-margin-top: 62px; }
 @media (max-width: 900px) {
   #navbar { padding: 0.85rem 1.5rem; }
   .ex-grid { grid-template-columns: 1fr; }
+  .opts-table, .period-table { display: block; max-width: 100%; overflow-x: auto; }
   .nav-hamburger { display: flex; }
   .nav-links {
     display: none;
