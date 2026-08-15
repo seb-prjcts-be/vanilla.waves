@@ -2,7 +2,3 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
-.claude/
-
-# project working log — local only
-cloud.md

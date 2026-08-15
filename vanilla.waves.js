@@ -111,7 +111,7 @@
   // otherwise not-calm (unbounded/Inf, or erratic accelerating rhythm).
   // 'gentle' = calm and bounded, including sharp-but-periodic (square, pulse)
   // and steady non-periodic waves (ramp up sine, triangle sine, meta sine).
-  // See strategy.md §0 — group: 'harsh' picks BEFORE wave selection;
+  // group: 'harsh' picks BEFORE wave selection;
   // mode: 'wild' warps WITHIN one wave. They are orthogonal.
   const CHARACTER = [
     'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle',
@@ -330,7 +330,7 @@
   // `group` narrows the pool BEFORE wave selection (orthogonal to `mode`).
   // Accepts: 'all' / null (full pool), 'gentle', 'harsh', or an array of
   // names/indices. Unresolvable entries are silently dropped; empty result
-  // falls back to the full pool. See strategy.md §0.
+  // falls back to the full pool.
 
   function resolveGroup(opt) {
     if (opt == null) return null;
